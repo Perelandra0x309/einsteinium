@@ -1,0 +1,19 @@
+Critical:
+-Keep updated recent and ranked lists for immediate use by apps (instead of recalculating the list for every request)
+-add version number to databases
+-add MIME type to created databases
+-new AppAttrFile looks for an existing database
+-optimize for speed
+-provide a -10 to 10 range for setting statistic weight in calculations (so at -10 more launches pushes app to lower rank, for example)
+
+Soon:
+-Enable a filtering system
+-Automatically ignore background apps
+-Function to create symlinks in given directory (accessable via sent BMessage).
+-Add new attributes for recent apps, improve ranking system
+
+Later:
+-Catch opened documents
+-Catch opened folders
+-Catch opened URLs
+-System uptime log

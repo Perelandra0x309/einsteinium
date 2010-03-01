@@ -1,0 +1,53 @@
+This file should be easiest to read in StyledEdit under BeOS R4.5 or higher. If the file gets extracted or moved to a non-BFS volume, the font sizes, wieghts and colors will be lost. 
+
+Possible attribute list:
+
+name
+filename
+rank
+checksum
+class: [ app_sig | mimetype ]
+path: /boot/home/whatever
+ignore: [ yes | no ]
+owner: { app_sig1: [ position | ignore ] | app_sig2: [ position | ignore ] }
+date_last_act
+date_first_act
+last_int
+avg_daily_int
+int_reg
+daily_int_reg
+
+Definitions:
+name = the name of the application or document, if renamed by the user this will differ from filename and the interface should usually choose to display this instead of the actual filename
+
+filename = real name of the file according to the file system
+
+rank = increasing number calculated by the engine according to number of activations, number of other entries in the database, interval regularity, and dates of activations of each entry
+
+checksum = might allow a document (non-application) to be identified and maintain its position on the list even if the user renames it
+
+class = application signature or document mimetype
+
+ignore = if "yes", no interfaces or applications will display this entry no matter what its rank is, although the rank will still be calculated in case the user wishes to un-ignore it sometime
+
+owner = interfaces or applications that will display this entry, with "position" this entry will be locked into a specific position in that application's display, with "ignore" only that application will ignore this entry. Other applications will only display the entry if its rank is high enough to put it within the X number of entries they display.
+
+date_last_act = last time this entry was opened/activated
+
+date_first_act = first time the engine became aware of this entry being opened/activated
+
+last_int = time interval between the last two activations
+
+avg_daily_int = average time interval on a daily basis, this will help identify applications that get used on a daily basis but perhaps not at regular intervals, for instance someone might check their mail three times a day, morning noon and early afternoon before leaving work-- the interval would be irregular but the daily average would be pretty regular
+
+int_reg = this will attempt to statistically identify applications that aren't used very often but are used at regular intervals 
+
+daily_int_reg = same as above using avg_daily_int instead of last_int
+
+Usage
+It should be trivial to create a daemon that regularly takes the first X entries according to rank and makes symlinks in any folder (hint: a Recent Apps/Docs folder under /boot/home/config/be) like this:
+
+ln -s /path/to/app/filename /path/to/destination/name
+
+It's so simple it's a bit mind-boggling. Go BeOS!
+
