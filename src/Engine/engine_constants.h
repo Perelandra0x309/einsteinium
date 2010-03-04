@@ -43,6 +43,9 @@
 //Defaults
 #define DEFAULTVALUE_LAUNCHES 5
 
+// Other text
+#define EE_SHELFVIEW_NAME "ee_shelfview"
+
 //Indexes
 enum scales_index
 {	LAUNCH_INDEX=0,
@@ -63,7 +66,8 @@ enum engine_messages
 	E_UPDATE_QUARTILES='Eupq',
 	E_RESCAN_DATA_FILES,
 	E_UPDATE_SCORES,
-	E_SET_IGNORE_ATTR
+	E_SET_IGNORE_ATTR,
+	E_SHELFVIEW_OPEN
 };
 enum attr_file_methods
 {	UPDATE_ATTR_SCORE=0,

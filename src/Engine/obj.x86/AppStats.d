@@ -1,4 +1,0 @@
-# --- DO NOT MODIFY THIS LINE -- AUTO-DEPENDS FOLLOW ---
-obj.x86/AppStats.o : AppStats.h
-
-# --- DO NOT MODIFY THIS LINE -- AUTO-DEPENDS PRECEDE ---

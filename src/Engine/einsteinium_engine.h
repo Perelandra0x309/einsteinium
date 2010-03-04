@@ -4,6 +4,7 @@
 #ifndef EINSTEINIUM_ENGINE_H
 #define EINSTEINIUM_ENGINE_H
 #include <AppKit.h>
+#include <Deskbar.h>
 #include <StorageKit.h>
 #include <stdio.h>
 #include "engine_constants.h"
@@ -11,6 +12,7 @@
 #include "AppStats.h"
 #include "AppAttrFile.h"
 #include "EESettingsFile.h"
+#include "EEShelfView.h"
 
 
 //Einsteinium Engine is an inherited subclass of BApplication to
@@ -34,6 +36,8 @@ private:
 	const time_t	ee_session;//current session number
 	double			quartiles[30];
 	BList			appsList;
+	BView*			shelfView;
+	int32			shelfViewId;
 	void			forEachAttrFile(int);
 	void			rescanAllAttrFiles();
 	void			rescanAttrFile(BEntry*);

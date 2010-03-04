@@ -9,6 +9,7 @@ einsteinium_engine::einsteinium_engine()//Einsteinium Engine Constructor
 	,watchingRoster(false)//initially roster is not being watched
 	,quartileRunner(NULL)
 	,ee_session(time(NULL))
+	,shelfViewId(0)
 {
 //	printf("ee_session=%i\n", ee_session);
 	//Create settings directories if they are not found
@@ -70,6 +71,13 @@ bool einsteinium_engine::QuitRequested()//clean up
 	// TODO wait for all messages to clear the message queue
 
 
+	// Remove shelf view
+	if(shelfViewId)
+	{
+		BDeskbar deskbar;
+		deskbar.RemoveItem(shelfViewId);
+	}
+
 	printf("Einsteinium engine quitting.\n");
 	return BApplication::QuitRequested();
 }
@@ -94,6 +102,12 @@ void einsteinium_engine::ReadyToRun()//Run right after app is ready
 	{	delete quartileRunner;
 		quartileRunner = NULL;
 	}
+
+	// Add the shelf view
+	BDeskbar deskbar;
+	shelfView = new EEShelfView(BRect(0, 0, 15, 15));
+	deskbar.AddItem(shelfView, &shelfViewId);
+//	delete shelfView;
 }
 
 

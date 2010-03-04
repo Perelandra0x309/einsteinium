@@ -2,6 +2,7 @@ NAME := einsteinium_engine
 TYPE := APP
 SRCS := methods.cpp \
 		db_interface.cpp \
+		EEShelfView.cpp \
 		EESettingsFile.cpp \
 		AppStats.cpp \
 		AppAttrFile.cpp \
@@ -9,7 +10,7 @@ SRCS := methods.cpp \
 		main.cpp
 LIBS := be stdc++.r4 xml2 sqlite3
 OPTIMIZE := FULL
-RSRCS := einsteinium_engine.rsrc
+RSRCS := einsteinium_engine.rsrc ../Icons/EsIcons.rsrc
 
 #       Specify your RDEF files, if any.
 RDEFS :=
@@ -30,7 +31,7 @@ SYSTEM_INCLUDE_PATHS := /boot/common/include/libxml2 /boot/common/include
 #       additional paths to look for local headers
 #       thes use the form: #include "header.h"
 #       source file directories are automatically included
-LOCAL_INCLUDE_PATHS :=
+LOCAL_INCLUDE_PATHS := ../Icons
 
 #       specify any preprocessor symbols to be defined.  The symbols will not
 #       have their values set automatically; you must supply the value (if any)
