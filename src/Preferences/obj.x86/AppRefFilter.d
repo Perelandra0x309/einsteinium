@@ -1,4 +1,0 @@
-# --- DO NOT MODIFY THIS LINE -- AUTO-DEPENDS FOLLOW ---
-obj.x86/AppRefFilter.o : AppRefFilter.h
-
-# --- DO NOT MODIFY THIS LINE -- AUTO-DEPENDS PRECEDE ---
