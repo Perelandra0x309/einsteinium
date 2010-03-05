@@ -1,6 +1,4 @@
-/* DeskbarView - mail_daemon's deskbar menu and view
- *
- * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
+/*
  */
 
 
@@ -20,10 +18,43 @@ BView* instantiate_deskbar_item(void)
 
 EEShelfView::EEShelfView(BRect frame)
 	:BView(frame, EE_SHELFVIEW_NAME, B_FOLLOW_NONE,
-		B_WILL_DRAW | B_FRAME_EVENTS /*B_PULSE_NEEDED*/),
+		B_WILL_DRAW/* | B_FRAME_EVENTS /*B_PULSE_NEEDED*/),
 	fIcon(NULL)
 {
-	_InitBitmaps();
+	app_info info;
+	be_app->GetAppInfo(&info);
+	BFile file(&info.ref, B_READ_ONLY);
+
+	if (file.InitCheck() != B_OK)
+		return;
+
+	BResources resources(&file);
+	size_t size = 0;
+	const uint8* rawIcon;
+	rawIcon = (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE,
+		ES_ICON_ENGINE_SHELF, &size);
+
+	if (rawIcon != NULL)
+	{
+		fIcon = new BBitmap(Bounds(), B_RGBA32);
+		if (fIcon->InitCheck() == B_OK)
+		{
+			if(BIconUtils::GetVectorIcon(rawIcon, size, fIcon) != B_OK)
+			{
+				printf("Error getting Vector\n");
+				delete fIcon;
+				fIcon = NULL;
+			}
+		}
+		else
+		{
+			printf("Error creating bitmap\n");
+		}
+	}
+	else printf("rawIcon was NULL\n");
+	printf("Icon = %i\n", fIcon);
+
+	SetToolTip("Einsteinium  \nRanked\nApplications");
 }
 
 
@@ -31,7 +62,14 @@ EEShelfView::EEShelfView(BMessage *message)
 	:BView(message),
 	fIcon(NULL)
 {
-	_InitBitmaps();
+	BMessage iconArchive;
+	status_t result = message->FindMessage("fIconArchive", &iconArchive);
+	if(result == B_OK)
+	{
+		fIcon = new BBitmap(&iconArchive);
+	}
+	// Apparently Haiku does not yet archive tool tips (Alpha-1 R1)
+	SetToolTip("Einsteinium  \nRanked\nApplications");
 }
 
 
@@ -45,11 +83,11 @@ EEShelfView::~EEShelfView()
 void EEShelfView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
-/*	if (Parent())
+	if (Parent())
 		SetViewColor(Parent()->ViewColor());
 	else
 		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetLowColor(ViewColor());*/
+	SetLowColor(ViewColor());
 
 	if (!be_roster->IsRunning(e_engine_sig)) {
 		BDeskbar deskbar;
@@ -75,13 +113,19 @@ status_t EEShelfView::Archive(BMessage *data, bool deep) const
 	BView::Archive(data, deep);
 	data->AddString("add_on", e_engine_sig);
 	data->AddString("class", "EEShelfView");
+	if(fIcon != NULL)
+	{
+		BMessage archive;
+		fIcon->Archive(&archive);
+		data->AddMessage("fIconArchive", &archive);
+	}
 	return B_NO_ERROR;
 }
 
 
 void EEShelfView::Draw(BRect rect)
 {
-	printf("Drawing shelf\n");
+//	printf("Drawing shelf\n");
 	if (fIcon == NULL)
 		return;
 
@@ -103,7 +147,7 @@ void EEShelfView::MessageReceived(BMessage* msg)
 	}
 }
 
-
+/*
 void EEShelfView::_InitBitmaps()
 {
 	app_info info;
@@ -122,15 +166,23 @@ void EEShelfView::_InitBitmaps()
 	if (rawIcon != NULL)
 	{
 		fIcon = new BBitmap(Bounds(), B_RGBA32);
-		if(BIconUtils::GetVectorIcon(rawIcon, size, fIcon) != B_OK)
+		if (fIcon->InitCheck() == B_OK)
 		{
-			printf("Error getting Vector\n");
-			delete fIcon;
-			fIcon = NULL;
+			if(BIconUtils::GetVectorIcon(rawIcon, size, fIcon) != B_OK)
+			{
+				printf("Error getting Vector\n");
+				delete fIcon;
+				fIcon = NULL;
+			}
+		}
+		else
+		{
+			printf("Error creating bitmap\n");
 		}
 	}
+	else printf("rawIcon was NULL\n");
 	printf("Icon = %i\n", fIcon);
-}
+}*/
 
 /*
 void EEShelfView::Pulse()

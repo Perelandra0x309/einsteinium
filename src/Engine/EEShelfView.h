@@ -1,6 +1,4 @@
-/* DeskbarView - mail_daemon's deskbar menu and view
- *
- * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
+/*
  */
 #ifndef EE_SHELF_VIEW_H
 #define EE_SHELF_VIEW_H
@@ -33,7 +31,7 @@ public:
 
 private:
 	BPopUpMenu*			_BuildMenu();
-	void				_InitBitmaps();
+//	void				_InitBitmaps();
 	BBitmap*			fIcon;
 };
 
