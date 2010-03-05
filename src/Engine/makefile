@@ -8,7 +8,7 @@ SRCS := methods.cpp \
 		AppAttrFile.cpp \
 		einsteinium_engine.cpp \
 		main.cpp
-LIBS := be stdc++.r4 xml2 sqlite3
+LIBS := be tracker stdc++.r4 xml2 sqlite3
 OPTIMIZE := FULL
 RSRCS := einsteinium_engine.rsrc ../Icons/EsIcons.rsrc
 
@@ -31,7 +31,7 @@ SYSTEM_INCLUDE_PATHS := /boot/common/include/libxml2 /boot/common/include
 #       additional paths to look for local headers
 #       thes use the form: #include "header.h"
 #       source file directories are automatically included
-LOCAL_INCLUDE_PATHS := ../Icons
+LOCAL_INCLUDE_PATHS := ../Icons Tracker
 
 #       specify any preprocessor symbols to be defined.  The symbols will not
 #       have their values set automatically; you must supply the value (if any)

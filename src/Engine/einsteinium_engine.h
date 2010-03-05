@@ -14,7 +14,10 @@
 #include "EESettingsFile.h"
 #include "EEShelfView.h"
 
-
+struct Subscriber {
+	int32 count;
+	BMessenger messenger;
+};
 //Einsteinium Engine is an inherited subclass of BApplication to
 //enabled the use of BMessages to the system and other apps
 class einsteinium_engine : public BApplication
@@ -35,7 +38,7 @@ private:
 	BMessageRunner	*quartileRunner;
 	const time_t	ee_session;//current session number
 	double			quartiles[30];
-	BList			appsList;
+	BList			appsList, subscribersList;
 	BView*			shelfView;
 	int32			shelfViewId;
 	void			forEachAttrFile(int);

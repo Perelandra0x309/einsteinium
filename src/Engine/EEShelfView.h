@@ -6,9 +6,11 @@
 
 #include <InterfaceKit.h>
 #include <Application.h>
+#include <StorageKit.h>
 #include <Roster.h>
 #include <Deskbar.h>
 #include <Resources.h>
+#include "IconMenuItem.h"
 #include "EsIcons.h"
 #include "IconUtils.h"
 #include "engine_constants.h"
@@ -30,9 +32,9 @@ public:
 //	virtual void		Pulse();
 
 private:
-	BPopUpMenu*			_BuildMenu();
-//	void				_InitBitmaps();
+	BPopUpMenu*			_BuildMenu(BMessage *message);
 	BBitmap*			fIcon;
+	BPopUpMenu*			fMenu;
 };
 
 #endif	/* EE_SHELF_VIEW_H */

@@ -70,6 +70,10 @@ bool einsteinium_engine::QuitRequested()//clean up
 
 	// TODO wait for all messages to clear the message queue
 
+	// Delete subscribers list items
+	Subscriber *sub;
+	deleteList(subscribersList, sub);
+	subscribersList.MakeEmpty();
 
 	// Remove shelf view
 	if(shelfViewId)
@@ -172,6 +176,7 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 					}
 				}
 				appFile.Close();//Write attributes to file
+
 			}
 			else//no signature found
 			{	printf("Application has no signature.\n"); }
@@ -180,6 +185,33 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 	/*	case B_SOME_APP_ACTIVATED: {//An application brought to the front??
 
 			break; }*/
+		case E_SUBSCRIBE_RANKED_APPS: {
+			printf("Received subscription message\n");
+			Subscriber* newSubscriber = new Subscriber();
+			status_t result = msg->FindMessenger("messenger", &(newSubscriber->messenger));
+			if(result != B_OK)
+			{
+				printf("Einsteinium Engine received invalid subscriber messenger.\n");
+				delete newSubscriber;
+				break;
+			}
+			int32 count;
+			result = msg->FindInt32("count", &(newSubscriber->count));
+			if(result != B_OK)
+				count = 10;  //set a default value
+			subscribersList.AddItem(newSubscriber);
+
+			// Test message
+			BMessage test(E_SUBSCRIBER_UPDATE_RANKED_APPS);
+			entry_ref ref;
+			be_roster->FindApp("application/x-vnd.Einsteinium_Preferences", &ref);
+			test.AddRef("refs", &ref);
+			be_roster->FindApp(e_engine_sig, &ref);
+			test.AddRef("refs", &ref);
+			newSubscriber->messenger.SendMessage(&test);
+
+			break;
+		}
 		case E_PRINT_RECENT_APPS:
 		case E_PRINT_RANKING_APPS: {//print the recent list to the terminal
 		//	printf("Constructing Recent Apps List:\n");
