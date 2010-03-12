@@ -39,8 +39,10 @@ private:
 	const time_t	ee_session;//current session number
 	double			quartiles[30];
 	BList			appsList, subscribersList;
-	BView*			shelfView;
+	BQuery			rankQuery;
+	BView			*shelfView;
 	int32			shelfViewId;
+	void			DoRankQuery();
 	void			forEachAttrFile(int);
 	void			rescanAllAttrFiles();
 	void			rescanAttrFile(BEntry*);

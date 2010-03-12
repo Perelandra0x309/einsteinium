@@ -88,7 +88,16 @@ bool einsteinium_engine::QuitRequested()//clean up
 
 
 void einsteinium_engine::ReadyToRun()//Run right after app is ready
-{	//Start watching the application roster for launches/quits/activations
+{
+	// Create the attribute file indexes
+/*	BVolumeRoster v_roster;
+	BVolume vol;
+	v_roster.GetBootVolume(&vol);
+	dev_t device = vol.Device();
+	//fs_create_index(device, stringIndices[i], B_STRING_TYPE, 0);
+	fs_create_index(device, ATTR_IGNORE_NAME, B_BOOL_TYPE, 0);*/
+
+	//Start watching the application roster for launches/quits/activations
 	if (be_roster->StartWatching(be_app_messenger,
 				B_REQUEST_QUIT | B_REQUEST_LAUNCHED/* | B_REQUEST_ACTIVATED*/) != B_OK)
 	{	//roster failed to be watched.  Should we continue or just quit???
@@ -176,7 +185,7 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 					}
 				}
 				appFile.Close();//Write attributes to file
-
+				DoRankQuery();
 			}
 			else//no signature found
 			{	printf("Application has no signature.\n"); }
@@ -302,6 +311,46 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 		default: BApplication::MessageReceived(msg);//The message may be for the application
 	}
 }
+
+void einsteinium_engine::DoRankQuery()
+{
+	//create query
+	//find ~/config/settings/Einsteinium/Applications directory
+	BPath appSettingsPath(settingsDirPath);
+	appSettingsPath.Append(e_settings_app_dir);
+	printf("Getting attr files\n");
+	BDirectory attrDir(appSettingsPath.Path());
+	entry_ref entry;
+	while(attrDir.GetNextRef(&entry) == B_OK)
+	{
+
+		printf("found entry %s\n", entry.name);
+
+	}
+/*	printf("Running rank query\n");
+	BVolumeRoster v_roster;
+	BVolume vol;
+	v_roster.GetBootVolume(&vol);
+	rankQuery.Clear();
+	rankQuery.PushAttr("BEOS:TYPE");
+	rankQuery.PushString(e_app_attr_filetype);
+	rankQuery.PushOp(B_EQ);
+	rankQuery.SetVolume(&vol);
+	if(rankQuery.Fetch()!=B_OK)
+	{
+		printf("Error fetching query\n");
+		return;
+	}
+	entry_ref entry;
+
+	while(rankQuery.GetNextRef(&entry) == B_OK)
+	{
+		printf("Rank Query found entry %s\n", entry.name);
+	}
+	printf("Done query\n");*/
+
+}
+
 void einsteinium_engine::forEachAttrFile(int action)
 {
 	//create path for the application attribute files directory
