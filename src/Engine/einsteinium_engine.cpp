@@ -44,7 +44,7 @@ einsteinium_engine::einsteinium_engine()//Einsteinium Engine Constructor
 			return;
 		}
 	}
-	
+
 	//Initialize the settings file object and check to see if it instatiated correctly
 	settingsFile = new EESettingsFile();
 	status_t result = settingsFile->CheckStatus();
@@ -52,7 +52,7 @@ einsteinium_engine::einsteinium_engine()//Einsteinium Engine Constructor
 		printf("Error creating Einsteinium Daemon settings file.  Cannot continue.\n");
 		be_app->PostMessage(B_QUIT_REQUESTED);//Quit. Can we do anthything w/o settings?
 	}
-	
+
 	// TODO Register the signature of the preferences application
 }
 
@@ -66,23 +66,23 @@ bool einsteinium_engine::QuitRequested()//clean up
 	//Need to stop watching the roster
 	if(watchingRoster)
 	{	be_roster->StopWatching(be_app_messenger); }
-	
+
 	//disable timer
 	if(quartileRunner != NULL) { delete quartileRunner; }
-	
+
 	// TODO wait for all messages to clear the message queue
-	
+
 	// Delete subscribers list items
 	Subscriber *sub;
 	deleteList(subscribersList, sub);
-	
+
 	// Remove shelf view
 	if(shelfViewId)
 	{
 		BDeskbar deskbar;
 		deskbar.RemoveItem(shelfViewId);
 	}
-	
+
 	printf("Einsteinium engine quitting.\n");
 	return BApplication::QuitRequested();
 }
@@ -97,7 +97,7 @@ void einsteinium_engine::ReadyToRun()//Run right after app is ready
 	dev_t device = vol.Device();
 	//fs_create_index(device, stringIndices[i], B_STRING_TYPE, 0);
 	fs_create_index(device, ATTR_IGNORE_NAME, B_BOOL_TYPE, 0);*/
-	
+
 	//Start watching the application roster for launches/quits/activations
 	if (be_roster->StartWatching(be_app_messenger,
 				B_REQUEST_QUIT | B_REQUEST_LAUNCHED/* | B_REQUEST_ACTIVATED*/) != B_OK)
@@ -116,12 +116,12 @@ void einsteinium_engine::ReadyToRun()//Run right after app is ready
 	{	delete quartileRunner;
 		quartileRunner = NULL;
 	}
-	
+
 	// Add the shelf view
 	BDeskbar deskbar;
 	shelfView = new EEShelfView(BRect(0, 0, 15, 15));
 	deskbar.AddItem(shelfView, &shelfViewId);
-//	delete shelfView;
+	delete shelfView;
 }
 
 
@@ -175,29 +175,29 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 					break;//Can't do anything, so exit switch
 				}
 				AppAttrFile appFile(sig, &appEntry);//Open attribute file
-				
+
 				// If this app is not ignored, get the current rank
 				uint previous_rank = 0-1;
 				bool haveSubscribers = subscribersList.CountItems() > 0;
 				bool ignoredApp = appFile.getIgnore();
+				BList appStatsList;
 				if(haveSubscribers && !ignoredApp)
 				{
-					createAppList();
-					appsList.SortItems(AppStatsSortScore);
-					int count = appsList.CountItems();
+					appStatsList = CreateAppStatsList(SORT_BY_SCORE);
+					int count = appStatsList.CountItems();
 					for(int i=0; i<count; i++)
 					{
-						AppStats* stats = (AppStats*)appsList.ItemAt(i);
+						AppStats* stats = (AppStats*)appStatsList.ItemAt(i);
 						if(stats->app_sig.Compare(sig) == 0)
 						{
 							previous_rank = i + 1;
-							appsList.RemoveItem(stats);
+							appStatsList.RemoveItem(stats);
 							delete stats;
 							i = count;
 						}
 					}
 				}
-				
+
 				switch(msg->what)
 				{	case B_SOME_APP_LAUNCHED: {
 						appFile.UpdateAppLaunched();//Update object's data (times, score)
@@ -209,20 +209,19 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 					}
 				}
 				appFile.Close();//Write attributes to file
-				
+
 				if(haveSubscribers && !ignoredApp)
 				{
-				//	DoRankQuery();
 					// Get the new rank
 					AppStats *newStats = new AppStats();
 					appFile.CopyAppStatsInto(newStats);
-					appsList.AddItem(newStats);
-					appsList.SortItems(AppStatsSortScore);
+					appStatsList.AddItem(newStats);
+					SortAppStatsList(appStatsList, SORT_BY_SCORE);
 					uint current_rank = 0-1;
-					int count = appsList.CountItems();
+					int count = appStatsList.CountItems();
 					for(int i=0; i<count; i++)
 					{
-						AppStats* stats = (AppStats*)appsList.ItemAt(i);
+						AppStats* stats = (AppStats*)appStatsList.ItemAt(i);
 						if(stats->app_sig.Compare(sig) == 0)
 						{
 							current_rank = i + 1;
@@ -239,11 +238,11 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 							if( (previous_rank<=currentSub->count)
 								|| (current_rank<=currentSub->count) )
 							{
-								SendListToSubscriber(&appsList, currentSub);
+								SendListToSubscriber(&appStatsList, currentSub);
 							}
 						}
 					}
-					EmptyAppStatsList(appsList);
+					EmptyAppStatsList(appStatsList);
 				}
 			}
 			else//no signature found
@@ -265,10 +264,9 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 				break;
 			}
 			subscribersList.AddItem(newSubscriber);
-			createAppList();
-			appsList.SortItems(AppStatsSortScore);
-			SendListToSubscriber(&appsList, newSubscriber);
-			EmptyAppStatsList(appsList);
+			BList appStatsList = CreateAppStatsList(SORT_BY_SCORE);
+			SendListToSubscriber(&appStatsList, newSubscriber);
+			EmptyAppStatsList(appStatsList);
 			break;
 		}
 		// TODO unsubscribe message
@@ -276,49 +274,49 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 		case E_PRINT_RANKING_APPS: {//print the recent list to the terminal
 		//	printf("Constructing Recent Apps List:\n");
 			//create list of eligible apps
-			createAppList();
+			BList appStatsList = CreateAppStatsList();
 			switch(msg->what){
 				case E_PRINT_RECENT_APPS: {//sort apps by most recent
 					printf("Sorting list by most recent...\n");
-					appsList.SortItems(AppStatsSortLastLaunch);
+					SortAppStatsList(appStatsList, SORT_BY_LAST_LAUNCHTIME);
 					break; }
 				case E_PRINT_RANKING_APPS: {//sort apps by score
 					printf("Sorting list by score...\n");
-					appsList.SortItems(AppStatsSortScore);
+					SortAppStatsList(appStatsList, SORT_BY_SCORE);
 					break; }
 			}
 			//print results
 			printf("Ordered list of apps:\n");
 			AppStats *stats;
-			int count = appsList.CountItems();
+			int count = appStatsList.CountItems();
 			for(int i=0; i<count; i++)//print info for each AppAttrFile in the list
-			{	stats = (AppStats*)(appsList.ItemAt(i));
+			{	stats = (AppStats*)(appStatsList.ItemAt(i));
 				printf("%i: %s (%s)\n", i+1, stats->getSig(), stats->getFilename() );
 			}
-			EmptyAppStatsList(appsList);
+			EmptyAppStatsList(appStatsList);
 			break; }
 		case E_REPLY_RECENT_APPS:
 		case E_REPLY_RANKING_APPS: {//Send a reply back to another app with data from the recent apps list
 			int16 reply_count = 0;
 			msg->FindInt16("count", &reply_count);//number of apps requested to return
 			//create list of eligible apps
-			createAppList();//created list
+			BList appStatsList = CreateAppStatsList();
 			BMessage replymsg;//Create reply BMessage
 			switch(msg->what)
 			{	case E_REPLY_RECENT_APPS: {//sort apps by recent
 					printf("Sorting list by most recent...\n");
-					appsList.SortItems(AppStatsSortLastLaunch);
+					SortAppStatsList(appStatsList, SORT_BY_LAST_LAUNCHTIME);
 					replymsg.what = E_RECENT_APPS_REPLY;
 					break; }
 				case E_REPLY_RANKING_APPS: {//sort apps by score
 					printf("Sorting list by score...\n");
-					appsList.SortItems(AppStatsSortScore);
+					SortAppStatsList(appStatsList, SORT_BY_SCORE);
 					replymsg.what = E_RANKING_APPS_REPLY;
 					break; }
 			}
 			//AppStats *stats;
-			if(reply_count == 0) { reply_count = appsList.CountItems(); }//add all apps to message
-			else { reply_count = min_c(reply_count, appsList.CountItems()); }//add only requested count or number of apps in list, whichever is least
+			if(reply_count == 0) { reply_count = appStatsList.CountItems(); }//add all apps to message
+			else { reply_count = min_c(reply_count, appStatsList.CountItems()); }//add only requested count or number of apps in list, whichever is least
 		/*	for(int i=0; i<recent_count; i++)//for each AppAttrFile object starting at index 0
 			{	stats = (AppStats*)appsList.ItemAt(i);
 				replymsg.AddString("app_signature", stats->getSig());//add app signature to message
@@ -328,9 +326,9 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 				replymsg.AddInt32("last_launch", stats->getLastLaunch());//add app last_date to message
 			}*/
 			//Send message
-			PopulateAppRankMessage(&appsList, &replymsg, reply_count);
+			PopulateAppRankMessage(&appStatsList, &replymsg, reply_count);
 			msg->SendReply(&replymsg);//reply is sent to the app which sent msg
-			EmptyAppStatsList(appsList);
+			EmptyAppStatsList(appStatsList);
 			break; }
 		case E_RESCAN_DATA_FILES:
 			rescanAllAttrFiles();
@@ -406,7 +404,7 @@ void einsteinium_engine::PopulateAppRankMessage(BList *appStatsList, BMessage *m
 		return;
 	}
 	entry_ref entry;
-	
+
 	while(rankQuery.GetNextRef(&entry) == B_OK)
 	{
 		printf("Rank Query found entry %s\n", entry.name);
@@ -415,7 +413,7 @@ void einsteinium_engine::PopulateAppRankMessage(BList *appStatsList, BMessage *m
 
 }*/
 
-void einsteinium_engine::forEachAttrFile(int action)
+void einsteinium_engine::forEachAttrFile(int action, BList *appStatsList = NULL)
 {
 	//create path for the application attribute files directory
 	BPath appAttrDirPath(settingsDirPath);
@@ -446,7 +444,7 @@ void einsteinium_engine::forEachAttrFile(int action)
 				{
 					AppStats *appStatsData = new AppStats();
 					attrFile.CopyAppStatsInto(appStatsData);
-					appsList.AddItem(appStatsData);//add object to the list
+					appStatsList->AddItem(appStatsData);//add object to the list
 //					attrEntry.GetPath(&appAttrDirPath);//create path from entry
 //					printf("Adding app %s to list\n", appAttrDirPath.Path());//debug info
 				}
@@ -455,6 +453,8 @@ void einsteinium_engine::forEachAttrFile(int action)
 		}
 	}
 }
+
+
 void einsteinium_engine::rescanAllAttrFiles()
 {	forEachAttrFile(RESCAN_ATTR_DATA); }
 
@@ -478,10 +478,43 @@ void einsteinium_engine::updateAttrScore(BEntry *entry)
 }
 
 
-void einsteinium_engine::createAppList()//Created list of apps
+BList einsteinium_engine::CreateAppStatsList(int sortAction=SORT_BY_NONE)
 {
-	EmptyAppStatsList(appsList);
-	forEachAttrFile(CREATE_APP_LIST);
+	BList newList;
+	forEachAttrFile(CREATE_APP_LIST, &newList);
+	SortAppStatsList(newList, sortAction);
+	return newList;
+}
+
+void einsteinium_engine::SortAppStatsList(BList &list, int sortAction)
+{
+	switch(sortAction)
+	{
+		case SORT_BY_SCORE:
+		{	list.SortItems(AppStatsSortScore);
+			break;
+		}
+		case SORT_BY_LAST_LAUNCHTIME:
+		{	list.SortItems(AppStatsSortLastLaunch);
+			break;
+		}
+		case SORT_BY_FIRST_LAUNCHTIME:
+		{	list.SortItems(AppStatsSortFirstLaunch);
+			break;
+		}
+		case SORT_BY_LAUNCH_COUNT:
+		{	list.SortItems(AppStatsSortLaunchCount);
+			break;
+		}
+		case SORT_BY_LAST_INTERVAL:
+		{	list.SortItems(AppStatsSortLastInterval);
+			break;
+		}
+		case SORT_BY_TOTAL_RUNNING_TIME:
+		{	list.SortItems(AppStatsSortRunningTime);
+			break;
+		}
+	}
 }
 
 void einsteinium_engine::EmptyAppStatsList(BList &list)
@@ -492,7 +525,7 @@ void einsteinium_engine::EmptyAppStatsList(BList &list)
 
 
 void einsteinium_engine::updateQuartiles()
-{	createAppList();
+{	BList appsList = CreateAppStatsList();
 	//Update Overall Score
 	printf("Getting quartiles for score\n");
 	appsList.SortItems(AppStatsSortScore);
@@ -507,7 +540,7 @@ void einsteinium_engine::updateQuartiles()
 	getQuartiles(getStatsFirstLaunch, appsList, quartiles+Q_FIRST_LAUNCH_INDEX);
 	//Update last interval
 	printf("Getting quartiles for last interval\n");
-	// remove apps from the list that have a last interval of 0 so they don't
+	// Create a copy of the list and remove apps that have a last interval of 0 so they don't
 	// skew the quartiles with lots of 0's
 	BList intervalList;
 	for(int i=0; i<appsList.CountItems(); i++)
@@ -526,7 +559,7 @@ void einsteinium_engine::updateQuartiles()
 	printf("Getting quartiles for launch count\n");
 	appsList.SortItems(AppStatsSortLaunchCount);
 	getQuartiles(getStatsLaunchCount, appsList, quartiles+Q_LAUNCHES_INDEX);
-	
+
 	// Write to file
 	BPath EstatsPath(settingsDirPath);
 	EstatsPath.Append("engine_quartiles");

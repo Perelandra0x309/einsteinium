@@ -38,19 +38,20 @@ private:
 	BMessageRunner	*quartileRunner;
 	const time_t	ee_session;//current session number
 	double			quartiles[30];
-	BList			appsList, subscribersList;
+	BList			subscribersList;
 	BQuery			rankQuery;
 	BView			*shelfView;
 	int32			shelfViewId;
 	void			SendListToSubscriber(BList *appStatsList, Subscriber *subscriber);
 	void			PopulateAppRankMessage(BList *appStatsList, BMessage *message, int count);
 //	void			DoRankQuery();
-	void			forEachAttrFile(int);
+	void			forEachAttrFile(int, BList *appStatsList = NULL);
 	void			rescanAllAttrFiles();
 	void			rescanAttrFile(BEntry*);
 	void			updateAllAttrScores();
 	void			updateAttrScore(BEntry*);
-	void			createAppList();//Created ordered list of apps
+	BList			CreateAppStatsList(int sortAction=SORT_BY_NONE);
+	void			SortAppStatsList(BList &list, int sortAction);
 	void			EmptyAppStatsList(BList &list);
 	void			updateQuartiles();
 	template < class itemType >
