@@ -24,16 +24,16 @@ EEShelfView::EEShelfView(BRect frame)
 	app_info info;
 	be_app->GetAppInfo(&info);
 	BFile file(&info.ref, B_READ_ONLY);
-
+	
 	if (file.InitCheck() != B_OK)
 		return;
-
+	
 	BResources resources(&file);
 	size_t size = 0;
 	const uint8* rawIcon;
 	rawIcon = (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE,
 		ES_ICON_ENGINE_SHELF, &size);
-
+	
 	if (rawIcon != NULL)
 	{
 		fIcon = new BBitmap(Bounds(), B_RGBA32);
@@ -90,7 +90,7 @@ void EEShelfView::AttachedToWindow()
 	else
 		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ViewColor());
-
+	
 	if (!be_roster->IsRunning(e_engine_sig)) {
 		BDeskbar deskbar;
 		deskbar.RemoveItem(EE_SHELFVIEW_NAME);
@@ -99,11 +99,11 @@ void EEShelfView::AttachedToWindow()
 	{
 		// Subscribe with the Einsteinium Engine to receive updates
 		BMessage subscribeMsg(E_SUBSCRIBE_RANKED_APPS);
-		subscribeMsg.AddInt32("count", 20);
+		subscribeMsg.AddInt16("count", 20);
 		subscribeMsg.AddMessenger("messenger", BMessenger(this));
 		BMessenger EsMessenger(e_engine_sig);
 		EsMessenger.SendMessage(&subscribeMsg);
-
+		
 		Invalidate();
 	}
 }
@@ -136,7 +136,7 @@ void EEShelfView::Draw(BRect rect)
 {
 	if (fIcon == NULL)
 		return;
-
+	
 	SetDrawingMode(B_OP_ALPHA);
 	DrawBitmap(fIcon);
 	SetDrawingMode(B_OP_COPY);
@@ -189,7 +189,7 @@ BPopUpMenu* EEShelfView::_BuildMenu(BMessage *message)
 
 	fMenu = new BPopUpMenu(B_EMPTY_STRING, false, false);
 	fMenu->SetFont(be_plain_font);
-
+	
 	// Add any refs found
 	int32 countFound;
 	type_code typeFound;
@@ -207,7 +207,7 @@ BPopUpMenu* EEShelfView::_BuildMenu(BMessage *message)
 		fMenu->AddItem(new IconMenuItem(newref.name, newMsg, &refNodeInfo, B_MINI_ICON));
 		// TODO how to get a vector icon?
 	}
-
+	
 	fMenu->AddSeparatorItem();
 	fMenu->AddItem(new BMenuItem("Preferences"B_UTF8_ELLIPSIS,
 		new BMessage(E_SHELFVIEW_OPENPREFS)));

@@ -15,7 +15,7 @@
 #include "EEShelfView.h"
 
 struct Subscriber {
-	int32 count;
+	int16 count;
 	BMessenger messenger;
 };
 //Einsteinium Engine is an inherited subclass of BApplication to
@@ -42,13 +42,16 @@ private:
 	BQuery			rankQuery;
 	BView			*shelfView;
 	int32			shelfViewId;
-	void			DoRankQuery();
+	void			SendListToSubscriber(BList *appStatsList, Subscriber *subscriber);
+	void			PopulateAppRankMessage(BList *appStatsList, BMessage *message, int count);
+//	void			DoRankQuery();
 	void			forEachAttrFile(int);
 	void			rescanAllAttrFiles();
 	void			rescanAttrFile(BEntry*);
 	void			updateAllAttrScores();
 	void			updateAttrScore(BEntry*);
 	void			createAppList();//Created ordered list of apps
+	void			EmptyAppStatsList(BList &list);
 	void			updateQuartiles();
 	template < class itemType >
 	void			getQuartiles(itemType (*)(AppStats*), BList&, double*);
