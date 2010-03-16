@@ -24,13 +24,13 @@ class AppAttrFile : public BFile
 					~AppAttrFile();
 	void			UpdateAppLaunched();
 	void			UpdateAppQuit();
-	void			Close();//write attributes to file
+//	void			Close();//write attributes to file
 	uint32			getScore() { return appStats.getScore(); }
 	const char*		getSig() { return appStats.getSig(); }
 	const char*		getPath() { return appStats.getPath(); }
 	const char*		getFilename() { return appStats.getFilename(); }
 	bool			getIgnore() { return E_ignore; }
-	void			setIgnore(bool ignore) { E_ignore = ignore; }
+	void			setIgnore(bool ignore);
 	void			rescanData();
 	void			calculateScore();
 	void			CopyAppStatsInto(AppStats*);

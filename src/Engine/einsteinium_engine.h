@@ -39,13 +39,13 @@ private:
 	const time_t	ee_session;//current session number
 	double			quartiles[30];
 	BList			subscribersList;
-	BQuery			rankQuery;
+//	BQuery			rankQuery;
 	BView			*shelfView;
 	int32			shelfViewId;
 	void			SendListToSubscriber(BList *appStatsList, Subscriber *subscriber);
 	void			PopulateAppRankMessage(BList *appStatsList, BMessage *message, int count);
 //	void			DoRankQuery();
-	void			forEachAttrFile(int, BList *appStatsList = NULL);
+	void			forEachAttrFile(int action, BList *appStatsList = NULL);
 	void			rescanAllAttrFiles();
 	void			rescanAttrFile(BEntry*);
 	void			updateAllAttrScores();
@@ -53,6 +53,7 @@ private:
 	BList			CreateAppStatsList(int sortAction=SORT_BY_NONE);
 	void			SortAppStatsList(BList &list, int sortAction);
 	void			EmptyAppStatsList(BList &list);
+	uint			FindAppStatsRank(BList &appStatsList, const char* signature);
 	void			updateQuartiles();
 	template < class itemType >
 	void			getQuartiles(itemType (*)(AppStats*), BList&, double*);

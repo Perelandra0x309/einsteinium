@@ -177,14 +177,14 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 				AppAttrFile appFile(sig, &appEntry);//Open attribute file
 
 				// If this app is not ignored, get the current rank
-				uint previous_rank = 0-1;
+				uint previous_rank;
 				bool haveSubscribers = subscribersList.CountItems() > 0;
 				bool ignoredApp = appFile.getIgnore();
 				BList appStatsList;
 				if(haveSubscribers && !ignoredApp)
 				{
 					appStatsList = CreateAppStatsList(SORT_BY_SCORE);
-					int count = appStatsList.CountItems();
+				/*	int count = appStatsList.CountItems();
 					for(int i=0; i<count; i++)
 					{
 						AppStats* stats = (AppStats*)appStatsList.ItemAt(i);
@@ -195,7 +195,10 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 							delete stats;
 							i = count;
 						}
-					}
+					}*/
+					previous_rank = FindAppStatsRank(appStatsList, sig);
+					AppStats *ptr = (AppStats*)(appStatsList.RemoveItem(previous_rank - 1));
+					if(ptr) delete ptr;
 				}
 
 				switch(msg->what)
@@ -208,7 +211,7 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 						break;
 					}
 				}
-				appFile.Close();//Write attributes to file
+//				appFile.Close();//Write attributes to file
 
 				if(haveSubscribers && !ignoredApp)
 				{
@@ -217,7 +220,7 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 					appFile.CopyAppStatsInto(newStats);
 					appStatsList.AddItem(newStats);
 					SortAppStatsList(appStatsList, SORT_BY_SCORE);
-					uint current_rank = 0-1;
+				/*	uint current_rank = 0-1;
 					int count = appStatsList.CountItems();
 					for(int i=0; i<count; i++)
 					{
@@ -227,7 +230,8 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 							current_rank = i + 1;
 							i = count;
 						}
-					}
+					}*/
+					uint current_rank = FindAppStatsRank(appStatsList, sig);
 					if(previous_rank != current_rank)
 					{
 						// The rank has changed, so we may need to update subscribers
@@ -343,6 +347,10 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 			int32 which;
 			bool ignore;
 			int i=0;
+			BList appStatsList;
+			uint lowestRankChanged = 0-1;
+			bool haveSubscribers = subscribersList.CountItems() > 0;
+			if(haveSubscribers) appStatsList = CreateAppStatsList(SORT_BY_SCORE);
 			while(msg->FindString("app_signature", i++, (const char**)&sig) == B_OK)//sig found
 			{	//get entry_ref for app from Message
 				appEntry = getEntryFromSig(sig);
@@ -353,10 +361,43 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 				if(msg->FindInt32("which", &which) == B_OK)
 				{	ignore = (which == 0); }
 				else continue;
-				// write ignore attribute
 				AppAttrFile attrFile(sig, &appEntry);
-				attrFile.setIgnore(ignore);
-				attrFile.Close();
+				bool currentIgnoreVal = attrFile.getIgnore();
+				// if the value has changed
+				if(ignore != currentIgnoreVal)
+				{
+					attrFile.setIgnore(ignore);
+					if(haveSubscribers)
+					{
+						if(!ignore)//add stats to apps list
+						{
+							AppStats *appStatsData = new AppStats();
+							attrFile.CopyAppStatsInto(appStatsData);
+							appStatsList.AddItem(appStatsData);
+							SortAppStatsList(appStatsList, SORT_BY_SCORE);
+						}
+						uint current_rank = FindAppStatsRank(appStatsList, sig);
+						lowestRankChanged = min_c(lowestRankChanged, current_rank);
+						if(ignore)//remove from list
+						{
+							AppStats *ptr = (AppStats*)(appStatsList.RemoveItem(current_rank - 1));
+							if(ptr) delete ptr;
+						}
+					}
+				}
+			}
+			if(haveSubscribers)
+			{
+				int subscribersCount = subscribersList.CountItems();
+				for(int j=0; j<subscribersCount; j++)
+				{
+					Subscriber *currentSub = (Subscriber*)subscribersList.ItemAt(j);
+					if( lowestRankChanged<=currentSub->count )
+					{
+						SendListToSubscriber(&appStatsList, currentSub);
+					}
+				}
+				EmptyAppStatsList(appStatsList);
 			}
 			break; }
 		default: BApplication::MessageReceived(msg);//The message may be for the application
@@ -461,7 +502,7 @@ void einsteinium_engine::rescanAllAttrFiles()
 void einsteinium_engine::rescanAttrFile(BEntry* entry)
 {	AppAttrFile attrFile(entry);
 	attrFile.rescanData();
-	attrFile.Close();
+//	attrFile.Close();
 }
 
 
@@ -474,7 +515,7 @@ void einsteinium_engine::updateAttrScore(BEntry *entry)
 //	printf("Updating attribute %s\n", path.Path());
 	AppAttrFile attrFile(entry);
 	attrFile.calculateScore();
-	attrFile.Close();
+//	attrFile.Close();
 }
 
 
@@ -523,6 +564,21 @@ void einsteinium_engine::EmptyAppStatsList(BList &list)
 	deleteList(list, t);
 }
 
+uint einsteinium_engine::FindAppStatsRank(BList &appStatsList, const char* signature)
+{
+	uint rank = 0-1;
+	int count = appStatsList.CountItems();
+	for(int i=0; i<count; i++)
+	{
+		AppStats* stats = (AppStats*)appStatsList.ItemAt(i);
+		if(stats->app_sig.Compare(signature) == 0)
+		{
+			rank = i + 1;
+			i = count;
+		}
+	}
+	return rank;
+}
 
 void einsteinium_engine::updateQuartiles()
 {	BList appsList = CreateAppStatsList();

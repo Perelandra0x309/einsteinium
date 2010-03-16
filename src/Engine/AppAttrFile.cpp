@@ -33,7 +33,7 @@ AppAttrFile::AppAttrFile(const char *appSig, const BEntry *appEntry)
 		newfile = true;//We'll be creating a new file
 	}
 	SetTo(&appAttrEntry, openMode);
-	
+
 	if(newfile)
 	{
 		// Initialize starting attributes and stats
@@ -43,7 +43,8 @@ AppAttrFile::AppAttrFile(const char *appSig, const BEntry *appEntry)
 		appStats.app_sig.SetTo(appSig);
 		appStats.app_filename.SetTo(appPath.Leaf());//define app filename
 		appStats.app_path.SetTo(appPath.Path());//define app path
-		
+		writeAttrValues();
+
 		new_session = true;
 		BString text("Einsteinium detected a new application, \"");
 		text.Append(appPath.Leaf());
@@ -78,13 +79,13 @@ AppAttrFile::AppAttrFile(const BEntry *attrEntry)//opening an existing AppAttrFi
 void AppAttrFile::initData(bool newfile)
 {
 	EE_session = ((einsteinium_engine*)be_app)->GetSession();
-	
+
 	// Database path
 	BPath appAttrPath(&appAttrEntry);
 	BString dataPathStr(appAttrPath.Path());
 	dataPathStr.Append(".db");
 	appDataEntry.SetTo(dataPathStr.String());
-	
+
 	// Read attributes from existing file
 	if(!newfile) readAttrValues();
 	// New attribute file, look for existing data file, if it exists rescan data
@@ -95,13 +96,14 @@ AppAttrFile::~AppAttrFile()
 {
 	Unset();
 }
+
 void AppAttrFile::UpdateAppLaunched()
 {
 	time_t now = time(NULL);//current time
 	//update database
 	BPath appDataPath(&appDataEntry);
 	Edb_Add_Launch_Time(appDataPath.Path(), EE_session, now);
-	
+
 	// Update the attributes
 	if(appStats.launch_count == 0) appStats.first_launch = now;
 	appStats.launch_count++;//increment launch count
@@ -109,30 +111,31 @@ void AppAttrFile::UpdateAppLaunched()
 		appStats.last_interval = now - appStats.last_launch;//update interval between last two launches
 	}
 	appStats.last_launch = now;//update last launch time
-	
+
 	//calculate score
 	calculateScore();
 }
+
 void AppAttrFile::UpdateAppQuit()
 {
 	time_t now = time(NULL);
 	//update database
 	BPath appDataPath(&appDataEntry);
 	Edb_Add_Quit_Time(appDataPath.Path(), EE_session, now);
-	
+
 	// Update the attributes
 	if( (!new_session) && (appStats.last_launch!=0) )
 	{	appStats.total_run_time += (now - appStats.last_launch); }
-	
+
 	//calculate score
 	calculateScore();
 }
-void AppAttrFile::Close()//Save attributes to file
+/*void AppAttrFile::Close()//Save attributes to file
 {
 	// TODO move this out?
 	writeAttrValues();
 	Unset();
-}
+}*/
 void AppAttrFile::calculateScore()
 {
 	const int *scales = ((einsteinium_engine*)be_app)->GetScalesPtr();
@@ -141,7 +144,7 @@ void AppAttrFile::calculateScore()
 		last_scale=scales[2],
 		interval_scale=scales[3],
 		runtime_scale=scales[4];
-	
+
 	const double *Quart = ((einsteinium_engine*)be_app)->GetQuartilesPtr();
 	float launch_val(0), first_launch_val(0), last_launch_val(0), last_interval_val(0),
 			total_run_time_val(0);
@@ -151,7 +154,7 @@ void AppAttrFile::calculateScore()
 		last_launch_val = getQuartileVal(Quart+Q_LAST_LAUNCH_INDEX, appStats.last_launch);
 		last_interval_val = getQuartileVal(Quart+Q_LAST_INTERVAL_INDEX, appStats.last_interval);
 		total_run_time_val = getQuartileVal(Quart+Q_TOTAL_RUN_TIME_INDEX, appStats.total_run_time);
-		
+
 		int max_scale = 100000;
 		// If last interval is zero (only one launch) put quartile value at .5 so that this
 		// statistic does not adversly effect the score
@@ -166,8 +169,9 @@ void AppAttrFile::calculateScore()
 						// Need to reverse interval scale, because longer intervals decrease the score
 						// TODO or do I change the sorting method to sort descending??
 					+ max_scale*(total_run_time_val * runtime_scale));
-	
+
 	}
+	writeAttrValues();
 }
 
 // Calculate the quartile value of where d lies in the quartile range Q
@@ -189,7 +193,7 @@ float AppAttrFile::getQuartileVal(const double *Q, double d)
 		// use Q[3] and Q[4] to find the quartile value range
 	}
 	else { return .5; }
-	
+
 	return (.25*index + .25*((d - Q[index])/(Q[index+1-index_offset] - Q[index-index_offset])));
 }
 
@@ -199,6 +203,12 @@ void AppAttrFile::rescanData()
 	BPath appDataPath(&appDataEntry);
 	Edb_Rescan_Data(appDataPath.Path(), &appStats);
 	calculateScore();
+}
+
+void AppAttrFile::setIgnore(bool ignore)
+{
+	E_ignore = ignore;
+	WriteAttr(ATTR_IGNORE_NAME, B_BOOL_TYPE, 0, &E_ignore, sizeof(E_ignore));
 }
 
 
@@ -272,9 +282,8 @@ void AppAttrFile::readAttrValues()
 	//Average daily interval
 	//Int_reg
 	//daily_int_reg
-
-
 }
+
 void AppAttrFile::writeAttrValues()
 {	//E session
 	if(new_session)
@@ -304,7 +313,7 @@ void AppAttrFile::writeAttrValues()
 	WriteAttr(ATTR_LAST_INTERVAL_NAME, B_INT32_TYPE, 0, &appStats.last_interval, sizeof(appStats.last_interval));
 	//Total running time
 	WriteAttr(ATTR_TOTAL_RUNTIME_NAME, B_INT32_TYPE, 0, &appStats.total_run_time, sizeof(appStats.total_run_time));
-	
+
 	//Average daily interval
 	//Int_reg
 	//daily_int_reg
