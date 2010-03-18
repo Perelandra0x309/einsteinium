@@ -305,6 +305,7 @@ void AttrSettingsView::saveItemSettings()//save user configureable settings
 		//	selectedItem->changed = !(selectedItem->changed);
 			SaveChangedItem(selectedItem);
 			attrLView->InvalidateItem(attrLView->IndexOf(selectedItem));
+			// TODO send message to engine to update subscribers
 		}
 	}
 }
@@ -345,9 +346,7 @@ void AttrSettingsView::saveIncludeSetting(const char *value)
 {
 	EESettingsFile *eeSettings = new EESettingsFile();
 	eeSettings->SaveLinkInclusionDefaultValue(value);
-	// TODO how to delete this object?
-//	delete eeSettings;
-//	eeSettings->QuitRequested();
+	delete eeSettings;
 }
 
 

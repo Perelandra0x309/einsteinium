@@ -13,7 +13,7 @@
 
 #include "engine_constants.h"
 
-class EESettingsFile : public BLooper
+class EESettingsFile : public BHandler
 {
 public:
 							EESettingsFile();
@@ -32,6 +32,7 @@ public:
 private:
 	BPath					settingsPath;
 	node_ref				settingsNodeRef;//node_ref to watch for changes to settings file
+	BLooper					*watchingLooper;
 	bool					watchingSettingsNode;//true when settings file is being watched
 	status_t				_status;
 	// Engine settings that can change

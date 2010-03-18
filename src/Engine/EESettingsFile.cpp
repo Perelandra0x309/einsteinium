@@ -5,7 +5,7 @@
 
 
 EESettingsFile::EESettingsFile()
-	: BLooper("name")
+	: BHandler("name")
 	,_status(B_ERROR)
 	,launch_scale(DEFAULTVALUE_LAUNCHES)
 	,first_scale(DEFAULTVALUE_LAUNCHES)
@@ -48,8 +48,9 @@ EESettingsFile::EESettingsFile()
 	settingsEntry.GetNodeRef(&settingsNodeRef);
 
 	//Start the Looper running
-	Run();
-	// TODO test BLooper quit proceedure
+	watchingLooper = new BLooper("settings");
+	watchingLooper->AddHandler(this);
+	watchingLooper->Run();
 
 	//watch the settings file for changes
 	StartWatching();
@@ -61,20 +62,22 @@ EESettingsFile::EESettingsFile()
 EESettingsFile::~EESettingsFile()
 {
 	StopWatching();
-	Lock();
-	Quit();
+	watchingLooper->Lock();
+	watchingLooper->Quit();
 }
 
 void EESettingsFile::StartWatching(){
-	status_t error = watch_node(&settingsNodeRef, B_WATCH_STAT, this);
+	status_t error = watch_node(&settingsNodeRef, B_WATCH_STAT, this, watchingLooper);
 	watchingSettingsNode = (error==B_OK);
-//	printf("Watching engine settings node was %ssuccessful.\n", watchingSettingsNode? "": "not ");
+	printf("Watching engine settings node was %ssuccessful.\n", watchingSettingsNode? "": "not ");
+	if(!watchingSettingsNode) printf("Error=%i (B_BAD_VALUE=%i, B_NO_MEMORY=%i, B_ERROR=%i)\n",
+			error, B_BAD_VALUE, B_NO_MEMORY, B_ERROR);
 }
 
 void EESettingsFile::StopWatching(){
 	if(watchingSettingsNode)//settings file is being watched
-	{	watch_node(&settingsNodeRef, B_STOP_WATCHING, this);
-//		printf("Stopped watching engine settings node\n");
+	{	watch_node(&settingsNodeRef, B_STOP_WATCHING, this, watchingLooper);
+		printf("Stopped watching engine settings node\n");
 		watchingSettingsNode = false;
 	}
 }

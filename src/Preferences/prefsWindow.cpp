@@ -255,6 +255,7 @@ void prefsWindow::readSettings()
 	readEngineSettings();
 	readDaemonSettings();
 	// TODO watch settings files for updates
+	// TODO create one instance of settings files to share among views?
 	Unlock();
 	return;
 }
@@ -277,6 +278,8 @@ void prefsWindow::readEngineSettings()
 	int count;
 	eeSettings->GetDeskbarSettings(show, count);
 	deskbarView->SetDeskbarValues(show, count);
+
+	delete eeSettings;
 }
 void prefsWindow::writeEngineSettings()
 {
@@ -290,6 +293,8 @@ void prefsWindow::writeEngineSettings()
 	scales[INTERVAL_INDEX] = e_prefs.interval_scale;
 	scales[RUNTIME_INDEX] = e_prefs.total_run_time_scale;
 	eeSettings->SaveScales(scales);
+
+	delete eeSettings;
 
 }
 void prefsWindow::readDaemonSettings()

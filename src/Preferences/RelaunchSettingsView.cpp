@@ -154,8 +154,8 @@ void RelaunchSettingsView::WriteSettings()
 		settingsList.AddItem(item->settings);
 	}
 	//printf("EP: Sending changed settings to daemon.\n");
-	EDSettingsFile *edSettings = new EDSettingsFile();
-	edSettings->SaveSettings(&settingsList, defaultAction);
+	EDSettingsFile edSettings;
+	edSettings.SaveSettings(&settingsList, defaultAction);
 	settingsList.MakeEmpty();
 
 }
@@ -249,6 +249,8 @@ void RelaunchSettingsView::ReadSettings()
 
 	// list items alphabetically ignoring case
 	appsLView->SortItems(SortRelaunchAppItems);
+
+	delete edSettings;
 }
 
 BSize RelaunchSettingsView::GetMinSize()

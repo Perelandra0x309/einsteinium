@@ -52,8 +52,8 @@ void DeskbarSettingsView::MessageReceived(BMessage* msg)
 			bool showDeskbar = showDeskbarCB->Value();
 			int16 count = strtol(itemCountTC->Text(), NULL, 0);
 			// TODO update settings file
-			EESettingsFile *settings = new EESettingsFile();
-			settings->SaveDeskbarSettings(showDeskbar, count);
+			EESettingsFile settings;
+			settings.SaveDeskbarSettings(showDeskbar, count);
 
 			app_info info;
 			status_t result = be_roster->GetAppInfo(e_engine_sig, &info);
@@ -68,6 +68,7 @@ void DeskbarSettingsView::MessageReceived(BMessage* msg)
 			}
 
 			itemCountTC->SetEnabled(showDeskbar);
+
 			break;
 		}
 	}

@@ -14,7 +14,7 @@
 #include "daemon_constants.h"
 #include "AppRelaunchSettings.h"
 
-class EDSettingsFile : public BLooper
+class EDSettingsFile : public BHandler //BLooper
 {
 public:
 							EDSettingsFile();
@@ -30,6 +30,7 @@ private:
 	BList					settingsList;
 	BPath					settingsPath;
 	node_ref				settingsNodeRef;//node_ref to watch for changes to settings file
+	BLooper					*watchingLooper;
 	bool					watchingSettingsNode;//true when settings file is being watched
 	int						defaultRelaunchAction;
 	status_t				_initStatus;

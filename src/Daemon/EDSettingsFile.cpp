@@ -4,7 +4,7 @@
 #include "EDSettingsFile.h"
 
 EDSettingsFile::EDSettingsFile()
-	: BLooper("name")
+	: BHandler("name")
 	,defaultRelaunchAction(ACTION_PROMPT)
 	,_initStatus(B_ERROR)
 {
@@ -35,7 +35,10 @@ EDSettingsFile::EDSettingsFile()
 	settingsEntry.GetNodeRef(&settingsNodeRef);
 
 	//Start the Looper running
-	Run();
+//	Run();
+	watchingLooper = new BLooper("settings");
+	watchingLooper->AddHandler(this);
+	watchingLooper->Run();
 
 	//watch the settings file for changes
 	StartWatching();
@@ -46,19 +49,21 @@ EDSettingsFile::EDSettingsFile()
 
 EDSettingsFile::~EDSettingsFile(){
 	StopWatching();
-	Lock();
-	Quit();
+	watchingLooper->Lock();
+	watchingLooper->Quit();
+//	Lock();
+//	Quit();
 }
 
 void EDSettingsFile::StartWatching(){
-	status_t result = watch_node(&settingsNodeRef, B_WATCH_STAT, this);
+	status_t result = watch_node(&settingsNodeRef, B_WATCH_STAT, this, watchingLooper);
 	watchingSettingsNode = (result==B_OK);
 //	printf("Watching daemon settings node was %ssuccessful.\n", watchingSettingsNode? "": "not ");
 }
 
 void EDSettingsFile::StopWatching(){
 	if(watchingSettingsNode)//settings file is being watched
-	{	watch_node(&settingsNodeRef, B_STOP_WATCHING, this);
+	{	watch_node(&settingsNodeRef, B_STOP_WATCHING, this, watchingLooper);
 //		printf("Stopped watching daemon settings node\n");
 		watchingSettingsNode = false;
 	}

@@ -324,7 +324,6 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 			EmptyAppStatsList(appStatsList);
 			break;
 		}
-		// TODO unsubscribe message
 		case E_UNSUBSCRIBE_RANKED_APPS: {
 		//	printf("Received unsubscribe message\n");
 			int32 uniqueID;
