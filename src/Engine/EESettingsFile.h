@@ -25,6 +25,8 @@ public:
 	void					SaveScales(int*);
 	const char*				GetLinkInclusionDefaultValue();
 	void					SaveLinkInclusionDefaultValue(const char*);
+	void					GetDeskbarSettings(bool &show, int &count);
+	void					SaveDeskbarSettings(bool show, int count);
 
 	int						scales[5];
 private:
@@ -32,8 +34,12 @@ private:
 	node_ref				settingsNodeRef;//node_ref to watch for changes to settings file
 	bool					watchingSettingsNode;//true when settings file is being watched
 	status_t				_status;
+	// Engine settings that can change
 	int						launch_scale, first_scale, last_scale, interval_scale, runtime_scale;
 	BString					inclusionDefault;
+	bool					showDeskbarMenu;
+	int						deskbarMenuCount;
+
 	void					StartWatching();
 	void					StopWatching();
 	int						xmlGetIntProp(xmlNodePtr cur, char *name);

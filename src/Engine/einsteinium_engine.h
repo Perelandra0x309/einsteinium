@@ -16,6 +16,7 @@
 
 struct Subscriber {
 	int16 count;
+	int32 uniqueID;
 	BMessenger messenger;
 };
 //Einsteinium Engine is an inherited subclass of BApplication to
@@ -40,10 +41,11 @@ private:
 	double			quartiles[30];
 	BList			subscribersList;
 //	BQuery			rankQuery;
-	BView			*shelfView;
+//	BView			*shelfView;
 	int32			shelfViewId;
 	void			SendListToSubscriber(BList *appStatsList, Subscriber *subscriber);
 	void			PopulateAppRankMessage(BList *appStatsList, BMessage *message, int count);
+	void			ShowShelfView(bool showShelfView, int shelfViewCount);
 //	void			DoRankQuery();
 	void			forEachAttrFile(int action, BList *appStatsList = NULL);
 	void			rescanAllAttrFiles();

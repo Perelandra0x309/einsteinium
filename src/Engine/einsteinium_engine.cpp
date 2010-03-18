@@ -77,11 +77,7 @@ bool einsteinium_engine::QuitRequested()//clean up
 	deleteList(subscribersList, sub);
 
 	// Remove shelf view
-	if(shelfViewId)
-	{
-		BDeskbar deskbar;
-		deskbar.RemoveItem(shelfViewId);
-	}
+	ShowShelfView(false, 0);
 
 	printf("Einsteinium engine quitting.\n");
 	return BApplication::QuitRequested();
@@ -118,10 +114,10 @@ void einsteinium_engine::ReadyToRun()//Run right after app is ready
 	}
 
 	// Add the shelf view
-	BDeskbar deskbar;
-	shelfView = new EEShelfView(BRect(0, 0, 15, 15));
-	deskbar.AddItem(shelfView, &shelfViewId);
-	delete shelfView;
+	bool showShelfView;
+	int shelfViewCount;
+	settingsFile->GetDeskbarSettings(showShelfView, shelfViewCount);
+	ShowShelfView(showShelfView, shelfViewCount);
 }
 
 
@@ -157,7 +153,9 @@ void einsteinium_engine::ArgvReceived(int32 argc, char** argv)
 //Messages sent to the application
 void einsteinium_engine::MessageReceived(BMessage *msg)
 {	switch(msg->what)//act according to the Message command
-	{	case B_SOME_APP_QUIT://An application quit
+	{
+		//---- Core functional messages ----//
+		case B_SOME_APP_QUIT://An application quit
 		case B_SOME_APP_LAUNCHED: {//An application launched
 			char* sig;//Find signature
 			if (msg->FindString("be:signature", (const char**)&sig) == B_OK)//sig found
@@ -184,18 +182,6 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 				if(haveSubscribers && !ignoredApp)
 				{
 					appStatsList = CreateAppStatsList(SORT_BY_SCORE);
-				/*	int count = appStatsList.CountItems();
-					for(int i=0; i<count; i++)
-					{
-						AppStats* stats = (AppStats*)appStatsList.ItemAt(i);
-						if(stats->app_sig.Compare(sig) == 0)
-						{
-							previous_rank = i + 1;
-							appStatsList.RemoveItem(stats);
-							delete stats;
-							i = count;
-						}
-					}*/
 					previous_rank = FindAppStatsRank(appStatsList, sig);
 					AppStats *ptr = (AppStats*)(appStatsList.RemoveItem(previous_rank - 1));
 					if(ptr) delete ptr;
@@ -211,7 +197,6 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 						break;
 					}
 				}
-//				appFile.Close();//Write attributes to file
 
 				if(haveSubscribers && !ignoredApp)
 				{
@@ -220,17 +205,6 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 					appFile.CopyAppStatsInto(newStats);
 					appStatsList.AddItem(newStats);
 					SortAppStatsList(appStatsList, SORT_BY_SCORE);
-				/*	uint current_rank = 0-1;
-					int count = appStatsList.CountItems();
-					for(int i=0; i<count; i++)
-					{
-						AppStats* stats = (AppStats*)appStatsList.ItemAt(i);
-						if(stats->app_sig.Compare(sig) == 0)
-						{
-							current_rank = i + 1;
-							i = count;
-						}
-					}*/
 					uint current_rank = FindAppStatsRank(appStatsList, sig);
 					if(previous_rank != current_rank)
 					{
@@ -255,18 +229,95 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 		}
 	/*	case B_SOME_APP_ACTIVATED: {//An application brought to the front??
 			break; }*/
+		case E_SET_IGNORE_ATTR: {
+			char* sig;//Find signature
+			BEntry appEntry;
+			int32 which;
+			bool ignore;
+			int i=0;
+			BList appStatsList;
+			uint lowestRankChanged = 0-1;
+			bool haveSubscribers = subscribersList.CountItems() > 0;
+			if(haveSubscribers) appStatsList = CreateAppStatsList(SORT_BY_SCORE);
+			while(msg->FindString("app_signature", i++, (const char**)&sig) == B_OK)//sig found
+			{	//get entry_ref for app from Message
+				appEntry = getEntryFromSig(sig);
+				if(!appEntry.Exists())//Entry doesn't exist.
+				{	printf("Entry for app %s could not be found.\n", sig);
+					continue;//Can't do anything, so go to next sig
+				}
+				if(msg->FindInt32("which", &which) == B_OK)
+				{	ignore = (which == 0); }
+				else continue;
+				AppAttrFile attrFile(sig, &appEntry);
+				bool currentIgnoreVal = attrFile.getIgnore();
+				// if the value has changed
+				if(ignore != currentIgnoreVal)
+				{
+					attrFile.setIgnore(ignore);
+					if(haveSubscribers)
+					{
+						if(!ignore)//add stats to apps list
+						{
+							AppStats *appStatsData = new AppStats();
+							attrFile.CopyAppStatsInto(appStatsData);
+							appStatsList.AddItem(appStatsData);
+							SortAppStatsList(appStatsList, SORT_BY_SCORE);
+						}
+						uint current_rank = FindAppStatsRank(appStatsList, sig);
+						lowestRankChanged = min_c(lowestRankChanged, current_rank);
+						if(ignore)//remove from list
+						{
+							AppStats *ptr = (AppStats*)(appStatsList.RemoveItem(current_rank - 1));
+							if(ptr) delete ptr;
+						}
+					}
+				}
+			}
+			if(haveSubscribers)
+			{
+				int subscribersCount = subscribersList.CountItems();
+				for(int j=0; j<subscribersCount; j++)
+				{
+					Subscriber *currentSub = (Subscriber*)subscribersList.ItemAt(j);
+					if( lowestRankChanged<=currentSub->count )
+					{
+						SendListToSubscriber(&appStatsList, currentSub);
+					}
+				}
+				EmptyAppStatsList(appStatsList);
+			}
+			break; }
+		case E_UPDATE_SHELFVIEW_SETTINGS:
+		{
+			bool showShelfView;
+			int16 count;
+			status_t result1 = msg->FindBool("show", &showShelfView);
+			status_t result2 = msg->FindInt16("count", &count);
+			if(result1 != B_OK || result2 != B_OK)
+			{
+				printf("Einsteinium Engine received invalid ShelfView settings message.\n");
+				break;
+			}
+			ShowShelfView(showShelfView, count);
+			break;
+		}
+
+		//---- Subscriber messages ----//
 		case E_SUBSCRIBE_RANKED_APPS: {
 		//	printf("Received subscription message\n");
 			Subscriber* newSubscriber = new Subscriber();
 			status_t result1 = msg->FindMessenger("messenger", &(newSubscriber->messenger));
 			status_t result2 = msg->FindInt16("count", &(newSubscriber->count));
-			if(result1 != B_OK || result2 != B_OK)
+			status_t result3 = msg->FindInt32("uniqueID", &(newSubscriber->uniqueID));
+			if(result1 != B_OK || result2 != B_OK || result3 != B_OK)
 			{
-				printf("Einsteinium Engine received invalid subscriber messenger.\n");
+				printf("Einsteinium Engine received invalid subscribe message.\n");
 				delete newSubscriber;
 				// TODO send reply?
 				break;
 			}
+			// TODO verify that there already is not a subscriber with the unique ID
 			subscribersList.AddItem(newSubscriber);
 			BList appStatsList = CreateAppStatsList(SORT_BY_SCORE);
 			SendListToSubscriber(&appStatsList, newSubscriber);
@@ -274,6 +325,31 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 			break;
 		}
 		// TODO unsubscribe message
+		case E_UNSUBSCRIBE_RANKED_APPS: {
+		//	printf("Received unsubscribe message\n");
+			int32 uniqueID;
+			status_t result = msg->FindInt32("uniqueID", &uniqueID);
+			if(result!=B_OK)
+			{
+				printf("Einsteinium Engine received invalid unsubscribe message.\n");
+				break;
+			}
+			int subscribersCount = subscribersList.CountItems();
+			for(int j=0; j<subscribersCount; j++)
+			{
+				Subscriber *currentSub = (Subscriber*)subscribersList.ItemAt(j);
+				if( uniqueID==currentSub->uniqueID )
+				{
+					subscribersList.RemoveItem(currentSub);
+					delete currentSub;
+					j = subscribersCount;
+				//	printf("Successful unsubscribe\n");
+				}
+			}
+			break;
+		}
+
+		//---- External requests ----//
 		case E_PRINT_RECENT_APPS:
 		case E_PRINT_RANKING_APPS: {//print the recent list to the terminal
 		//	printf("Constructing Recent Apps List:\n");
@@ -341,65 +417,6 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 		case E_UPDATE_SCORES:
 			updateAllAttrScores();
 			break;
-		case E_SET_IGNORE_ATTR: {
-			char* sig;//Find signature
-			BEntry appEntry;
-			int32 which;
-			bool ignore;
-			int i=0;
-			BList appStatsList;
-			uint lowestRankChanged = 0-1;
-			bool haveSubscribers = subscribersList.CountItems() > 0;
-			if(haveSubscribers) appStatsList = CreateAppStatsList(SORT_BY_SCORE);
-			while(msg->FindString("app_signature", i++, (const char**)&sig) == B_OK)//sig found
-			{	//get entry_ref for app from Message
-				appEntry = getEntryFromSig(sig);
-				if(!appEntry.Exists())//Entry doesn't exist.
-				{	printf("Entry for app %s could not be found.\n", sig);
-					continue;//Can't do anything, so go to next sig
-				}
-				if(msg->FindInt32("which", &which) == B_OK)
-				{	ignore = (which == 0); }
-				else continue;
-				AppAttrFile attrFile(sig, &appEntry);
-				bool currentIgnoreVal = attrFile.getIgnore();
-				// if the value has changed
-				if(ignore != currentIgnoreVal)
-				{
-					attrFile.setIgnore(ignore);
-					if(haveSubscribers)
-					{
-						if(!ignore)//add stats to apps list
-						{
-							AppStats *appStatsData = new AppStats();
-							attrFile.CopyAppStatsInto(appStatsData);
-							appStatsList.AddItem(appStatsData);
-							SortAppStatsList(appStatsList, SORT_BY_SCORE);
-						}
-						uint current_rank = FindAppStatsRank(appStatsList, sig);
-						lowestRankChanged = min_c(lowestRankChanged, current_rank);
-						if(ignore)//remove from list
-						{
-							AppStats *ptr = (AppStats*)(appStatsList.RemoveItem(current_rank - 1));
-							if(ptr) delete ptr;
-						}
-					}
-				}
-			}
-			if(haveSubscribers)
-			{
-				int subscribersCount = subscribersList.CountItems();
-				for(int j=0; j<subscribersCount; j++)
-				{
-					Subscriber *currentSub = (Subscriber*)subscribersList.ItemAt(j);
-					if( lowestRankChanged<=currentSub->count )
-					{
-						SendListToSubscriber(&appStatsList, currentSub);
-					}
-				}
-				EmptyAppStatsList(appStatsList);
-			}
-			break; }
 		default: BApplication::MessageReceived(msg);//The message may be for the application
 	}
 }
@@ -425,6 +442,22 @@ void einsteinium_engine::PopulateAppRankMessage(BList *appStatsList, BMessage *m
 			appEntry.GetRef(&appRef);
 			message->AddRef("refs", &appRef);
 		}
+	}
+}
+
+void einsteinium_engine::ShowShelfView(bool showShelfView, int shelfViewCount)
+{
+	BDeskbar deskbar;
+	if(shelfViewId)// shelf view is currently showing
+	{
+		deskbar.RemoveItem(shelfViewId);
+		shelfViewId = 0;
+	}
+	if(showShelfView)
+	{
+		BView *shelfView = new EEShelfView(BRect(0, 0, 15, 15), shelfViewCount);
+		deskbar.AddItem(shelfView, &shelfViewId);
+		delete shelfView;
 	}
 }
 

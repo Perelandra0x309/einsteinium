@@ -14,17 +14,17 @@
 #include "EsIcons.h"
 #include "IconUtils.h"
 #include "engine_constants.h"
-
 #include <stdio.h>
 
 class _EXPORT EEShelfView : public BView {
 public:
-						EEShelfView(BRect frame);
+						EEShelfView(BRect frame, int16 count);
 						EEShelfView(BMessage* data);
 	virtual				~EEShelfView();
 
 	virtual void		Draw(BRect rect);
 	virtual void		AttachedToWindow();
+	virtual void		DetachedFromWindow();
 	static EEShelfView*	Instantiate(BMessage* data);
 	virtual	status_t	Archive(BMessage* data, bool deep = true) const;
 	virtual void	 	MouseDown(BPoint);
@@ -35,6 +35,8 @@ private:
 	BPopUpMenu*			_BuildMenu(BMessage *message);
 	BBitmap*			fIcon;
 	BPopUpMenu*			fMenu;
+	int16				fInitialCount;
+	int32				fUniqueID;
 };
 
 #endif	/* EE_SHELF_VIEW_H */

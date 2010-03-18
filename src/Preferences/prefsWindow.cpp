@@ -35,6 +35,8 @@ prefsWindow::prefsWindow(BRect size)
 	prefsListView->AddItem(attrSI);
 	rankSI = new BStringItem("    App Rankings");
 	prefsListView->AddItem(rankSI);
+	deskbarSI = new BStringItem("    Deskbar Menu");
+	prefsListView->AddItem(deskbarSI);
 	maintSI = new BStringItem("    Maintenance");
 	prefsListView->AddItem(maintSI);
 
@@ -71,6 +73,10 @@ prefsWindow::prefsWindow(BRect size)
 	attrView = new AttrSettingsView(viewRect);
 	mainView->AddChild(attrView);
 	attrView->Hide();
+	//Deskbar Settings View
+	deskbarView = new DeskbarSettingsView(viewRect);
+	mainView->AddChild(deskbarView);
+	deskbarView->Hide();
 	//Engine Maintenance View
 	e_maintenanceView = new EMaintenanceView(viewRect);
 	mainView->AddChild(e_maintenanceView);
@@ -192,6 +198,8 @@ void prefsWindow::MessageReceived(BMessage* msg)
 				{	curView = rankingView; }
 				else if(item == attrSI)
 				{	curView = attrView; }
+				else if(item == deskbarSI)
+				{	curView = deskbarView; }
 				else if(item == maintSI)
 				{	curView = e_maintenanceView; }
 				else
@@ -221,6 +229,7 @@ void prefsWindow::MessageReceived(BMessage* msg)
 		// Save rank slider settings and recalculate scores
 		case SAVE_RANKING: {
 			writeEngineSettings();
+			// TODO detect if engine is running first
 			BMessenger messenger(e_engine_sig);
 			BMessage msg(E_UPDATE_SCORES);
 			messenger.SendMessage(&msg);
@@ -229,6 +238,7 @@ void prefsWindow::MessageReceived(BMessage* msg)
 			appLaunchView->MessageReceived(msg);
 			rankingView->MessageReceived(msg);
 			attrView->MessageReceived(msg);
+			deskbarView->MessageReceived(msg);
 			break; }
 	}
 	return;
@@ -262,6 +272,11 @@ void prefsWindow::readEngineSettings()
 	// Read setting for action when new application is detected
 	attrView->SetLinkInclusionDefault(eeSettings->GetLinkInclusionDefaultValue());
 
+	// Deskbar settings
+	bool show;
+	int count;
+	eeSettings->GetDeskbarSettings(show, count);
+	deskbarView->SetDeskbarValues(show, count);
 }
 void prefsWindow::writeEngineSettings()
 {

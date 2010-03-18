@@ -23,10 +23,11 @@ class EMaintenanceView : public BView
 	virtual void	MessageReceived(BMessage*);
 private:
 	bool			watchingRoster;
-	BButton			*setB, *ranksB, *quartilesB, *dataB;
+	BButton			*ranksB, *quartilesB, *dataB;
 	BTextView		*ranksTV, *quartilesTV, *dataTV;
 	BBox			*rankBox;
 	SystemStatusBox *statusBox;
+	void			SetButtonEnabledState();
 };
 
 #endif

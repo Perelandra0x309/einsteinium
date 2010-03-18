@@ -8,6 +8,7 @@
 #include "RelaunchSettingsView.h"
 #include "RankingSettingsView.h"
 #include "AttrSettingsView.h"
+#include "DeskbarSettingsView.h"
 #include "EMaintenanceView.h"
 #include "BitmapListItem.h"
 #include "EESettingsFile.h"
@@ -26,10 +27,11 @@ private:
 	BView					*mainView, *emptySettingsView, *curView;
 	BListView				*prefsListView;
 	BitmapListItem			*daemonBLI, *engineBLI;
-	BStringItem				*appLaunchSI, *rankSI, *attrSI, *maintSI;
+	BStringItem				*appLaunchSI, *rankSI, *attrSI, *deskbarSI, *maintSI;
 	RelaunchSettingsView	*appLaunchView;
 	RankingSettingsView		*rankingView;
 	AttrSettingsView		*attrView;
+	DeskbarSettingsView		*deskbarView;
 	EMaintenanceView		*e_maintenanceView;
 	BitmapListItem*			CreateDaemonBLI();
 	BitmapListItem*			CreateEngineBLI();

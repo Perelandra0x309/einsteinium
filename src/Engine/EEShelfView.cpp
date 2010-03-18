@@ -1,39 +1,31 @@
 /*
  */
 
-
 #include "EEShelfView.h"
 
 const char* kTrackerSignature = "application/x-vnd.Be-TRAK";
 
 
-/*
-BView* instantiate_deskbar_item(void)
-{
-	return new EEShelfView(BRect(0, 0, 15, 15));
-}
-*/
-
-
-
-EEShelfView::EEShelfView(BRect frame)
+EEShelfView::EEShelfView(BRect frame, int16 count)
 	:BView(frame, EE_SHELFVIEW_NAME, B_FOLLOW_NONE,
 		B_WILL_DRAW/* | B_FRAME_EVENTS /*B_PULSE_NEEDED*/),
 	fIcon(NULL)
 {
+	fInitialCount = count;
+
 	app_info info;
 	be_app->GetAppInfo(&info);
 	BFile file(&info.ref, B_READ_ONLY);
-	
+
 	if (file.InitCheck() != B_OK)
 		return;
-	
+
 	BResources resources(&file);
 	size_t size = 0;
 	const uint8* rawIcon;
 	rawIcon = (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE,
 		ES_ICON_ENGINE_SHELF, &size);
-	
+
 	if (rawIcon != NULL)
 	{
 		fIcon = new BBitmap(Bounds(), B_RGBA32);
@@ -52,7 +44,6 @@ EEShelfView::EEShelfView(BRect frame)
 		}
 	}
 	else printf("rawIcon was NULL\n");
-//	printf("Icon = %i\n", fIcon);
 
 	SetToolTip("Einsteinium  \nRanked\nApplications");
 }
@@ -68,6 +59,7 @@ EEShelfView::EEShelfView(BMessage *message)
 	{
 		fIcon = new BBitmap(&iconArchive);
 	}
+	message->FindInt16("count", &fInitialCount);
 	// Apparently Haiku does not yet archive tool tips (Alpha-1 R1)
 	SetToolTip("Einsteinium  \nRanked\nApplications");
 }
@@ -79,8 +71,6 @@ EEShelfView::~EEShelfView()
 		delete fIcon;
 }
 
-// TODO Detached from Window- unsubscribe
-
 
 void EEShelfView::AttachedToWindow()
 {
@@ -90,7 +80,8 @@ void EEShelfView::AttachedToWindow()
 	else
 		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ViewColor());
-	
+
+	fUniqueID = time(NULL);
 	if (!be_roster->IsRunning(e_engine_sig)) {
 		BDeskbar deskbar;
 		deskbar.RemoveItem(EE_SHELFVIEW_NAME);
@@ -99,12 +90,26 @@ void EEShelfView::AttachedToWindow()
 	{
 		// Subscribe with the Einsteinium Engine to receive updates
 		BMessage subscribeMsg(E_SUBSCRIBE_RANKED_APPS);
-		subscribeMsg.AddInt16("count", 20);
+		subscribeMsg.AddInt32("uniqueID", fUniqueID);
+		subscribeMsg.AddInt16("count", fInitialCount);
 		subscribeMsg.AddMessenger("messenger", BMessenger(this));
 		BMessenger EsMessenger(e_engine_sig);
 		EsMessenger.SendMessage(&subscribeMsg);
-		
+
 		Invalidate();
+	}
+}
+
+
+void EEShelfView::DetachedFromWindow()
+{
+	// Unsubscribe from the Einsteinium Engine
+	if (be_roster->IsRunning(e_engine_sig))
+	{
+		BMessage subscribeMsg(E_UNSUBSCRIBE_RANKED_APPS);
+		subscribeMsg.AddInt32("uniqueID", fUniqueID);
+		BMessenger EsMessenger(e_engine_sig);
+		EsMessenger.SendMessage(&subscribeMsg);
 	}
 }
 
@@ -122,6 +127,7 @@ status_t EEShelfView::Archive(BMessage *data, bool deep) const
 	BView::Archive(data, deep);
 	data->AddString("add_on", e_engine_sig);
 	data->AddString("class", "EEShelfView");
+	data->AddInt16("count", fInitialCount);
 	if(fIcon != NULL)
 	{
 		BMessage archive;
@@ -136,7 +142,7 @@ void EEShelfView::Draw(BRect rect)
 {
 	if (fIcon == NULL)
 		return;
-	
+
 	SetDrawingMode(B_OP_ALPHA);
 	DrawBitmap(fIcon);
 	SetDrawingMode(B_OP_COPY);
@@ -158,7 +164,6 @@ void EEShelfView::MessageReceived(BMessage* msg)
 			break;
 		}
 		case E_SUBSCRIBER_UPDATE_RANKED_APPS: {
-//			printf("Received test subscribe reply from Es\n");
 			_BuildMenu(msg);
 			break;
 		}
@@ -189,7 +194,7 @@ BPopUpMenu* EEShelfView::_BuildMenu(BMessage *message)
 
 	fMenu = new BPopUpMenu(B_EMPTY_STRING, false, false);
 	fMenu->SetFont(be_plain_font);
-	
+
 	// Add any refs found
 	int32 countFound;
 	type_code typeFound;
@@ -207,7 +212,7 @@ BPopUpMenu* EEShelfView::_BuildMenu(BMessage *message)
 		fMenu->AddItem(new IconMenuItem(newref.name, newMsg, &refNodeInfo, B_MINI_ICON));
 		// TODO how to get a vector icon?
 	}
-	
+
 	fMenu->AddSeparatorItem();
 	fMenu->AddItem(new BMenuItem("Preferences"B_UTF8_ELLIPSIS,
 		new BMessage(E_SHELFVIEW_OPENPREFS)));

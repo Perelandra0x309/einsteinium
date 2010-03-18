@@ -307,14 +307,12 @@ void AttrSettingsView::saveItemSettings()//save user configureable settings
 			attrLView->InvalidateItem(attrLView->IndexOf(selectedItem));
 		}
 	}
-	return;
 }
 
 
 void AttrSettingsView::clearItemSettings()
 {
 	ignoreCB->SetValue(0);
-	return;
 }
 
 
@@ -325,7 +323,6 @@ void AttrSettingsView::updateSelectedItem()
 	{	selectedItem = NULL; }
 	else//Item selected
 	{	selectedItem = (AppAttrItem*)attrLView->ItemAt(index); }
-	return;
 }
 
 
@@ -341,7 +338,6 @@ void AttrSettingsView::recallItemSettings()
 		ignoreCB->SetValue(selectedItem->s_ignore);
 		removeB->SetEnabled(true);
 	}
-	return;
 }
 
 
@@ -349,7 +345,9 @@ void AttrSettingsView::saveIncludeSetting(const char *value)
 {
 	EESettingsFile *eeSettings = new EESettingsFile();
 	eeSettings->SaveLinkInclusionDefaultValue(value);
-	eeSettings->QuitRequested();
+	// TODO how to delete this object?
+//	delete eeSettings;
+//	eeSettings->QuitRequested();
 }
 
 

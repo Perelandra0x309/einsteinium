@@ -1,4 +1,4 @@
-NAME := Einsteinium
+NAME := Einsteinium_Preferences
 TYPE := APP
 SRCS := ../Daemon/AppRelaunchSettings.cpp \
 		../Daemon/EDSettingsFile.cpp \
@@ -7,6 +7,7 @@ SRCS := ../Daemon/AppRelaunchSettings.cpp \
 		AppRefFilter.cpp \
 		AttrSettingsView.cpp \
 		BitmapListItem.cpp \
+		DeskbarSettingsView.cpp \
 		EMaintenanceView.cpp \
 		RankingSettingsView.cpp \
 		RelaunchSettingsView.cpp \

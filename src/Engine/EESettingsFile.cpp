@@ -13,6 +13,8 @@ EESettingsFile::EESettingsFile()
 	,interval_scale(DEFAULTVALUE_LAUNCHES)
 	,runtime_scale(DEFAULTVALUE_LAUNCHES)
 	,inclusionDefault(EE_XMLTEXT_VALUE_PROMPT)
+	,showDeskbarMenu(false)
+	,deskbarMenuCount(0)
 {
 	// find path for settings directory
 	find_directory(B_USER_SETTINGS_DIRECTORY, &settingsPath);
@@ -47,13 +49,10 @@ EESettingsFile::EESettingsFile()
 
 	//Start the Looper running
 	Run();
+	// TODO test BLooper quit proceedure
 
 	//watch the settings file for changes
 	StartWatching();
-	/*status_t error = watch_node(&settingsNodeRef, B_WATCH_STAT, this);
-	watchingSettingsNode = (error==B_OK);
-	printf("Watching engine settings node was %ssuccessful.\n", watchingSettingsNode? "": "not ");*/
-
 
 	_status = B_OK;
 }
@@ -126,6 +125,14 @@ void EESettingsFile::ReadSettingsFromFile(BPath file)
 			interval_scale = xmlGetIntProp(cur, EE_XMLTEXT_PROPERTY_INTERVAL);
 			runtime_scale = xmlGetIntProp(cur, EE_XMLTEXT_PROPERTY_RUNTIME);
 		}
+		// deskbar settings
+		if (!xmlStrcmp(cur->name, (const xmlChar *) EE_XMLTEXT_CHILD_NAME_DESKBAR))
+		{
+			xmlChar *value = xmlGetProp(cur, (const xmlChar *) EE_XMLTEXT_PROPERTY_SHOW);
+			showDeskbarMenu = strcmp("true", (char *)value)==0;
+			deskbarMenuCount = xmlGetIntProp(cur, EE_XMLTEXT_PROPERTY_COUNT);
+		}
+
 		cur = cur->next;
 	}
 
@@ -149,13 +156,17 @@ int EESettingsFile::xmlGetIntProp(xmlNodePtr cur, char *name){
 
 status_t EESettingsFile::WriteSettingsToFile()
 {
-	//create default items for lists
 	char launchChar[32], firstChar[32], lastChar[32], intervalChar[32], runtimeChar[32];
 	sprintf(launchChar, "%ld", launch_scale);
 	sprintf(firstChar, "%ld", first_scale);
 	sprintf(lastChar, "%ld", last_scale);
 	sprintf(intervalChar, "%ld", interval_scale);
 	sprintf(runtimeChar, "%ld", runtime_scale);
+	BString showDeskbar;
+	if(showDeskbarMenu) showDeskbar.SetTo("true");
+	else showDeskbar.SetTo("false");
+	char countChar[32];
+	sprintf(countChar, "%i", deskbarMenuCount);
 
 	BString xml_text("<?xml version=\"1.0\"?>\n");
 	xml_text.Append("<").Append(EE_XMLTEXT_ROOT_NAME).Append(">\n");
@@ -167,15 +178,23 @@ status_t EESettingsFile::WriteSettingsToFile()
 	// write scale values
 	xml_text.Append("	<").Append(EE_XMLTEXT_CHILD_NAME_RANK)
 			.Append(" ").Append(EE_XMLTEXT_PROPERTY_LAUNCHES)
-			.Append("=\"").Append(launchChar).Append("\"")
+				.Append("=\"").Append(launchChar).Append("\"")
 			.Append(" ").Append(EE_XMLTEXT_PROPERTY_FIRSTLAUNCH)
-			.Append("=\"").Append(firstChar).Append("\"")
+				.Append("=\"").Append(firstChar).Append("\"")
 			.Append(" ").Append(EE_XMLTEXT_PROPERTY_LASTLAUNCH)
-			.Append("=\"").Append(lastChar).Append("\"")
+				.Append("=\"").Append(lastChar).Append("\"")
 			.Append(" ").Append(EE_XMLTEXT_PROPERTY_INTERVAL)
-			.Append("=\"").Append(intervalChar).Append("\"")
+				.Append("=\"").Append(intervalChar).Append("\"")
 			.Append(" ").Append(EE_XMLTEXT_PROPERTY_RUNTIME)
-			.Append("=\"").Append(runtimeChar).Append("\"")
+				.Append("=\"").Append(runtimeChar).Append("\"")
+			.Append("/>\n");
+
+	// write deskbar settings
+	xml_text.Append("	<").Append(EE_XMLTEXT_CHILD_NAME_DESKBAR)
+			.Append(" ").Append(EE_XMLTEXT_PROPERTY_SHOW)
+				.Append("=\"").Append(showDeskbar.String()).Append("\"")
+			.Append(" ").Append(EE_XMLTEXT_PROPERTY_COUNT)
+				.Append("=\"").Append(countChar).Append("\"")
 			.Append("/>\n");
 
 	xml_text.Append("</").Append(EE_XMLTEXT_ROOT_NAME).Append(">\n");
@@ -267,3 +286,15 @@ void EESettingsFile::SaveLinkInclusionDefaultValue(const char *value)
 	}
 }
 
+void EESettingsFile::GetDeskbarSettings(bool &show, int &count)
+{
+	show = showDeskbarMenu;
+	count = deskbarMenuCount;
+}
+
+void EESettingsFile::SaveDeskbarSettings(bool show, int count)
+{
+	showDeskbarMenu = show;
+	deskbarMenuCount = count;
+	WriteSettingsToFile();
+}

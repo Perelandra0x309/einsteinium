@@ -77,9 +77,6 @@ EMaintenanceView::EMaintenanceView(BRect size)
 		.Add(rankBox)
 		.AddGlue()
 	);
-
-	// TODO check to see if the engine is running.  Do we launch it if it is not?
-
 }
 
 EMaintenanceView::~EMaintenanceView()
@@ -104,6 +101,8 @@ void EMaintenanceView::AllAttached()
 	else//watching was sucessful
 	{	watchingRoster = true;
 	}
+
+	SetButtonEnabledState();
 }
 
 void EMaintenanceView::MessageReceived(BMessage* msg)
@@ -114,12 +113,22 @@ void EMaintenanceView::MessageReceived(BMessage* msg)
 		{
 			const char* sig;
 			if (msg->FindString("be:signature", &sig) != B_OK) break;
-			if(strcmp(sig, e_engine_sig) == 0)//Found a match for the app signature
+			if(strcmp(sig, e_engine_sig) == 0)//Found a match for the einsteinium engine signature
 			{
 				BMessenger messenger(statusBox);
 				messenger.SendMessage(msg);
+				SetButtonEnabledState();
 			}
 		}
 	}
 }
 
+void EMaintenanceView::SetButtonEnabledState()
+{
+	app_info info;
+	status_t result = be_roster->GetAppInfo(e_engine_sig, &info);
+	bool running = result==B_OK;
+	ranksB->SetEnabled(running);
+	quartilesB->SetEnabled(running);
+	dataB->SetEnabled(running);
+}
