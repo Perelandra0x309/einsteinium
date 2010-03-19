@@ -41,7 +41,6 @@ private:
 	double			quartiles[30];
 	BList			subscribersList;
 //	BQuery			rankQuery;
-//	BView			*shelfView;
 	int32			shelfViewId;
 	void			SendListToSubscriber(BList *appStatsList, Subscriber *subscriber);
 	void			PopulateAppRankMessage(BList *appStatsList, BMessage *message, int count);

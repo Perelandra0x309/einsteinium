@@ -18,13 +18,12 @@ class RankingSettingsView : public BView
 					RankingSettingsView(BRect);
 					~RankingSettingsView();
 	virtual void	MessageReceived(BMessage*);
-//	virtual void	MouseDown(BMessage*);
 	void			setSliderValues(engine_prefs& prefs);
 	void			getSliderValues(engine_prefs& prefs);
 	BSize			GetMinSize();
 private:
 	BSlider			*launchesSl, *firstSl, *lastSl, *intervalSl, *runtimeSl;
-	BButton			*setB/*, *ranksB, *quartilesB, *dataB*/;
+	BButton			*setB;
 	BTextView		*ranksTV, *quartilesTV, *dataTV;
 	BBox			*slidersBox, *rankBox;
 	void			InitSlider(BSlider *slider);

@@ -5,8 +5,6 @@
 #define EP_DESKBARSETTINGS_VIEW
 #include <InterfaceKit.h>
 #include <AppKit.h>
-//#include <SupportKit.h>
-//#include <fs_attr.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <GridLayoutBuilder.h>
@@ -19,7 +17,6 @@ class DeskbarSettingsView : public BView
 {public:
 					DeskbarSettingsView(BRect);
 //					~DeskbarSettingsView();
-//	virtual void	AllAttached();
 	virtual void	MessageReceived(BMessage*);
 	void			SetDeskbarValues(bool show, int count);
 private:

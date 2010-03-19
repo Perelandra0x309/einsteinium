@@ -175,9 +175,10 @@ bool prefsWindow::QuitRequested()
 }
 
 
-/*void prefsWindow::FrameResized(float width, float height)
+void prefsWindow::FrameResized(float width, float height)
 {
-}*/
+	e_maintenanceView->ResizeStatusBox();
+}
 
 
 void prefsWindow::MessageReceived(BMessage* msg)
@@ -186,7 +187,6 @@ void prefsWindow::MessageReceived(BMessage* msg)
 			Lock();
 			curView->Hide();
 			int32 index = prefsListView->CurrentSelection();
-			// TODO Trigger saving the previous view's settings here?
 
 			if(index < 0)//No selection
 			{	curView = emptySettingsView; }
@@ -241,23 +241,20 @@ void prefsWindow::MessageReceived(BMessage* msg)
 			deskbarView->MessageReceived(msg);
 			break; }
 	}
-	return;
 }
 void prefsWindow::storeSettings()
 {
 	writeEngineSettings();
-	writeDaemonSettings();
-	return;
+//	writeDaemonSettings();
 }
 void prefsWindow::readSettings()
 {
 	Lock();
 	readEngineSettings();
-	readDaemonSettings();
+//	readDaemonSettings();
 	// TODO watch settings files for updates
 	// TODO create one instance of settings files to share among views?
 	Unlock();
-	return;
 }
 void prefsWindow::readEngineSettings()
 {
@@ -297,11 +294,11 @@ void prefsWindow::writeEngineSettings()
 	delete eeSettings;
 
 }
-void prefsWindow::readDaemonSettings()
+/*void prefsWindow::readDaemonSettings()
 {
 	appLaunchView->ReadSettings();
-}
-void prefsWindow::writeDaemonSettings()
+}*/
+/*void prefsWindow::writeDaemonSettings()
 {
 	appLaunchView->WriteSettings();
 	/*
@@ -315,5 +312,5 @@ void prefsWindow::writeDaemonSettings()
 	appLaunchView->WriteSettings(xml_text);
 	archive.Write(xml_text.String(), xml_text.Length());
 	archive.Unset();*/
-}
+//}
 

@@ -5,7 +5,6 @@
 
 RelaunchSettingsView::RelaunchSettingsView(BRect size)
 	:BView(size, "Auto-Relaunch", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
-	,settingsChanged(false)
 {	SetViewColor(bg_color);
 	BRect viewRect;
 
@@ -59,7 +58,11 @@ RelaunchSettingsView::RelaunchSettingsView(BRect size)
 	BPath path("/dummy/Default setting");
 	defaultSettings = new AppRelaunchSettings("for all applications not in this list", path);
 
+	//Settings file
+	edSettings = new EDSettingsFile();
+	ReadSettings();
 }
+
 RelaunchSettingsView::~RelaunchSettingsView()
 {	//Remove List Items
 	RelaunchAppItem *Item;
@@ -70,7 +73,9 @@ RelaunchSettingsView::~RelaunchSettingsView()
 	}while(Item);
 	delete appsPanel;
 	delete appFilter;
+	delete edSettings;
 }
+
 void RelaunchSettingsView::MessageReceived(BMessage* msg)
 {	switch(msg->what)
 	{	case ED_RELAPP_SELECTION_CHANGED: {
@@ -88,7 +93,6 @@ void RelaunchSettingsView::MessageReceived(BMessage* msg)
 			appsPanel->Show();
 			break; }
 		case ED_ADD_APPITEM_REF: {
-			Window()->Lock();
 			entry_ref srcRef;
 			msg->FindRef("refs", &srcRef);
 			BEntry srcEntry(&srcRef, true);
@@ -97,16 +101,19 @@ void RelaunchSettingsView::MessageReceived(BMessage* msg)
 			char *buf = new char[B_ATTR_NAME_LENGTH];
 			ssize_t size;
 			if( (size = node.ReadAttr("BEOS:APP_SIG",0,0,buf,B_ATTR_NAME_LENGTH)) > 0 )
-			{	RelaunchAppItem* item = new RelaunchAppItem(buf, path);
+			{
+				Window()->Lock();
+				RelaunchAppItem* item = new RelaunchAppItem(buf, path);
 				appsLView->AddItem(item);
 				appsLView->SortItems(SortRelaunchAppItems);
 				appsLView->Select(appsLView->IndexOf(item));
 				appsLView->ScrollToSelection();
-				settingsChanged = true;
+				Window()->Unlock();
+				edSettings->UpdateActionForApp(buf, item->settings->GetRelaunchActionString().String());
+
 			}
 			else (new BAlert("","Excecutable does not have an application signature","OK"))->Go();
 			delete[] buf;
-			Window()->Unlock();
 			break; }
 		case ED_REMOVE_APPITEM: {
 			int32 count = appsLView->CountItems();
@@ -114,8 +121,8 @@ void RelaunchSettingsView::MessageReceived(BMessage* msg)
 			for(int i=count-1; i>=0; i--)
 			{	if(appsLView->IsItemSelected(i))
 				{	item = dynamic_cast<RelaunchAppItem *>(appsLView->RemoveItem(i));
+					edSettings->RemoveApp(item->settings->appSig.String());
 					delete item;
-					settingsChanged = true;
 				}
 			}
 			saveSelectedItemSettings();
@@ -125,14 +132,15 @@ void RelaunchSettingsView::MessageReceived(BMessage* msg)
 			break; }
 		case ED_AUTO_RELAUNCH_CHANGED: {
 			saveSelectedItemSettings();
-			settingsChanged = true;
+			edSettings->UpdateActionForApp(selectedItem->settings->appSig.String(),
+									selectedItem->settings->GetRelaunchActionString().String());
 			break; }
 		default: { break; }
 	}
 	return;
 }
 
-void RelaunchSettingsView::WriteSettings()
+/*void RelaunchSettingsView::WriteSettings()
 {
 	// if no changed were made no need to update settings file
 	if(!settingsChanged) return;
@@ -154,86 +162,15 @@ void RelaunchSettingsView::WriteSettings()
 		settingsList.AddItem(item->settings);
 	}
 	//printf("EP: Sending changed settings to daemon.\n");
-	EDSettingsFile edSettings;
-	edSettings.SaveSettings(&settingsList, defaultAction);
+//	EDSettingsFile edSettings;
+	edSettings->SaveSettings(&settingsList, defaultAction);
 	settingsList.MakeEmpty();
 
-}
-/*void RelaunchSettingsView::WriteSettings(BString &text)
-{
-	//make sure current item has been saved
-	saveSelectedItemSettings();
-
-
-		text.SetTo("<einsteinium_daemon>\n");
-		text.Append("	<relaunch>\n");
-
-		//Create setting node for defaults value
-		RelaunchAppItem *item;
-		item = dynamic_cast<RelaunchAppItem *>(appsLView->ItemAt(0));
-		text.Append("		<app sig=\"default\" relaunch=\"");
-		BString relaunchTextValue;
-		switch(item->settings->relaunchAction)
-		{
-			case ACTION_AUTO: {
-				relaunchTextValue.SetTo(ED_XMLTEXT_VALUE_AUTO);
-				break;
-			}
-			case ACTION_PROMPT: {
-				relaunchTextValue.SetTo(ED_XMLTEXT_VALUE_PROMPT);
-				break;
-			}
-			case ACTION_IGNORE: {
-				relaunchTextValue.SetTo(ED_XMLTEXT_VALUE_IGNORE);
-				break;
-			}
-			default: {
-				// default to prompt
-				relaunchTextValue.SetTo(ED_XMLTEXT_VALUE_PROMPT);
-				break;
-			}
-		}
-		text.Append(relaunchTextValue);
-		text.Append("\"/>\n");
-
-		int count = appsLView->CountItems();
-		for(int i=1; i<count; i++)
-		{	item = dynamic_cast<RelaunchAppItem *>(appsLView->ItemAt(i));
-			text.Append("		<app");
-			text.Append(" sig=\"");//app signature
-			text.Append(item->settings->appSig.String());
-			text.Append("\" relaunch=\"");//monitor app for relaunch?
-			switch(item->settings->relaunchAction)
-			{
-				case ACTION_AUTO: {
-					relaunchTextValue.SetTo(ED_XMLTEXT_VALUE_AUTO);
-					break;
-				}
-				case ACTION_PROMPT: {
-					relaunchTextValue.SetTo(ED_XMLTEXT_VALUE_PROMPT);
-					break;
-				}
-				case ACTION_IGNORE: {
-					relaunchTextValue.SetTo(ED_XMLTEXT_VALUE_IGNORE);
-					break;
-				}
-				default: {
-					// default to prompt
-					relaunchTextValue.SetTo(ED_XMLTEXT_VALUE_PROMPT);
-					break;
-				}
-			}
-			text.Append(relaunchTextValue);
-			text.Append("\"/>\n");
-		}
-		text.Append("	</relaunch>\n");
-		text.Append("</einsteinium_daemon>\n");
 }*/
+
 
 void RelaunchSettingsView::ReadSettings()
 {
-	EDSettingsFile *edSettings = new EDSettingsFile();
-
 	// Add default settings item
 	defaultSettings->relaunchAction = edSettings->GetDefaultRelaunchAction();
 	appsLView->AddItem(new RelaunchAppItem(defaultSettings));
@@ -249,9 +186,8 @@ void RelaunchSettingsView::ReadSettings()
 
 	// list items alphabetically ignoring case
 	appsLView->SortItems(SortRelaunchAppItems);
-
-	delete edSettings;
 }
+
 
 BSize RelaunchSettingsView::GetMinSize()
 {
@@ -262,11 +198,6 @@ BSize RelaunchSettingsView::GetMinSize()
 	return size;
 }
 
-/*RelaunchAppItem* RelaunchSettingsView::createRAI(AppRelaunchSettings* settings)
-{
-	RelaunchAppItem *item = new RelaunchAppItem(settings);
-	return item;
-}*/
 
 void RelaunchSettingsView::saveSelectedItemSettings()//save user configureable settings
 {
@@ -368,14 +299,12 @@ RelaunchAppItem::RelaunchAppItem(const char* sig, BPath path)
 	:BListItem()
 {
 	settings = new AppRelaunchSettings(sig, path);
-//	original_settings = new AppRelaunchSettings(settings);
 }
 
 
 RelaunchAppItem::RelaunchAppItem(AppRelaunchSettings *set)
 	:BListItem()
 {
-//	original_settings = set;
 	settings = new AppRelaunchSettings(set);
 }
 
@@ -383,14 +312,7 @@ RelaunchAppItem::RelaunchAppItem(AppRelaunchSettings *set)
 RelaunchAppItem::~RelaunchAppItem()
 {
 	delete settings;
-//	delete original_settings;
 }
-
-
-/*bool RelaunchAppItem::HasChanged()
-{
-	return !(settings->Equals(original_settings));
-}*/
 
 
 void RelaunchAppItem::DrawItem(BView* owner, BRect item_rect, bool complete)

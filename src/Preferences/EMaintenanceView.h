@@ -5,7 +5,6 @@
 #ifndef EP_EMAINTENANCE_VIEW
 #define EP_EMAINTENANCE_VIEW
 #include <InterfaceKit.h>
-//#include <SupportKit.h>
 #include <fs_attr.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
@@ -21,6 +20,7 @@ class EMaintenanceView : public BView
 					~EMaintenanceView();
 	virtual void	AllAttached();
 	virtual void	MessageReceived(BMessage*);
+	void			ResizeStatusBox();
 private:
 	bool			watchingRoster;
 	BButton			*ranksB, *quartilesB, *dataB;

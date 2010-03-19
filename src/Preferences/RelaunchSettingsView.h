@@ -21,14 +21,13 @@ class RelaunchSettingsView : public BView
 					RelaunchSettingsView(BRect);
 					~RelaunchSettingsView();
 	virtual void	MessageReceived(BMessage*);
-	void			WriteSettings();
-//	void			WriteSettings(BString&);
+//	void			WriteSettings();
 	void			ReadSettings();
 	BSize			GetMinSize();
 private:
-	bool			settingsChanged;
 	AppRefFilter	*appFilter;
 	BFilePanel		*appsPanel;
+	EDSettingsFile	*edSettings;
 	AppRelaunchSettings *defaultSettings;
 	RelaunchAppItem	*selectedItem;
 	BListView		*appsLView;
@@ -36,7 +35,6 @@ private:
 	BButton			*addAppB, *removeAppB;
 	BBox			*relaunchBox;
 	BRadioButton	*autoRelaunchRB, *promptRelaunchRB, *dontRelaunchRB;
-//	RelaunchAppItem* createRAI(AppRelaunchSettings*);
 	void			saveSelectedItemSettings();
 	void			clearItemSettings();
 	void			updateSelectedItem();
@@ -45,13 +43,12 @@ private:
 
 class RelaunchAppItem : public BListItem
 {public:
-					RelaunchAppItem(const char*, BPath/*, bool=true, bool=false*/);
+					RelaunchAppItem(const char*, BPath);
 					RelaunchAppItem(AppRelaunchSettings*);
 					~RelaunchAppItem();
-//	bool			HasChanged();
 	int				ICompare(RelaunchAppItem*);
 private:
-	AppRelaunchSettings *settings/*, *original_settings*/;
+	AppRelaunchSettings *settings;
 	void			DrawItem(BView*, BRect, bool);
 //	void			Update(BView *owner, const BFont *font);
 //	virtual bool	InitiateDrag(BPoint point, int32 index, bool wasSelected);

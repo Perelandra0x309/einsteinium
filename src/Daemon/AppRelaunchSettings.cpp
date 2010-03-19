@@ -60,6 +60,23 @@ status_t AppRelaunchSettings::SetRelaunchAction(const char *action)
 	{	return B_ERROR; }
 	return B_OK;
 }
+// TODO improve code so we don't have to do this translation
+BString AppRelaunchSettings::GetRelaunchActionString()
+{
+	BString text;
+	switch(relaunchAction){
+		case ACTION_AUTO:
+			text.SetTo(ED_XMLTEXT_VALUE_AUTO);
+			break;
+		case ACTION_PROMPT:
+			text.SetTo(ED_XMLTEXT_VALUE_PROMPT);
+			break;
+		case ACTION_IGNORE:
+				text.SetTo(ED_XMLTEXT_VALUE_IGNORE);
+			break;
+	}
+	return text;
+}
 
 bool AppRelaunchSettings::Equals(AppRelaunchSettings* compare)
 {
@@ -77,22 +94,4 @@ BEntry AppRelaunchSettings::getEntryFromSig(const char* sig)
 	be_roster->FindApp(sig, &ref);
 	BEntry entry(&ref);
 	return entry;
-/*BVolumeRoster v_roster;
-	BVolume vol;
-	BQuery query;
-	BEntry entry;
-	BString pred("BEOS:APP_SIG==");
-	pred.Append(sig);
-	v_roster.Rewind();
-	while(v_roster.GetNextVolume(&vol)==B_NO_ERROR)
-	{	if(vol.KnowsAttr() && vol.KnowsMime() && vol.KnowsQuery())
-		{	query.Clear();
-			query.SetPredicate(pred.String());
-			query.SetVolume(&vol);
-			if(query.Fetch()!=B_OK) continue;
-			if(query.GetNextEntry(&entry)==B_OK)//entry found
-			{	break; }
-		}
-	}
-	return entry;*/
 }

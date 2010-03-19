@@ -19,6 +19,7 @@ class AppRelaunchSettings
 	int				relaunchAction;
 	BString			appPath, appSig, name;
 	status_t		SetRelaunchAction(const char *action);
+	BString			GetRelaunchActionString();
 	bool			Equals(AppRelaunchSettings*);
 private:
 	BEntry			getEntryFromSig(const char* sig);

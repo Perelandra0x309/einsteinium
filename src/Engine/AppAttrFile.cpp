@@ -130,12 +130,7 @@ void AppAttrFile::UpdateAppQuit()
 	//calculate score
 	calculateScore();
 }
-/*void AppAttrFile::Close()//Save attributes to file
-{
-	// TODO move this out?
-	writeAttrValues();
-	Unset();
-}*/
+
 void AppAttrFile::calculateScore()
 {
 	const int *scales = ((einsteinium_engine*)be_app)->GetScalesPtr();

@@ -31,6 +31,8 @@ bool einsteinium_daemon::QuitRequested()
 	if(watchingRoster)
 	{	be_roster->StopWatching(be_app_messenger); }
 
+	delete settingsFile;
+
 //	printf("Einsteinium daemon quitting.\n");
 	return BApplication::QuitRequested();
 }

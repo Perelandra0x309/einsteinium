@@ -28,14 +28,16 @@ class SystemStatusBox : public BBox
 {
 public:
 							SystemStatusBox(BEntry entry, const char * sig);
-							~SystemStatusBox();
+//							~SystemStatusBox();
 			void			AttachedToWindow();
+			void			ResizeStatusText();
 	virtual void			MessageReceived(BMessage*);
 	virtual	void			Draw(BRect updateRect){ BBox::Draw(updateRect); }
 private:
 	BStringView				*statusSV;
-	BString					signature, name;
+	BString					signature, name, stringViewText;
 	BButton					*restartB, *startstopB;
+	float					usedWidth;
 	int						currentState;
 	status_t				StopService();
 	status_t				StartService();

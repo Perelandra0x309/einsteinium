@@ -35,7 +35,6 @@ EDSettingsFile::EDSettingsFile()
 	settingsEntry.GetNodeRef(&settingsNodeRef);
 
 	//Start the Looper running
-//	Run();
 	watchingLooper = new BLooper("settings");
 	watchingLooper->AddHandler(this);
 	watchingLooper->Run();
@@ -51,8 +50,6 @@ EDSettingsFile::~EDSettingsFile(){
 	StopWatching();
 	watchingLooper->Lock();
 	watchingLooper->Quit();
-//	Lock();
-//	Quit();
 }
 
 void EDSettingsFile::StartWatching(){
@@ -239,31 +236,6 @@ status_t EDSettingsFile::WriteSettingsToFile(BPath file)
 	xmlCleanupParser();
 }
 
-
-void EDSettingsFile::SaveSettings(BList* newSettingsList, int defaultAction)
-{
-	//Stop watching file
-	StopWatching();
-
-	// Update the private settings list
-	defaultRelaunchAction = defaultAction;
-	AppRelaunchSettings *newSettings = NULL;//, *currentSettings = NULL;
-	deleteList(settingsList, newSettings);
-	settingsList.MakeEmpty();
-	int index, count = newSettingsList->CountItems();//search each item in list
-	for(index=0; index<count; index++)//search each item in list
-	{	newSettings = static_cast<AppRelaunchSettings *>(newSettingsList->ItemAt(index));
-		AppRelaunchSettings *clonedSettings = new AppRelaunchSettings(newSettings);
-		settingsList.AddItem(clonedSettings);
-	}
-
-	// Write to file
-	WriteSettingsToFile(settingsPath);
-
-	//Start watching file
-	StartWatching();
-}
-
 void EDSettingsFile::UpdateActionForApp(const char *_signature, const char *_relaunch)
 {
 	AppRelaunchSettings *appSettings = FindSettingsForApp(_signature);
@@ -274,6 +246,23 @@ void EDSettingsFile::UpdateActionForApp(const char *_signature, const char *_rel
 		appSettings = new AppRelaunchSettings(_signature, _relaunch);
 		settingsList.AddItem(appSettings);
 	}
+
+	//Stop watching file
+	StopWatching();
+
+	// Write to file
+	WriteSettingsToFile(settingsPath);
+
+	//Start watching file
+	StartWatching();
+}
+
+void EDSettingsFile::RemoveApp(const char *_signature)
+{
+	AppRelaunchSettings *appSettings = FindSettingsForApp(_signature);
+	if(appSettings==NULL) return;
+	settingsList.RemoveItem(appSettings);
+	delete appSettings;
 
 	//Stop watching file
 	StopWatching();

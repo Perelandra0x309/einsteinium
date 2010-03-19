@@ -6,6 +6,7 @@
 #include <InterfaceKit.h>
 #include <SupportKit.h>
 #include <StorageKit.h>
+#include <Roster.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <GridLayoutBuilder.h>
@@ -24,7 +25,6 @@ class AttrSettingsView : public BView
 	virtual void	MessageReceived(BMessage*);
 	void			SetLinkInclusionDefault(const char*);
 	BSize			GetMinSize();
-//	void			SaveChanges();
 private:
 	BPath			settingsPath;
 	AppRefFilter	*appFilter;
@@ -51,7 +51,7 @@ class AppAttrItem : public BListItem
 //					~AppAttrItem();
 	int				ICompare(AppAttrItem*);
 private:
-	bool			/*changed, */s_ignore;
+	bool			s_ignore;
 	BString			attrPath, appSig, appName;
 	void			DrawItem(BView*, BRect, bool);
 //	void			Update(BView *owner, const BFont *font);

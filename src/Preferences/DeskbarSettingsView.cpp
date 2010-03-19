@@ -51,7 +51,6 @@ void DeskbarSettingsView::MessageReceived(BMessage* msg)
 		case EE_DESKBAR_CHANGED: {
 			bool showDeskbar = showDeskbarCB->Value();
 			int16 count = strtol(itemCountTC->Text(), NULL, 0);
-			// TODO update settings file
 			EESettingsFile settings;
 			settings.SaveDeskbarSettings(showDeskbar, count);
 

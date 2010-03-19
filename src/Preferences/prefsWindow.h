@@ -20,7 +20,7 @@ public:
 							prefsWindow(BRect);
 							~prefsWindow();
 	virtual	bool			QuitRequested();
-//	virtual void			FrameResized(float width, float height);
+	virtual void			FrameResized(float width, float height);
 	virtual void			MessageReceived(BMessage*);
 private:
 	engine_prefs			e_prefs;
@@ -39,8 +39,8 @@ private:
 	void					readSettings();
 	void					readEngineSettings();
 	void					writeEngineSettings();
-	void					readDaemonSettings();
-	void					writeDaemonSettings();
+//	void					readDaemonSettings();
+//	void					writeDaemonSettings();
 };
 
 #endif

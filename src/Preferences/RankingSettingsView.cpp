@@ -54,11 +54,6 @@ RankingSettingsView::RankingSettingsView(BRect size)
 	slidersBox = new BBox("Rank Sliders");
 	slidersBox->SetLabel("Rank Weights");
 	slidersBox->AddChild(BGroupLayoutBuilder(B_VERTICAL, 5)
-		/*.Add(launchesSl)
-		.Add(firstSl)
-		.Add(lastSl)
-		.Add(intervalSl)
-		.Add(runtimeSl)*/
 		.AddGlue()
 		.Add(launchesBox)
 		.AddGlue()

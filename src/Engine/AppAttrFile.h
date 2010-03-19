@@ -24,7 +24,6 @@ class AppAttrFile : public BFile
 					~AppAttrFile();
 	void			UpdateAppLaunched();
 	void			UpdateAppQuit();
-//	void			Close();//write attributes to file
 	uint32			getScore() { return appStats.getScore(); }
 	const char*		getSig() { return appStats.getSig(); }
 	const char*		getPath() { return appStats.getPath(); }

@@ -79,6 +79,8 @@ bool einsteinium_engine::QuitRequested()//clean up
 	// Remove shelf view
 	ShowShelfView(false, 0);
 
+	delete settingsFile;
+
 	printf("Einsteinium engine quitting.\n");
 	return BApplication::QuitRequested();
 }
@@ -317,7 +319,7 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 				// TODO send reply?
 				break;
 			}
-			// TODO verify that there already is not a subscriber with the unique ID
+			// TODO if there already is a subscriber with the unique ID update it
 			subscribersList.AddItem(newSubscriber);
 			BList appStatsList = CreateAppStatsList(SORT_BY_SCORE);
 			SendListToSubscriber(&appStatsList, newSubscriber);
@@ -414,8 +416,22 @@ void einsteinium_engine::MessageReceived(BMessage *msg)
 		case E_UPDATE_QUARTILES:
 			updateQuartiles();
 		case E_UPDATE_SCORES:
+		{
 			updateAllAttrScores();
+			// update subscribers
+			int subscribersCount = subscribersList.CountItems();
+			if(subscribersCount>0)
+			{
+				BList appStatsList = CreateAppStatsList(SORT_BY_SCORE);
+				for(int j=0; j<subscribersCount; j++)
+				{
+					Subscriber *currentSub = (Subscriber*)subscribersList.ItemAt(j);
+					SendListToSubscriber(&appStatsList, currentSub);
+				}
+				EmptyAppStatsList(appStatsList);
+			}
 			break;
+		}
 		default: BApplication::MessageReceived(msg);//The message may be for the application
 	}
 }
@@ -534,7 +550,6 @@ void einsteinium_engine::rescanAllAttrFiles()
 void einsteinium_engine::rescanAttrFile(BEntry* entry)
 {	AppAttrFile attrFile(entry);
 	attrFile.rescanData();
-//	attrFile.Close();
 }
 
 
@@ -547,7 +562,6 @@ void einsteinium_engine::updateAttrScore(BEntry *entry)
 //	printf("Updating attribute %s\n", path.Path());
 	AppAttrFile attrFile(entry);
 	attrFile.calculateScore();
-//	attrFile.Close();
 }
 
 

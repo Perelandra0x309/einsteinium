@@ -1,4 +1,4 @@
-/*constants.h
+/*prefs_constants.h
 	constant definitions and message commands
 */
 #ifndef EP_CONSTANTS_H
@@ -43,9 +43,9 @@ enum prefs_messages
 	E_RECALC_QUARTS,
 	E_RESCAN_DATA,
 	//services
-	EP_RESTART_SERVICE,
-	EP_START_SERVICE,
-	EP_STOP_SERVICE
+	RESTART_SERVICE,
+	START_SERVICE,
+	STOP_SERVICE
 
 };
 //Colors

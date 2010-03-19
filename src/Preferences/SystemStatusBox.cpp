@@ -16,7 +16,7 @@ SystemStatusBox::SystemStatusBox(BEntry entry, const char * sig)
 	SetResizingMode(B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
 	signature.SetTo(sig);
 	statusSV = new BStringView("Status String", "Status: ");
-	restartB = new BButton("Restart", new BMessage(EP_RESTART_SERVICE));
+	restartB = new BButton("Restart", new BMessage(RESTART_SERVICE));
 	restartB->SetEnabled(false);
 	startstopB = new BButton("Stop");
 	startstopB->SetEnabled(false);
@@ -29,18 +29,23 @@ SystemStatusBox::SystemStatusBox(BEntry entry, const char * sig)
 		.SetInsets(5, 5, 5, 5)
 	);
 
-	GetRunningState();
 }
 
-SystemStatusBox::~SystemStatusBox()
+/*SystemStatusBox::~SystemStatusBox()
 {
-}
+}*/
 
 void SystemStatusBox::AttachedToWindow()
 {
 	BBox::AttachedToWindow();
 	restartB->SetTarget(this);
 	startstopB->SetTarget(this);
+	usedWidth = restartB->PreferredSize().width + startstopB->PreferredSize().width
+				+ (2 * 10) // space between each control
+				+ (2 * 5) // insets
+				+ 100 + 4*BORDER_SIZE // left selection view size
+				+ 45; // extra padding
+	GetRunningState();
 }
 
 void SystemStatusBox::MessageReceived(BMessage* msg)
@@ -57,7 +62,7 @@ void SystemStatusBox::MessageReceived(BMessage* msg)
 				// In the middle of a restart- send message to start the service
 				{
 					BMessenger messenger(this);
-					BMessage message(EP_START_SERVICE);
+					BMessage message(START_SERVICE);
 					messenger.SendMessage(&message);
 				}
 				else
@@ -78,7 +83,7 @@ void SystemStatusBox::MessageReceived(BMessage* msg)
 			}
 			break;
 		}
-		case EP_RESTART_SERVICE:
+		case RESTART_SERVICE:
 		{
 			SetState(STATE_OK_RESTARTING);
 			status_t rc = StopService();
@@ -91,13 +96,13 @@ void SystemStatusBox::MessageReceived(BMessage* msg)
 					SetState(STATE_ERROR_STOPPING__IS_NOT_RUNNING);
 					// Attempt to start the service
 					BMessenger messenger(this);
-					BMessage message(EP_START_SERVICE);
+					BMessage message(START_SERVICE);
 					messenger.SendMessage(&message);
 				}
 			}
 			break;
 		}
-		case EP_START_SERVICE:
+		case START_SERVICE:
 		{
 			SetState(STATE_OK_STARTING);
 			status_t rc = StartService();
@@ -110,7 +115,7 @@ void SystemStatusBox::MessageReceived(BMessage* msg)
 			}
 			break;
 		}
-		case EP_STOP_SERVICE:
+		case STOP_SERVICE:
 		{
 			SetState(STATE_OK_STOPPING);
 			status_t rc = StopService();
@@ -138,7 +143,7 @@ status_t SystemStatusBox::StopService()
 	BMessenger appMessenger(signature.String());
 	if(!appMessenger.IsValid())
 	{
-		BString err("Error: Could not create messenger for ");
+		BString err("Error: Could not create messenger for service ");
 		err.Append(name);
 		(new BAlert("", err.String(),"OK"))->Go(NULL);
 		return rc;
@@ -149,10 +154,29 @@ status_t SystemStatusBox::StopService()
 
 void SystemStatusBox::SetStatusText(const char* text)
 {
-	// TODO check size of string view, possibly create tool tip if message too long?
-	BString label("Status: ");
-	label.Append(text);
-	statusSV->SetText(label.String());
+	stringViewText.SetTo("Status: ");
+	stringViewText.Append(text);
+//	stringViewText.Append(" (Really really long text used for testing purposes.)");
+	ResizeStatusText();
+}
+
+void SystemStatusBox::ResizeStatusText()
+{
+	// truncate text and create tool tip if message is too long
+	BString newString(stringViewText);
+	float remainingWidth = Window()->Bounds().Width() - usedWidth;
+	statusSV->TruncateString(&newString, B_TRUNCATE_END, remainingWidth);
+	statusSV->SetText(newString.String());
+	// TODO need to work on the tooltip- not working correctly
+/*	if(newString.Compare(stringViewText)!=0)
+	{
+		statusSV->SetToolTip(stringViewText.String());
+	}
+	else
+	{
+		statusSV->SetToolTip("");
+		statusSV->SetToolTip((BToolTip*)NULL);
+	}*/
 }
 
 void SystemStatusBox::GetRunningState(){
@@ -172,7 +196,7 @@ void SystemStatusBox::SetState(int newstate)
 			restartB->SetEnabled(true);
 			startstopB->SetLabel("Stop");
 			startstopB->SetEnabled(true);
-			startstopB->SetMessage(new BMessage(EP_STOP_SERVICE));
+			startstopB->SetMessage(new BMessage(STOP_SERVICE));
 			currentState = STATE_OK_RUNNING;
 			break;
 		}
@@ -182,7 +206,7 @@ void SystemStatusBox::SetState(int newstate)
 			restartB->SetEnabled(false);
 			//startstopB->SetLabel("Start");
 			startstopB->SetEnabled(false);
-			//startstopB->SetMessage(new BMessage(EP_START_SERVICE));
+			//startstopB->SetMessage(new BMessage(START_SERVICE));
 			currentState = STATE_OK_STOPPING;
 			break;
 		}
@@ -192,7 +216,7 @@ void SystemStatusBox::SetState(int newstate)
 			restartB->SetEnabled(false);
 			startstopB->SetLabel("Start");
 			startstopB->SetEnabled(true);
-			startstopB->SetMessage(new BMessage(EP_START_SERVICE));
+			startstopB->SetMessage(new BMessage(START_SERVICE));
 			currentState = STATE_ERROR_STOPPING__IS_NOT_RUNNING;
 			break;
 		}
@@ -202,7 +226,7 @@ void SystemStatusBox::SetState(int newstate)
 			restartB->SetEnabled(true);
 			startstopB->SetLabel("Stop");
 			startstopB->SetEnabled(true);
-			startstopB->SetMessage(new BMessage(EP_STOP_SERVICE));
+			startstopB->SetMessage(new BMessage(STOP_SERVICE));
 			currentState = STATE_ERROR_STOPPING__IS_RUNNING;
 			break;
 		}
@@ -212,7 +236,7 @@ void SystemStatusBox::SetState(int newstate)
 			restartB->SetEnabled(false);
 			startstopB->SetLabel("Start");
 			startstopB->SetEnabled(true);
-			startstopB->SetMessage(new BMessage(EP_START_SERVICE));
+			startstopB->SetMessage(new BMessage(START_SERVICE));
 			currentState = STATE_OK_STOPPED;
 			break;
 		}
@@ -222,7 +246,7 @@ void SystemStatusBox::SetState(int newstate)
 			restartB->SetEnabled(false);
 			//startstopB->SetLabel("Start");
 			startstopB->SetEnabled(false);
-			//startstopB->SetMessage(new BMessage(EP_START_SERVICE));
+			//startstopB->SetMessage(new BMessage(START_SERVICE));
 			currentState = STATE_OK_STARTING;
 			break;
 		}
@@ -232,7 +256,7 @@ void SystemStatusBox::SetState(int newstate)
 			restartB->SetEnabled(true);
 			startstopB->SetLabel("Stop");
 			startstopB->SetEnabled(true);
-			startstopB->SetMessage(new BMessage(EP_STOP_SERVICE));
+			startstopB->SetMessage(new BMessage(STOP_SERVICE));
 			currentState = STATE_ERROR_STARTING__IS_RUNNING;
 		}
 		case STATE_ERROR_STARTING__IS_NOT_RUNNING:
@@ -241,7 +265,7 @@ void SystemStatusBox::SetState(int newstate)
 			restartB->SetEnabled(false);
 			startstopB->SetLabel("Start");
 			startstopB->SetEnabled(true);
-			startstopB->SetMessage(new BMessage(EP_START_SERVICE));
+			startstopB->SetMessage(new BMessage(START_SERVICE));
 			currentState = STATE_ERROR_STARTING__IS_NOT_RUNNING;
 			break;
 		}
@@ -251,7 +275,7 @@ void SystemStatusBox::SetState(int newstate)
 			restartB->SetEnabled(false);
 			//startstopB->SetLabel("Start");
 			startstopB->SetEnabled(false);
-			//startstopB->SetMessage(new BMessage(EP_START_SERVICE));
+			//startstopB->SetMessage(new BMessage(START_SERVICE));
 			currentState = STATE_OK_RESTARTING;
 			break;
 		}

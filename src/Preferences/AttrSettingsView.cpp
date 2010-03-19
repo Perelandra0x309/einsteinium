@@ -219,22 +219,6 @@ BSize AttrSettingsView::GetMinSize()
 	return size;
 }
 
-/*void AttrSettingsView::SaveChanges()
-{	saveItemSettings();
-	AppAttrItem* item;
-	BNode attrNode;
-	int count = attrLView->CountItems();
-	for(int i=0; i<count; i++)
-	{	item = (AppAttrItem*)(attrLView->ItemAt(i));
-		if(!item->changed) { continue; }
-		attrNode.SetTo(item->attrPath.String());
-		if(attrNode.InitCheck()!=B_OK) { continue; }
-		attrNode.WriteAttr("EIN:IGNORE", B_BOOL_TYPE, 0, &(item->s_ignore), sizeof(bool));
-		item->changed = false;
-		attrLView->InvalidateItem(i);
-	}
-
-}*/
 
 void AttrSettingsView::RebuildAttrList()
 {	EmptyAttrList();
@@ -293,7 +277,18 @@ void AttrSettingsView::SaveChangedItem(AppAttrItem *item)
 		// TODO error message?
 		return;
 	}
-	attrNode.WriteAttr(ATTR_IGNORE_NAME, B_BOOL_TYPE, 0, &(item->s_ignore), sizeof(bool));
+	app_info info;
+	status_t result = be_roster->GetAppInfo(e_engine_sig, &info);
+	if(result==B_OK)
+	{
+		BMessenger messenger(e_engine_sig);
+		BMessage msg(E_SET_IGNORE_ATTR);
+		msg.AddString("app_signature", item->appSig);
+		msg.AddInt32("which", item->s_ignore ? 0 : 1);
+		messenger.SendMessage(&msg);
+	}
+	else
+		attrNode.WriteAttr(ATTR_IGNORE_NAME, B_BOOL_TYPE, 0, &(item->s_ignore), sizeof(bool));
 }
 
 
@@ -302,10 +297,8 @@ void AttrSettingsView::saveItemSettings()//save user configureable settings
 	{	bool ignore = ignoreCB->Value();
 		if(ignore!=selectedItem->s_ignore)
 		{	selectedItem->s_ignore = ignore;
-		//	selectedItem->changed = !(selectedItem->changed);
 			SaveChangedItem(selectedItem);
 			attrLView->InvalidateItem(attrLView->IndexOf(selectedItem));
-			// TODO send message to engine to update subscribers
 		}
 	}
 }
@@ -351,7 +344,7 @@ void AttrSettingsView::saveIncludeSetting(const char *value)
 
 
 AppAttrItem::AppAttrItem(const char* sig, BPath& path)
-	:BListItem(), /*changed(false), */s_ignore(false)
+	:BListItem(), s_ignore(false)
 	,attrPath(path.Path()), appSig(sig), appName(path.Leaf())
 	// TODO appName may not be path.Leaf()
 {	}
@@ -371,7 +364,6 @@ void AppAttrItem::DrawItem(BView* owner, BRect item_rect, bool complete)
 	if(!s_ignore) owner->SetHighColor(enabled_color);
 	else owner->SetHighColor(disabled_color);
 	BString text(appName);
-//	if(changed) text.Append("*");
 	text.Append(" (").Append(appSig).Append(")");
 	owner->DrawString(text.String(), BPoint(item_rect.left+5.0,item_rect.bottom - 2.0));
 }

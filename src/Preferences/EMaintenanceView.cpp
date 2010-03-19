@@ -91,7 +91,8 @@ void EMaintenanceView::AllAttached()
 	BView::AllAttached();
 
 	//Start watching the application roster for launches and quits of services
-	status_t result = be_roster->StartWatching(BMessenger(this));
+	status_t result = be_roster->StartWatching(BMessenger(this),
+							B_REQUEST_QUIT | B_REQUEST_LAUNCHED);
 	if(result  != B_OK)
 	{	//roster failed to be watched.  Show warning, but we can continue.
 		(new BAlert("Watching Warning", "Warning: This app was not able to succeesfully start "
@@ -121,6 +122,11 @@ void EMaintenanceView::MessageReceived(BMessage* msg)
 			}
 		}
 	}
+}
+
+void EMaintenanceView::ResizeStatusBox()
+{
+	statusBox->ResizeStatusText();
 }
 
 void EMaintenanceView::SetButtonEnabledState()

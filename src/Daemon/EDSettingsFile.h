@@ -14,13 +14,13 @@
 #include "daemon_constants.h"
 #include "AppRelaunchSettings.h"
 
-class EDSettingsFile : public BHandler //BLooper
+class EDSettingsFile : public BHandler
 {
 public:
 							EDSettingsFile();
 							~EDSettingsFile();
-	void					SaveSettings(BList*, int);
 	void					UpdateActionForApp(const char *_signature, const char *_relaunch);
+	void					RemoveApp(const char *_signature);
 	AppRelaunchSettings*	FindSettingsForApp(const char *sig);
 	status_t				CheckInitStatus() { return _initStatus; }
 	int						GetDefaultRelaunchAction() { return defaultRelaunchAction; }
