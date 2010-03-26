@@ -1,15 +1,17 @@
-/*EMaintenanceView.cpp
-	Create view for maintaining engine application data
-*/
+/* EMaintenanceView.cpp
+ * Copyright 2010 Brian Hill
+ * All rights reserved. Distributed under the terms of the BSD License.
+ */
 #include "EMaintenanceView.h"
 
 EMaintenanceView::EMaintenanceView(BRect size)
-	:BView(size, "Engine Maintenance", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
-	,watchingRoster(false)
-{	SetViewColor(bg_color);
-
-	BEntry serviceEntry = getEntryFromSig(e_engine_sig);
-	statusBox = NULL;
+	:
+	BView(size, "Engine Maintenance", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
+	fWatchingRoster(false)
+{
+	SetViewColor(bg_color);
+	BEntry serviceEntry = GetEntryFromSig(e_engine_sig);
+	fStatusBox = NULL;
 	if(serviceEntry.Exists())
 	{
 		BNode serviceNode;
@@ -25,10 +27,10 @@ EMaintenanceView::EMaintenanceView(BRect size)
 						if(serviceNode.GetAttrInfo("BEOS:APP_SIG", &info) == B_OK) {
 							serviceNode.ReadAttrString("BEOS:APP_SIG", &sig);
 							//printf("Found server: %s\n", sig.String());
-							statusBox = new SystemStatusBox(serviceEntry, sig.String());
+							fStatusBox = new SystemStatusBox(serviceEntry, sig.String());
 							// Override the standard look used in the Services view
-							statusBox->SetBorder(B_FANCY_BORDER);
-							statusBox->SetLabel("Engine Status");
+							fStatusBox->SetBorder(B_FANCY_BORDER);
+							fStatusBox->SetLabel("Engine Status");
 						}
 					}
 				}
@@ -38,55 +40,59 @@ EMaintenanceView::EMaintenanceView(BRect size)
 	}
 
 	//Engine commands
-	rankBox = new BBox("Rank BBox");
-	rankBox->SetLabel("Rank Commands");
-	ranksB = new BButton("rank", "Recalculate Scores", new BMessage(E_RECALC_SCORES));
-	ranksB->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
-	ranksTV = new BTextView("Rank Description");
-	ranksTV->SetText("Recalculate the rank score of each application.");
-	ranksTV->SetViewColor(bg_color);
-	ranksTV->MakeSelectable(false);
-	ranksTV->MakeEditable(false);
-	quartilesB = new BButton("quartiles", "Recalculate Quartiles", new BMessage(E_RECALC_QUARTS));
-	quartilesTV = new BTextView("Quartiles Description");
-	quartilesTV->SetText("Update the statitical quartiles for each measure used in the rank calculation.");
-	quartilesTV->SetViewColor(bg_color);
-	quartilesTV->MakeSelectable(false);
-	quartilesTV->MakeEditable(false);
-	dataB = new BButton("data", "Rescan Data", new BMessage(E_RESCAN_DATA));
-	dataB->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
-	dataTV = new BTextView("Rescan Data Description");
-	dataTV->SetText("Rescan all the application start and quit times from the database to recreate application statistics.");
-	dataTV->SetViewColor(bg_color);
-	dataTV->MakeSelectable(false);
-	dataTV->MakeEditable(false);
-	rankBox->AddChild(BGridLayoutBuilder(5, 5)
-		.Add(ranksB, 0, 0)
-		.Add(ranksTV, 1, 0, 1, 2)
-		.Add(quartilesB, 0, 2)
-		.Add(quartilesTV, 1, 2, 1, 2)
-		.Add(dataB, 0, 4)
-		.Add(dataTV, 1, 4, 1, 2)
+	fRankBox = new BBox("Rank BBox");
+	fRankBox->SetLabel("Rank Commands");
+	fRanksB = new BButton("rank", "Recalculate Scores", new BMessage(E_RECALC_SCORES));
+	fRanksB->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	fRanksTV = new BTextView("Rank Description");
+	fRanksTV->SetText("Recalculate the rank score of each application.");
+	fRanksTV->SetViewColor(bg_color);
+	fRanksTV->MakeSelectable(false);
+	fRanksTV->MakeEditable(false);
+	fQuartilesB = new BButton("quartiles", "Recalculate Quartiles", new BMessage(E_RECALC_QUARTS));
+	fQuartilesTV = new BTextView("Quartiles Description");
+	fQuartilesTV->SetText("Update the statitical quartiles for each measure used in the rank calculation.");
+	fQuartilesTV->SetViewColor(bg_color);
+	fQuartilesTV->MakeSelectable(false);
+	fQuartilesTV->MakeEditable(false);
+	fDataB = new BButton("data", "Rescan Data", new BMessage(E_RESCAN_DATA));
+	fDataB->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	fDataTV = new BTextView("Rescan Data Description");
+	fDataTV->SetText("Rescan all the application start and quit times from the database to recreate application statistics.");
+	fDataTV->SetViewColor(bg_color);
+	fDataTV->MakeSelectable(false);
+	fDataTV->MakeEditable(false);
+	fRankBox->AddChild(BGridLayoutBuilder(5, 5)
+		.Add(fRanksB, 0, 0)
+		.Add(fRanksTV, 1, 0, 1, 2)
+		.Add(fQuartilesB, 0, 2)
+		.Add(fQuartilesTV, 1, 2, 1, 2)
+		.Add(fDataB, 0, 4)
+		.Add(fDataTV, 1, 4, 1, 2)
 		.SetInsets(5, 5, 5, 5)
 	);
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	BGroupLayoutBuilder builder(B_VERTICAL, 10);
-	if(statusBox != NULL) { builder.Add(statusBox); }
+	if(fStatusBox != NULL)
+		builder.Add(fStatusBox);
 	AddChild(builder
-		.Add(rankBox)
+		.Add(fRankBox)
 		.AddGlue()
 	);
 }
 
+
 EMaintenanceView::~EMaintenanceView()
 {
 	//Need to stop watching the roster
-	if(watchingRoster)
-	{	be_roster->StopWatching(BMessenger(this)); }
+	if(fWatchingRoster)
+		be_roster->StopWatching(BMessenger(this));
 }
 
-void EMaintenanceView::AllAttached()
+
+void
+EMaintenanceView::AllAttached()
 {
 	BView::AllAttached();
 
@@ -94,19 +100,21 @@ void EMaintenanceView::AllAttached()
 	status_t result = be_roster->StartWatching(BMessenger(this),
 							B_REQUEST_QUIT | B_REQUEST_LAUNCHED);
 	if(result  != B_OK)
-	{	//roster failed to be watched.  Show warning, but we can continue.
+		//roster failed to be watched.  Show warning, but we can continue.
 		(new BAlert("Watching Warning", "Warning: This app was not able to succeesfully start "
 					"watching the roster for aplication quit and launch messages.  "
-					"The status of the Einsteinium Engine may not be up to date at any time.", "OK"))->Go();
-	}
-	else//watching was sucessful
-	{	watchingRoster = true;
-	}
+					"The status of the Einsteinium Engine may not be up to date at any time.",
+					"OK"))->Go();
+	else
+		//watching was sucessful
+		fWatchingRoster = true;
 
-	SetButtonEnabledState();
+	_SetButtonEnabledState();
 }
 
-void EMaintenanceView::MessageReceived(BMessage* msg)
+
+void
+EMaintenanceView::MessageReceived(BMessage* msg)
 {	switch(msg->what)
 	{
 		case B_SOME_APP_QUIT:
@@ -116,25 +124,27 @@ void EMaintenanceView::MessageReceived(BMessage* msg)
 			if (msg->FindString("be:signature", &sig) != B_OK) break;
 			if(strcmp(sig, e_engine_sig) == 0)//Found a match for the einsteinium engine signature
 			{
-				BMessenger messenger(statusBox);
+				BMessenger messenger(fStatusBox);
 				messenger.SendMessage(msg);
-				SetButtonEnabledState();
+				_SetButtonEnabledState();
 			}
 		}
 	}
 }
 
-void EMaintenanceView::ResizeStatusBox()
+
+void
+EMaintenanceView::ResizeStatusBox()
 {
-	statusBox->ResizeStatusText();
+	fStatusBox->ResizeStatusText();
 }
 
-void EMaintenanceView::SetButtonEnabledState()
+
+void
+EMaintenanceView::_SetButtonEnabledState()
 {
-	app_info info;
-	status_t result = be_roster->GetAppInfo(e_engine_sig, &info);
-	bool running = result==B_OK;
-	ranksB->SetEnabled(running);
-	quartilesB->SetEnabled(running);
-	dataB->SetEnabled(running);
+	bool running = be_roster->IsRunning(e_engine_sig);
+	fRanksB->SetEnabled(running);
+	fQuartilesB->SetEnabled(running);
+	fDataB->SetEnabled(running);
 }

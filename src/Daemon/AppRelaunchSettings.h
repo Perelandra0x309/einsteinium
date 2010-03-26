@@ -1,6 +1,7 @@
-/*AppRelaunchSettings.h
-	Settings read from file
-*/
+/* AppRelaunchSettings.h
+ * Copyright 2010 Brian Hill
+ * All rights reserved. Distributed under the terms of the BSD License.
+ */
 #ifndef ED_APPRELAUNCHSETTINGS_H
 #define ED_APPRELAUNCHSETTINGS_H
 
@@ -10,8 +11,8 @@
 #include "daemon_constants.h"
 
 
-class AppRelaunchSettings
-{public:
+class AppRelaunchSettings {
+public:
 					AppRelaunchSettings();
 					AppRelaunchSettings(AppRelaunchSettings*);
 					AppRelaunchSettings(const char *_signature, const char *_relaunch = NULL);
@@ -22,7 +23,7 @@ class AppRelaunchSettings
 	BString			GetRelaunchActionString();
 	bool			Equals(AppRelaunchSettings*);
 private:
-	BEntry			getEntryFromSig(const char* sig);
+	BEntry			_GetEntryFromSig(const char* sig);
 	// TODO add timestamp that records the last time settings were updated?
 };
 

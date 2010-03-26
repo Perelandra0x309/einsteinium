@@ -1,13 +1,15 @@
-/*
+/* EEShelfView.cpp
+ * Copyright 2010 Brian Hill
+ * All rights reserved. Distributed under the terms of the BSD License.
  */
-
 #include "EEShelfView.h"
 
 const char* kTrackerSignature = "application/x-vnd.Be-TRAK";
 
 
 EEShelfView::EEShelfView(BRect frame, int16 count)
-	:BView(frame, EE_SHELFVIEW_NAME, B_FOLLOW_NONE,
+	:
+	BView(frame, EE_SHELFVIEW_NAME, B_FOLLOW_NONE,
 		B_WILL_DRAW/* | B_FRAME_EVENTS /*B_PULSE_NEEDED*/),
 	fIcon(NULL)
 {
@@ -16,7 +18,6 @@ EEShelfView::EEShelfView(BRect frame, int16 count)
 	app_info info;
 	be_app->GetAppInfo(&info);
 	BFile file(&info.ref, B_READ_ONLY);
-
 	if (file.InitCheck() != B_OK)
 		return;
 
@@ -43,22 +44,22 @@ EEShelfView::EEShelfView(BRect frame, int16 count)
 			printf("Error creating bitmap\n");
 		}
 	}
-	else printf("rawIcon was NULL\n");
+	else
+		printf("rawIcon was NULL\n");
 
 	SetToolTip("Einsteinium  \nRanked\nApplications");
 }
 
 
 EEShelfView::EEShelfView(BMessage *message)
-	:BView(message),
+	:
+	BView(message),
 	fIcon(NULL)
 {
 	BMessage iconArchive;
 	status_t result = message->FindMessage("fIconArchive", &iconArchive);
 	if(result == B_OK)
-	{
 		fIcon = new BBitmap(&iconArchive);
-	}
 	message->FindInt16("count", &fInitialCount);
 	// Apparently Haiku does not yet archive tool tips (Alpha-1 R1)
 	SetToolTip("Einsteinium  \nRanked\nApplications");
@@ -72,7 +73,8 @@ EEShelfView::~EEShelfView()
 }
 
 
-void EEShelfView::AttachedToWindow()
+void
+EEShelfView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
 	if (Parent())
@@ -95,13 +97,13 @@ void EEShelfView::AttachedToWindow()
 		subscribeMsg.AddMessenger("messenger", BMessenger(this));
 		BMessenger EsMessenger(e_engine_sig);
 		EsMessenger.SendMessage(&subscribeMsg);
-
 		Invalidate();
 	}
 }
 
 
-void EEShelfView::DetachedFromWindow()
+void
+EEShelfView::DetachedFromWindow()
 {
 	// Unsubscribe from the Einsteinium Engine
 	if (be_roster->IsRunning(e_engine_sig))
@@ -114,7 +116,8 @@ void EEShelfView::DetachedFromWindow()
 }
 
 
-EEShelfView* EEShelfView::Instantiate(BMessage *data)
+EEShelfView*
+EEShelfView::Instantiate(BMessage *data)
 {
 	if (!validate_instantiation(data, "EEShelfView"))
 		return NULL;
@@ -122,7 +125,8 @@ EEShelfView* EEShelfView::Instantiate(BMessage *data)
 }
 
 
-status_t EEShelfView::Archive(BMessage *data, bool deep) const
+status_t
+EEShelfView::Archive(BMessage *data, bool deep) const
 {
 	BView::Archive(data, deep);
 	data->AddString("add_on", e_engine_sig);
@@ -138,7 +142,8 @@ status_t EEShelfView::Archive(BMessage *data, bool deep) const
 }
 
 
-void EEShelfView::Draw(BRect rect)
+void
+EEShelfView::Draw(BRect rect)
 {
 	if (fIcon == NULL)
 		return;
@@ -149,7 +154,8 @@ void EEShelfView::Draw(BRect rect)
 }
 
 
-void EEShelfView::MessageReceived(BMessage* msg)
+void
+EEShelfView::MessageReceived(BMessage* msg)
 {
 	switch(msg->what)
 	{
@@ -174,24 +180,25 @@ void EEShelfView::MessageReceived(BMessage* msg)
 
 
 /*
-void EEShelfView::Pulse()
+void
+EEShelfView::Pulse()
 {
 	// TODO: Check if einsteinium engine is still running
 }*/
 
 
-void EEShelfView::MouseDown(BPoint pos)
+void
+EEShelfView::MouseDown(BPoint pos)
 {
 	ConvertToScreen(&pos);
-	if (fMenu) {
+	if (fMenu)
 		fMenu->Go(pos, true, true, BRect(pos.x - 2, pos.y - 2,
 			pos.x + 2, pos.y + 2), true);
-	}
 }
 
-BPopUpMenu* EEShelfView::_BuildMenu(BMessage *message)
+BPopUpMenu*
+EEShelfView::_BuildMenu(BMessage *message)
 {
-
 	fMenu = new BPopUpMenu(B_EMPTY_STRING, false, false);
 	fMenu->SetFont(be_plain_font);
 
@@ -210,7 +217,7 @@ BPopUpMenu* EEShelfView::_BuildMenu(BMessage *message)
 		BMessage *newMsg = new BMessage(E_SHELFVIEW_OPEN);
 		newMsg->AddRef("refs", &newref);
 		fMenu->AddItem(new IconMenuItem(newref.name, newMsg, &refNodeInfo, B_MINI_ICON));
-		// TODO how to get a vector icon?
+		// TODO does this also get a vector icon?
 	}
 
 	fMenu->AddSeparatorItem();

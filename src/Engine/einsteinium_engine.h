@@ -1,71 +1,74 @@
-/*einsteinium_engine.h
-	Main engine application object definitions
-*/
+/* einsteinium_engine.h
+ * Copyright 2010 Brian Hill
+ * All rights reserved. Distributed under the terms of the BSD License.
+ */
 #ifndef EINSTEINIUM_ENGINE_H
 #define EINSTEINIUM_ENGINE_H
+
 #include <AppKit.h>
-#include <Deskbar.h>
 #include <StorageKit.h>
+#include <Deskbar.h>
 #include <stdio.h>
-#include "engine_constants.h"
-#include "methods.h"
 #include "AppStats.h"
 #include "AppAttrFile.h"
 #include "EESettingsFile.h"
 #include "EEShelfView.h"
+#include "engine_constants.h"
+#include "methods.h"
+
 
 struct Subscriber {
 	int16 count;
 	int32 uniqueID;
 	BMessenger messenger;
 };
-//Einsteinium Engine is an inherited subclass of BApplication to
-//enabled the use of BMessages to the system and other apps
-class einsteinium_engine : public BApplication
-{public:
+
+class einsteinium_engine : public BApplication {
+public:
 					einsteinium_engine();
 //					~einsteinium_engine();
-	virtual bool	QuitRequested();//Clean up data
-	virtual void	ReadyToRun();//First function to run
-	virtual void	ArgvReceived(int32, char**);//command line options
-	virtual void	MessageReceived(BMessage*);//received BMessages
-	const double*	GetQuartilesPtr() const { return quartiles; }
-	const int*		GetScalesPtr() const { return settingsFile->GetScales(); }
-	const time_t	GetSession() { return ee_session; }
+	virtual bool	QuitRequested();
+	virtual void	ReadyToRun();
+	virtual void	ArgvReceived(int32, char**);
+	virtual void	MessageReceived(BMessage*);
+	const double*	GetQuartilesPtr() const { return fQuartiles; }
+	const int*		GetScalesPtr() const { return fSettingsFile->GetScales(); }
+	const time_t	GetSession() { return fEngineSession; }
 private:
-	BPath			settingsDirPath;
-	EESettingsFile	*settingsFile;
-	bool			watchingRoster;//will be true when roster is being watched
-	BMessageRunner	*quartileRunner;
-	const time_t	ee_session;//current session number
-	double			quartiles[30];
-	BList			subscribersList;
-//	BQuery			rankQuery;
-	int32			shelfViewId;
-	void			SendListToSubscriber(BList *appStatsList, Subscriber *subscriber);
-	void			PopulateAppRankMessage(BList *appStatsList, BMessage *message, int count);
-	void			ShowShelfView(bool showShelfView, int shelfViewCount);
-//	void			DoRankQuery();
-	void			forEachAttrFile(int action, BList *appStatsList = NULL);
-	void			rescanAllAttrFiles();
-	void			rescanAttrFile(BEntry*);
-	void			updateAllAttrScores();
-	void			updateAttrScore(BEntry*);
-	BList			CreateAppStatsList(int sortAction=SORT_BY_NONE);
-	void			SortAppStatsList(BList &list, int sortAction);
-	void			EmptyAppStatsList(BList &list);
-	uint			FindAppStatsRank(BList &appStatsList, const char* signature);
-	void			updateQuartiles();
+	BPath			fSettingsDirPath;
+	EESettingsFile	*fSettingsFile;
+	bool			fWatchingRoster;//will be true when roster is being watched
+	BMessageRunner	*fQuartileRunner;
+	const time_t	fEngineSession;//current session number
+	double			fQuartiles[30];
+	BList			fSubscribersList;
+//	BQuery			fRankQuery;
+	int32			fShelfViewId;
+	// functions
+	void			_SendListToSubscriber(BList *appStatsList, Subscriber *subscriber);
+	void			_PopulateAppRankMessage(BList *appStatsList, BMessage *message, int count);
+	void			_ShowShelfView(bool showShelfView, int shelfViewCount);
+//	void			_DoRankQuery();
+	void			_ForEachAttrFile(int action, BList *appStatsList = NULL);
+	void			_RescanAllAttrFiles();
+	void			_RescanAttrFile(BEntry*);
+	void			_UpdateAllAttrScores();
+	void			_UpdateAttrScore(BEntry*);
+	BList			_CreateAppStatsList(int sortAction=SORT_BY_NONE);
+	void			_SortAppStatsList(BList &list, int sortAction);
+	void			_EmptyAppStatsList(BList &list);
+	uint			_FindAppStatsRank(BList &appStatsList, const char* signature);
+	void			_UpdateQuartiles();
 	template < class itemType >
-	void			getQuartiles(itemType (*)(AppStats*), BList&, double*);
-	void			writeQuartiles(BFile*, double*);
-	void			writeQuartilesNamed(BFile*, double*, const char*);
-//	bool			readQuartiles(BFile*, double*);
-//	bool			readQuartilesNamed(BFile*, double*, const char*);
+	void			_GetQuartiles(itemType (*)(AppStats*), BList&, double*);
+	void			_WriteQuartiles(BFile*, double*);
+	void			_WriteQuartilesNamed(BFile*, double*, const char*);
+//	bool			_ReadQuartiles(BFile*, double*);
+//	bool			_ReadQuartilesNamed(BFile*, double*, const char*);
 };
 
 
 template < class itemType >
-void deleteList(BList&, itemType*);
+void DeleteList(BList&, itemType*);
 
 #endif

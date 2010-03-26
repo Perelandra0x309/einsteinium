@@ -1,23 +1,26 @@
-/*RelaunchSettingsView
-	Definitions and objects for the view containing settings for relaunching
-	apps with the daemon
-*/
+/* RelaunchSettingsView
+ * Copyright 2010 Brian Hill
+ * All rights reserved. Distributed under the terms of the BSD License.
+ */
 #ifndef EP_RELAUNCH_VIEW
 #define EP_RELAUNCH_VIEW
+
 #include <InterfaceKit.h>
-#include <SupportKit.h>
 #include <StorageKit.h>
+#include <SupportKit.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <GridLayoutBuilder.h>
 #include <fstream>
-#include "prefs_constants.h"
 #include "AppRefFilter.h"
 #include "EDSettingsFile.h"
+#include "prefs_constants.h"
+
 
 class RelaunchAppItem;
-class RelaunchSettingsView : public BView
-{public:
+
+class RelaunchSettingsView : public BView {
+public:
 					RelaunchSettingsView(BRect);
 					~RelaunchSettingsView();
 	virtual void	MessageReceived(BMessage*);
@@ -25,35 +28,36 @@ class RelaunchSettingsView : public BView
 	void			ReadSettings();
 	BSize			GetMinSize();
 private:
-	AppRefFilter	*appFilter;
-	BFilePanel		*appsPanel;
-	EDSettingsFile	*edSettings;
-	AppRelaunchSettings *defaultSettings;
-	RelaunchAppItem	*selectedItem;
-	BListView		*appsLView;
-	BScrollView		*appsSView;
-	BButton			*addAppB, *removeAppB;
-	BBox			*relaunchBox;
-	BRadioButton	*autoRelaunchRB, *promptRelaunchRB, *dontRelaunchRB;
-	void			saveSelectedItemSettings();
-	void			clearItemSettings();
-	void			updateSelectedItem();
-	void			recallItemSettings();
+	AppRefFilter	*fAppFilter;
+	BFilePanel		*fAppsPanel;
+	EDSettingsFile	*fDaemonSettings;
+	AppRelaunchSettings *fDefaultSettings;
+	RelaunchAppItem	*fSelectedItem;
+	BListView		*fAppsLView;
+	BScrollView		*fAppsSView;
+	BButton			*fAddAppB, *fRemoveAppB;
+	BBox			*fRelaunchBox;
+	BRadioButton	*fAutoRelaunchRB, *fPromptRelaunchRB, *fDontRelaunchRB;
+	void			_SaveSelectedItemSettings();
+	void			_ClearItemSettings();
+	void			_UpdateSelectedItem();
+	void			_RecallItemSettings();
 };
 
-class RelaunchAppItem : public BListItem
-{public:
+class RelaunchAppItem : public BListItem {
+public:
 					RelaunchAppItem(const char*, BPath);
 					RelaunchAppItem(AppRelaunchSettings*);
 					~RelaunchAppItem();
+	virtual void	DrawItem(BView*, BRect, bool);
 	int				ICompare(RelaunchAppItem*);
 private:
-	AppRelaunchSettings *settings;
-	void			DrawItem(BView*, BRect, bool);
+	AppRelaunchSettings *fSettings;
 //	void			Update(BView *owner, const BFont *font);
 //	virtual bool	InitiateDrag(BPoint point, int32 index, bool wasSelected);
 	friend class RelaunchSettingsView;
 };
 
-	int				SortRelaunchAppItems(const void*, const void*);
+int SortRelaunchAppItems(const void*, const void*);
+
 #endif

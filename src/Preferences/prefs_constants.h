@@ -1,12 +1,16 @@
-/*prefs_constants.h
-	constant definitions and message commands
-*/
+/* prefs_constants.h
+ * Copyright 2010 Brian Hill
+ * All rights reserved. Distributed under the terms of the BSD License.
+ */
 #ifndef EP_CONSTANTS_H
 #define EP_CONSTANTS_H
+
+/*	constant definitions and message commands */
 
 #define BORDER_SIZE 5
 static const char* app_sig = "application/x-vnd.Einsteinium_Preferences";
 static const rgb_color bg_color = {216,216,216,0};//grey background color
+
 //settings
 struct engine_prefs
 {	int		launches_scale, first_launch_scale, last_launch_scale,
@@ -48,6 +52,7 @@ enum prefs_messages
 	STOP_SERVICE
 
 };
+
 //Colors
 const rgb_color enabled_color = {0,0,0,0};
 const rgb_color disabled_color = {100,100,100,0};

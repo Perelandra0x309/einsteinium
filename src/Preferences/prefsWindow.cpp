@@ -4,112 +4,117 @@
 #include "prefsWindow.h"
 
 prefsWindow::prefsWindow(BRect size)
-	:BWindow(size, "Einsteinium Preferences", B_TITLED_WINDOW, B_NOT_ZOOMABLE)
+	:
+	BWindow(size, "Einsteinium Preferences", B_TITLED_WINDOW, B_NOT_ZOOMABLE)
 {
 	//Defaults
-	e_prefs.launches_scale = 5;
-	e_prefs.first_launch_scale = 5;
-	e_prefs.last_launch_scale = 5;
-	e_prefs.interval_scale = 5;
-	e_prefs.total_run_time_scale = 5;
-
+	fEnginePrefs.launches_scale = 5;
+	fEnginePrefs.first_launch_scale = 5;
+	fEnginePrefs.last_launch_scale = 5;
+	fEnginePrefs.interval_scale = 5;
+	fEnginePrefs.total_run_time_scale = 5;
 
 	Lock();
 	BRect viewRect(Bounds());
-	mainView = new BView(viewRect, "Background View", B_FOLLOW_ALL_SIDES, B_WILL_DRAW);
-	mainView->SetViewColor(bg_color);
-	AddChild(mainView);
+	fMainView = new BView(viewRect, "Background View", B_FOLLOW_ALL_SIDES, B_WILL_DRAW);
+	fMainView->SetViewColor(bg_color);
+	AddChild(fMainView);
 	//Prefs list view
 	viewRect.Set(BORDER_SIZE, BORDER_SIZE, BORDER_SIZE + 100, Bounds().bottom - BORDER_SIZE);
-	prefsListView = new BListView(viewRect, "Preferences", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
-	prefsListView->SetSelectionMessage(new BMessage(PREFS_ITEM_CHANGED));
+	fPrefsListView = new BListView(viewRect, "Preferences", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
+	fPrefsListView->SetSelectionMessage(new BMessage(PREFS_ITEM_CHANGED));
 	//Daemon settings
-	daemonBLI = CreateDaemonBLI();
-	prefsListView->AddItem(daemonBLI);
-	appLaunchSI = new BStringItem("    App Relaunch");
-	prefsListView->AddItem(appLaunchSI);
+	fDaemonBLI = _CreateDaemonBLI();
+	fPrefsListView->AddItem(fDaemonBLI);
+	fAppLaunchSI = new BStringItem("    App Relaunch");
+	fPrefsListView->AddItem(fAppLaunchSI);
 	//Engine settings
-	engineBLI = CreateEngineBLI();
-	prefsListView->AddItem(engineBLI);
-	attrSI = new BStringItem("    List Inclusion");
-	prefsListView->AddItem(attrSI);
-	rankSI = new BStringItem("    App Rankings");
-	prefsListView->AddItem(rankSI);
-	deskbarSI = new BStringItem("    Deskbar Menu");
-	prefsListView->AddItem(deskbarSI);
-	maintSI = new BStringItem("    Maintenance");
-	prefsListView->AddItem(maintSI);
+	fEngineBLI = _CreateEngineBLI();
+	fPrefsListView->AddItem(fEngineBLI);
+	fAttrSI = new BStringItem("    List Inclusion");
+	fPrefsListView->AddItem(fAttrSI);
+	fRankSI = new BStringItem("    App Rankings");
+	fPrefsListView->AddItem(fRankSI);
+	fDeskbarSI = new BStringItem("    Deskbar Menu");
+	fPrefsListView->AddItem(fDeskbarSI);
+	fMaintSI = new BStringItem("    Maintenance");
+	fPrefsListView->AddItem(fMaintSI);
 
 	BFont font;
-	prefsListView->GetFont(&font);
-	prefsListView->ResizeTo(daemonBLI->GetWidth(&font) + 10, prefsListView->Frame().Height());
-	BScrollView *prefsScrollView = new BScrollView("List Scrollview", prefsListView, B_FOLLOW_TOP_BOTTOM);
-	mainView->AddChild(prefsScrollView);
+	fPrefsListView->GetFont(&font);
+	fPrefsListView->ResizeTo(fDaemonBLI->GetWidth(&font) + 10, fPrefsListView->Frame().Height());
+	BScrollView *prefsScrollView = new BScrollView("List Scrollview", fPrefsListView,
+		B_FOLLOW_TOP_BOTTOM);
+	fMainView->AddChild(prefsScrollView);
 
 
 	//Empty settings view
 	viewRect.Set(prefsScrollView->Frame().right + BORDER_SIZE, BORDER_SIZE,
 					Bounds().right - BORDER_SIZE, Bounds().bottom - BORDER_SIZE);
-
-	emptySettingsView = new BView(viewRect, "Empty SettingsView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW);
-	emptySettingsView->SetViewColor(bg_color);
-	BBox *box = new BBox(BRect(0,0,emptySettingsView->Bounds().right,
-				emptySettingsView->Bounds().bottom), "Empty Box", B_FOLLOW_ALL_SIDES);
+	fEmptySettingsView = new BView(viewRect, "Empty SettingsView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW);
+	fEmptySettingsView->SetViewColor(bg_color);
+	BBox *box = new BBox(BRect(0,0,fEmptySettingsView->Bounds().right,
+				fEmptySettingsView->Bounds().bottom), "Empty Box", B_FOLLOW_ALL_SIDES);
 	box->SetLabel("About Einsteinium Prefs");
 	// TODO add about text
-	emptySettingsView->AddChild(box);
-	mainView->AddChild(emptySettingsView);
-	emptySettingsView->Hide();
+	fEmptySettingsView->AddChild(box);
+	fMainView->AddChild(fEmptySettingsView);
+	fEmptySettingsView->Hide();
 
 	//Relaunch Apps View
-	appLaunchView = new RelaunchSettingsView(viewRect);
-	mainView->AddChild(appLaunchView);
-	appLaunchView->Hide();
+	fAppLaunchView = new RelaunchSettingsView(viewRect);
+	fMainView->AddChild(fAppLaunchView);
+	fAppLaunchView->Hide();
 	//Recent Apps ranking prefs view
-	rankingView = new RankingSettingsView(viewRect);
-	mainView->AddChild(rankingView);
-	rankingView->Hide();
+	fRankingView = new RankingSettingsView(viewRect);
+	fMainView->AddChild(fRankingView);
+	fRankingView->Hide();
 	//Attribute settings
-	attrView = new AttrSettingsView(viewRect);
-	mainView->AddChild(attrView);
-	attrView->Hide();
+	fAttrView = new AttrSettingsView(viewRect);
+	fMainView->AddChild(fAttrView);
+	fAttrView->Hide();
 	//Deskbar Settings View
-	deskbarView = new DeskbarSettingsView(viewRect);
-	mainView->AddChild(deskbarView);
-	deskbarView->Hide();
+	fDeskbarView = new DeskbarSettingsView(viewRect);
+	fMainView->AddChild(fDeskbarView);
+	fDeskbarView->Hide();
 	//Engine Maintenance View
-	e_maintenanceView = new EMaintenanceView(viewRect);
-	mainView->AddChild(e_maintenanceView);
-	e_maintenanceView->Hide();
+	fMaintenanceView = new EMaintenanceView(viewRect);
+	fMainView->AddChild(fMaintenanceView);
+	fMaintenanceView->Hide();
 
-	curView = emptySettingsView;
-	curView->Show();
+	fCurrentView = fEmptySettingsView;
+	fCurrentView->Show();
 
 	// resize main window and set min size based on the min sizes of each view
 	float minHeight=0, minWidth=0;
-	BSize minSize = appLaunchView->GetMinSize();
+	BSize minSize = fAppLaunchView->GetMinSize();
 	minHeight = minSize.height;
 	minWidth = minSize.width;
-	minSize = rankingView->GetMinSize();
+	minSize = fRankingView->GetMinSize();
 	minHeight = max_c(minHeight, minSize.height);
 	minWidth = max_c(minWidth, minSize.width);
-	minSize = attrView->GetMinSize();
+	minSize = fAttrView->GetMinSize();
 	minHeight = max_c(minHeight, minSize.height);
 	minWidth = max_c(minWidth, minSize.width);
-	float finalMinWidth = prefsListView->Frame().right + minWidth + 10;
+	float finalMinWidth = fPrefsListView->Frame().right + minWidth + 10;
 	float finalMinHeight = minHeight + 10;
 	SetSizeLimits(finalMinWidth, B_SIZE_UNLIMITED, finalMinHeight, B_SIZE_UNLIMITED);
 	ResizeTo(finalMinWidth, finalMinHeight);
 
 	//Settings
-	readSettings();
+	_ReadSettings();
 	Unlock();
 	Show();
 }
+
+
 prefsWindow::~prefsWindow()
 {
 }
-BitmapListItem* prefsWindow::CreateDaemonBLI()
+
+
+BitmapListItem*
+prefsWindow::_CreateDaemonBLI()
 {
 	const int32 kImageWidth = 16;
 	const int32 kImageHeight = 16;
@@ -134,10 +139,14 @@ BitmapListItem* prefsWindow::CreateDaemonBLI()
 	0x1f, 0x1f, 0x00, 0x0f, 0x00, 0x0f, 0x00, 0x00, 0x11, 0x11, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f,
 	0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f
 	};
-	BitmapListItem *newBLI = new BitmapListItem(daemonImageBits, iconRect, kImageColorSpace, "Daemon Settings");
+	BitmapListItem *newBLI = new BitmapListItem(daemonImageBits, iconRect,
+		kImageColorSpace, "Daemon Settings");
 	return newBLI;
 }
-BitmapListItem* prefsWindow::CreateEngineBLI()
+
+
+BitmapListItem*
+prefsWindow::_CreateEngineBLI()
 {
 	const int32 kImageWidth = 16;
 	const int32 kImageHeight = 16;
@@ -162,53 +171,58 @@ BitmapListItem* prefsWindow::CreateEngineBLI()
 	0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x00, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x00,
 	0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 	};
-	BitmapListItem *newBLI = new BitmapListItem(engineImageBits, iconRect, kImageColorSpace, "Engine Settings");
+	BitmapListItem *newBLI = new BitmapListItem(engineImageBits, iconRect,
+		kImageColorSpace, "Engine Settings");
 	return newBLI;
 }
 
 
-bool prefsWindow::QuitRequested()
+bool
+prefsWindow::QuitRequested()
 {
-	storeSettings();
+	_StoreSettings();
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return(true);
 }
 
 
-void prefsWindow::FrameResized(float width, float height)
+void
+prefsWindow::FrameResized(float width, float height)
 {
-	e_maintenanceView->ResizeStatusBox();
+	fMaintenanceView->ResizeStatusBox();
 }
 
 
-void prefsWindow::MessageReceived(BMessage* msg)
+void
+prefsWindow::MessageReceived(BMessage* msg)
 {	switch(msg->what)
 	{	case PREFS_ITEM_CHANGED: {
 			Lock();
-			curView->Hide();
-			int32 index = prefsListView->CurrentSelection();
+			fCurrentView->Hide();
+			int32 index = fPrefsListView->CurrentSelection();
 
-			if(index < 0)//No selection
-			{	curView = emptySettingsView; }
-			else//Item selected
-			{	BStringItem *item = (BStringItem*)prefsListView->ItemAt(index);
-				if(item == appLaunchSI)
-				{	curView = appLaunchView; }
-				else if(item == rankSI)
-				{	curView = rankingView; }
-				else if(item == attrSI)
-				{	curView = attrView; }
-				else if(item == deskbarSI)
-				{	curView = deskbarView; }
-				else if(item == maintSI)
-				{	curView = e_maintenanceView; }
+			if(index < 0)
+				//No selection
+				fCurrentView = fEmptySettingsView;
+			else {
+				//Item selected
+				BStringItem *item = (BStringItem*)fPrefsListView->ItemAt(index);
+				if(item == fAppLaunchSI)
+					fCurrentView = fAppLaunchView;
+				else if(item == fRankSI)
+					fCurrentView = fRankingView;
+				else if(item == fAttrSI)
+					fCurrentView = fAttrView;
+				else if(item == fDeskbarSI)
+					fCurrentView = fDeskbarView;
+				else if(item == fMaintSI)
+					fCurrentView = fMaintenanceView;
 				else
-				{	// If one of the BitmapListItems was selected, selected next ListItem
-					prefsListView->Select(index+1);
-				}
+					// If one of the BitmapListItems was selected, selected next ListItem
+					fPrefsListView->Select(index+1);
 			}
 
-			curView->Show();
+			fCurrentView->Show();
 			Unlock();
 			break; }
 		case E_RECALC_SCORES: {
@@ -228,77 +242,90 @@ void prefsWindow::MessageReceived(BMessage* msg)
 			break; }
 		// Save rank slider settings and recalculate scores
 		case SAVE_RANKING: {
-			writeEngineSettings();
+			_WriteEngineSettings();
 			// TODO detect if engine is running first
 			BMessenger messenger(e_engine_sig);
 			BMessage msg(E_UPDATE_SCORES);
 			messenger.SendMessage(&msg);
 			break; }
 		default: {
-			appLaunchView->MessageReceived(msg);
-			rankingView->MessageReceived(msg);
-			attrView->MessageReceived(msg);
-			deskbarView->MessageReceived(msg);
+			fAppLaunchView->MessageReceived(msg);
+			fRankingView->MessageReceived(msg);
+			fAttrView->MessageReceived(msg);
+			fDeskbarView->MessageReceived(msg);
 			break; }
 	}
 }
-void prefsWindow::storeSettings()
+
+
+void
+prefsWindow::_StoreSettings()
 {
-	writeEngineSettings();
-//	writeDaemonSettings();
+	_WriteEngineSettings();
+//	_WriteDaemonSettings();
 }
-void prefsWindow::readSettings()
+
+
+void
+prefsWindow::_ReadSettings()
 {
 	Lock();
-	readEngineSettings();
-//	readDaemonSettings();
+	_ReadEngineSettings();
+//	_ReadDaemonSettings();
 	// TODO watch settings files for updates
 	// TODO create one instance of settings files to share among views?
 	Unlock();
 }
-void prefsWindow::readEngineSettings()
+
+
+void
+prefsWindow::_ReadEngineSettings()
 {
 	EESettingsFile *eeSettings = new EESettingsFile();
 	int *scales = eeSettings->GetScales();
-	e_prefs.launches_scale = scales[LAUNCH_INDEX];
-	e_prefs.first_launch_scale = scales[FIRST_INDEX];
-	e_prefs.last_launch_scale = scales[LAST_INDEX];
-	e_prefs.interval_scale = scales[INTERVAL_INDEX];
-	e_prefs.total_run_time_scale = scales[RUNTIME_INDEX];
-	rankingView->setSliderValues(e_prefs);
+	fEnginePrefs.launches_scale = scales[LAUNCH_INDEX];
+	fEnginePrefs.first_launch_scale = scales[FIRST_INDEX];
+	fEnginePrefs.last_launch_scale = scales[LAST_INDEX];
+	fEnginePrefs.interval_scale = scales[INTERVAL_INDEX];
+	fEnginePrefs.total_run_time_scale = scales[RUNTIME_INDEX];
+	fRankingView->SetSliderValues(fEnginePrefs);
 
 	// Read setting for action when new application is detected
-	attrView->SetLinkInclusionDefault(eeSettings->GetLinkInclusionDefaultValue());
+	fAttrView->SetLinkInclusionDefault(eeSettings->GetLinkInclusionDefaultValue());
 
 	// Deskbar settings
 	bool show;
 	int count;
 	eeSettings->GetDeskbarSettings(show, count);
-	deskbarView->SetDeskbarValues(show, count);
+	fDeskbarView->SetDeskbarValues(show, count);
 
 	delete eeSettings;
 }
-void prefsWindow::writeEngineSettings()
+
+
+void
+prefsWindow::_WriteEngineSettings()
 {
 	// Rank scale settings
-	rankingView->getSliderValues(e_prefs);
+	fRankingView->GetSliderValues(fEnginePrefs);
 	EESettingsFile *eeSettings = new EESettingsFile();
 	int scales[5];
-	scales[LAUNCH_INDEX] = e_prefs.launches_scale;
-	scales[FIRST_INDEX] = e_prefs.first_launch_scale;
-	scales[LAST_INDEX] = e_prefs.last_launch_scale;
-	scales[INTERVAL_INDEX] = e_prefs.interval_scale;
-	scales[RUNTIME_INDEX] = e_prefs.total_run_time_scale;
+	scales[LAUNCH_INDEX] = fEnginePrefs.launches_scale;
+	scales[FIRST_INDEX] = fEnginePrefs.first_launch_scale;
+	scales[LAST_INDEX] = fEnginePrefs.last_launch_scale;
+	scales[INTERVAL_INDEX] = fEnginePrefs.interval_scale;
+	scales[RUNTIME_INDEX] = fEnginePrefs.total_run_time_scale;
 	eeSettings->SaveScales(scales);
 
 	delete eeSettings;
-
 }
-/*void prefsWindow::readDaemonSettings()
+
+
+/*void prefsWindow::_ReadDaemonSettings()
 {
 	appLaunchView->ReadSettings();
 }*/
-/*void prefsWindow::writeDaemonSettings()
+/*void prefsWindow::_WriteDaemonSettings()
 {
 	appLaunchView->WriteSettings();
 	/*

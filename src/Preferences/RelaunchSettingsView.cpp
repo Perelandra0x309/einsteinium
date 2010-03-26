@@ -1,96 +1,106 @@
-/*RealunchSettingsView.cpp
-	Functions for daemon relaunch apps settings
-*/
+/* RealunchSettingsView.cpp
+ * Copyright 2010 Brian Hill
+ * All rights reserved. Distributed under the terms of the BSD License.
+ */
 #include "RelaunchSettingsView.h"
 
+/*	Definitions and objects for the view containing settings for relaunching
+	apps with the daemon
+*/
+
 RelaunchSettingsView::RelaunchSettingsView(BRect size)
-	:BView(size, "Auto-Relaunch", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
-{	SetViewColor(bg_color);
+	:
+	BView(size, "Auto-Relaunch", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
+{
+	SetViewColor(bg_color);
 	BRect viewRect;
 
-	addAppB = new BButton(viewRect, "Add", "Add" B_UTF8_ELLIPSIS,
+	fAddAppB = new BButton(viewRect, "Add", "Add" B_UTF8_ELLIPSIS,
 						new BMessage(ED_ADD_APPITEM), B_FOLLOW_RIGHT);
-	addAppB->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
-	removeAppB = new BButton(viewRect, "Remove", "Remove",
+	fAddAppB->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	fRemoveAppB = new BButton(viewRect, "Remove", "Remove",
 						new BMessage(ED_REMOVE_APPITEM), B_FOLLOW_RIGHT);
-	removeAppB->SetEnabled(false);
-	relaunchBox = new BBox("Application Relaunch Behavior");
-	relaunchBox->SetLabel("Application Relaunch Settings");
+	fRemoveAppB->SetEnabled(false);
+	fRelaunchBox = new BBox("Application Relaunch Behavior");
+	fRelaunchBox->SetLabel("Application Relaunch Settings");
 
-	autoRelaunchRB = new BRadioButton("Auto Relaunch",
+	fAutoRelaunchRB = new BRadioButton("Auto Relaunch",
 						"Automatically relaunch this application when it quits",
 						new BMessage(ED_AUTO_RELAUNCH_CHANGED));
-	promptRelaunchRB = new BRadioButton("Prompt Relaunch",
+	fPromptRelaunchRB = new BRadioButton("Prompt Relaunch",
 						"Ask me whether to relaunch this application when it quits",
 						new BMessage(ED_AUTO_RELAUNCH_CHANGED));
-	dontRelaunchRB = new BRadioButton("Ignore Relaunch",
+	fDontRelaunchRB = new BRadioButton("Ignore Relaunch",
 						"Do not relaunch this application when it quits",
 						new BMessage(ED_AUTO_RELAUNCH_CHANGED));
 
-	appsLView = new BListView(viewRect, "App List View", B_SINGLE_SELECTION_LIST,
+	fAppsLView = new BListView(viewRect, "App List View", B_SINGLE_SELECTION_LIST,
 								B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS);
-	appsLView->SetSelectionMessage(new BMessage(ED_RELAPP_SELECTION_CHANGED));
-	appsSView = new BScrollView("Apps List Scroll View", appsLView, B_FOLLOW_ALL_SIDES, 0,
+	fAppsLView->SetSelectionMessage(new BMessage(ED_RELAPP_SELECTION_CHANGED));
+	fAppsSView = new BScrollView("Apps List Scroll View", fAppsLView, B_FOLLOW_ALL_SIDES, 0,
 								false, true);
 
-	relaunchBox->AddChild(BGridLayoutBuilder(5, 5)
-		.Add(appsSView, 0, 0, 1, 3)
-		.Add(addAppB, 1, 0)
-		.Add(removeAppB, 1, 1)
-		.Add(autoRelaunchRB, 0, 3, 2, 1)
-		.Add(promptRelaunchRB, 0, 4, 2, 1)
-		.Add(dontRelaunchRB, 0, 5, 2, 1)
+	fRelaunchBox->AddChild(BGridLayoutBuilder(5, 5)
+		.Add(fAppsSView, 0, 0, 1, 3)
+		.Add(fAddAppB, 1, 0)
+		.Add(fRemoveAppB, 1, 1)
+		.Add(fAutoRelaunchRB, 0, 3, 2, 1)
+		.Add(fPromptRelaunchRB, 0, 4, 2, 1)
+		.Add(fDontRelaunchRB, 0, 5, 2, 1)
 		.SetInsets(5, 5, 5, 5)
 	);
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
-		.Add(relaunchBox)
+		.Add(fRelaunchBox)
 	);
 
 	//File Panel
-	appFilter = new AppRefFilter();
-	appsPanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL, B_FILE_NODE, false, NULL, appFilter);
+	fAppFilter = new AppRefFilter();
+	fAppsPanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL, B_FILE_NODE, false, NULL, fAppFilter);
 
-	recallItemSettings();
+	_RecallItemSettings();
 
 	//Default relaunch settings item
 	BPath path("/dummy/Default setting");
-	defaultSettings = new AppRelaunchSettings("for all applications not in this list", path);
+	fDefaultSettings = new AppRelaunchSettings("for all applications not in this list", path);
 
 	//Settings file
-	edSettings = new EDSettingsFile();
+	fDaemonSettings = new EDSettingsFile();
 	ReadSettings();
 }
+
 
 RelaunchSettingsView::~RelaunchSettingsView()
 {	//Remove List Items
 	RelaunchAppItem *Item;
 	int32 count;
 	do
-	{	Item = (RelaunchAppItem*)appsLView->RemoveItem(int32(0));
+	{	Item = (RelaunchAppItem*)fAppsLView->RemoveItem(int32(0));
 		delete Item;
 	}while(Item);
-	delete appsPanel;
-	delete appFilter;
-	delete edSettings;
+	delete fAppsPanel;
+	delete fAppFilter;
+	delete fDaemonSettings;
 }
 
-void RelaunchSettingsView::MessageReceived(BMessage* msg)
+
+void
+RelaunchSettingsView::MessageReceived(BMessage* msg)
 {	switch(msg->what)
 	{	case ED_RELAPP_SELECTION_CHANGED: {
 			Window()->Lock();
-			saveSelectedItemSettings();
-			clearItemSettings();
-			updateSelectedItem();
-			recallItemSettings();
+			_SaveSelectedItemSettings();
+			_ClearItemSettings();
+			_UpdateSelectedItem();
+			_RecallItemSettings();
 			Window()->Unlock();
 			break; }
 		case ED_ADD_APPITEM: {
 			BMessage addmsg(ED_ADD_APPITEM_REF);
-			appsPanel->SetMessage(&addmsg);
-			appsPanel->SetTarget(this);
-			appsPanel->Show();
+			fAppsPanel->SetMessage(&addmsg);
+			fAppsPanel->SetTarget(this);
+			fAppsPanel->Show();
 			break; }
 		case ED_ADD_APPITEM_REF: {
 			entry_ref srcRef;
@@ -104,41 +114,42 @@ void RelaunchSettingsView::MessageReceived(BMessage* msg)
 			{
 				Window()->Lock();
 				RelaunchAppItem* item = new RelaunchAppItem(buf, path);
-				appsLView->AddItem(item);
-				appsLView->SortItems(SortRelaunchAppItems);
-				appsLView->Select(appsLView->IndexOf(item));
-				appsLView->ScrollToSelection();
+				fAppsLView->AddItem(item);
+				fAppsLView->SortItems(SortRelaunchAppItems);
+				fAppsLView->Select(fAppsLView->IndexOf(item));
+				fAppsLView->ScrollToSelection();
 				Window()->Unlock();
-				edSettings->UpdateActionForApp(buf, item->settings->GetRelaunchActionString().String());
-
+				fDaemonSettings->UpdateActionForApp(buf,
+					item->fSettings->GetRelaunchActionString().String());
 			}
 			else (new BAlert("","Excecutable does not have an application signature","OK"))->Go();
 			delete[] buf;
 			break; }
 		case ED_REMOVE_APPITEM: {
-			int32 count = appsLView->CountItems();
+			int32 count = fAppsLView->CountItems();
 			RelaunchAppItem *item;
 			for(int i=count-1; i>=0; i--)
-			{	if(appsLView->IsItemSelected(i))
-				{	item = dynamic_cast<RelaunchAppItem *>(appsLView->RemoveItem(i));
-					edSettings->RemoveApp(item->settings->appSig.String());
+			{	if(fAppsLView->IsItemSelected(i))
+				{	item = dynamic_cast<RelaunchAppItem *>(fAppsLView->RemoveItem(i));
+					fDaemonSettings->RemoveApp(item->fSettings->appSig.String());
 					delete item;
 				}
 			}
-			saveSelectedItemSettings();
-			clearItemSettings();
-			updateSelectedItem();
-			recallItemSettings();
+			_SaveSelectedItemSettings();
+			_ClearItemSettings();
+			_UpdateSelectedItem();
+			_RecallItemSettings();
 			break; }
 		case ED_AUTO_RELAUNCH_CHANGED: {
-			saveSelectedItemSettings();
-			edSettings->UpdateActionForApp(selectedItem->settings->appSig.String(),
-									selectedItem->settings->GetRelaunchActionString().String());
+			_SaveSelectedItemSettings();
+			fDaemonSettings->UpdateActionForApp(fSelectedItem->fSettings->appSig.String(),
+									fSelectedItem->fSettings->GetRelaunchActionString().String());
 			break; }
 		default: { break; }
 	}
 	return;
 }
+
 
 /*void RelaunchSettingsView::WriteSettings()
 {
@@ -169,158 +180,165 @@ void RelaunchSettingsView::MessageReceived(BMessage* msg)
 }*/
 
 
-void RelaunchSettingsView::ReadSettings()
+void
+RelaunchSettingsView::ReadSettings()
 {
 	// Add default settings item
-	defaultSettings->relaunchAction = edSettings->GetDefaultRelaunchAction();
-	appsLView->AddItem(new RelaunchAppItem(defaultSettings));
+	fDefaultSettings->relaunchAction = fDaemonSettings->GetDefaultRelaunchAction();
+	fAppsLView->AddItem(new RelaunchAppItem(fDefaultSettings));
 
 	// Read settings from file
-	BList settingsList = edSettings->GetSettingsList();
+	BList settingsList = fDaemonSettings->GetSettingsList();
 	if(settingsList.IsEmpty()) return;
 	int count = settingsList.CountItems();
 	for(int i=0; i<count; i++){
 		AppRelaunchSettings* settings = (AppRelaunchSettings *)settingsList.ItemAt(i);
-		appsLView->AddItem(new RelaunchAppItem(settings));
+		fAppsLView->AddItem(new RelaunchAppItem(settings));
 	}
 
 	// list items alphabetically ignoring case
-	appsLView->SortItems(SortRelaunchAppItems);
+	fAppsLView->SortItems(SortRelaunchAppItems);
 }
 
 
-BSize RelaunchSettingsView::GetMinSize()
+BSize
+RelaunchSettingsView::GetMinSize()
 {
 	BSize size(B_SIZE_UNSET, B_SIZE_UNSET);
-	size.width = promptRelaunchRB->MinSize().width + 20;
-	size.height = (3 * promptRelaunchRB->MinSize().height)
-					+ (2 * addAppB->MinSize().height) + 60;
+	size.width = fPromptRelaunchRB->MinSize().width + 20;
+	size.height = (3 * fPromptRelaunchRB->MinSize().height)
+					+ (2 * fAddAppB->MinSize().height) + 60;
 	return size;
 }
 
 
-void RelaunchSettingsView::saveSelectedItemSettings()//save user configureable settings
+void
+RelaunchSettingsView::_SaveSelectedItemSettings()//save user configureable settings
 {
-	if(selectedItem != NULL)
+	if(fSelectedItem != NULL)
 	{
 		//Automatically relaunch app without prompting
-		if(autoRelaunchRB->Value())
-		{
-			selectedItem->settings->relaunchAction = ACTION_AUTO;
-		}
+		if(fAutoRelaunchRB->Value())
+			fSelectedItem->fSettings->relaunchAction = ACTION_AUTO;
+
 		//prompt whether to relaunch
-		else if(promptRelaunchRB->Value())
-		{
-			selectedItem->settings->relaunchAction = ACTION_PROMPT;
-		}
+		else if(fPromptRelaunchRB->Value())
+			fSelectedItem->fSettings->relaunchAction = ACTION_PROMPT;
+
 		//dont relaunch and dont ask
-		else if(dontRelaunchRB->Value())
-		{
-			selectedItem->settings->relaunchAction = ACTION_IGNORE;
-		}
+		else if(fDontRelaunchRB->Value())
+			fSelectedItem->fSettings->relaunchAction = ACTION_IGNORE;
+
 		//somehow no radio button selected?  Prompt
 		else
-		{
-			selectedItem->settings->relaunchAction = ACTION_PROMPT;
-		}
+			fSelectedItem->fSettings->relaunchAction = ACTION_PROMPT;
 
-		appsLView->InvalidateItem(appsLView->IndexOf(selectedItem));
+		fAppsLView->InvalidateItem(fAppsLView->IndexOf(fSelectedItem));
 	}
-	return;
 }
 
 
-void RelaunchSettingsView::clearItemSettings()
+void
+RelaunchSettingsView::_ClearItemSettings()
 {
-	autoRelaunchRB->SetValue(false);
-	promptRelaunchRB->SetValue(false);
-	dontRelaunchRB->SetValue(false);
-	return;
+	fAutoRelaunchRB->SetValue(false);
+	fPromptRelaunchRB->SetValue(false);
+	fDontRelaunchRB->SetValue(false);
 }
 
 
-void RelaunchSettingsView::updateSelectedItem()
+void
+RelaunchSettingsView::_UpdateSelectedItem()
 {
-	int32 index = appsLView->CurrentSelection();
-	if(index < 0)//No selection
-	{	selectedItem = NULL; }
-	else//Item selected
-	{	selectedItem = (RelaunchAppItem*)appsLView->ItemAt(index); }
-	return;
+	int32 index = fAppsLView->CurrentSelection();
+	if(index < 0)
+		//No selection
+		fSelectedItem = NULL;
+	else
+		fSelectedItem = (RelaunchAppItem*)fAppsLView->ItemAt(index);
 }
 
 
-void RelaunchSettingsView::recallItemSettings()
-{	//Enable or disable objects
-	if(selectedItem == NULL)//no selected item
+void
+RelaunchSettingsView::_RecallItemSettings()
+{
+	//Enable or disable objects
+	if(fSelectedItem == NULL)//no selected item
 	{
-		autoRelaunchRB->SetEnabled(false);
-		promptRelaunchRB->SetEnabled(false);
-		dontRelaunchRB->SetEnabled(false);
-		autoRelaunchRB->SetValue(false);
-		promptRelaunchRB->SetValue(false);
-		dontRelaunchRB->SetValue(false);
-		removeAppB->SetEnabled(false);
+		fAutoRelaunchRB->SetEnabled(false);
+		fPromptRelaunchRB->SetEnabled(false);
+		fDontRelaunchRB->SetEnabled(false);
+		fAutoRelaunchRB->SetValue(false);
+		fPromptRelaunchRB->SetValue(false);
+		fDontRelaunchRB->SetValue(false);
+		fRemoveAppB->SetEnabled(false);
 	}
 	else
 	{
-		autoRelaunchRB->SetEnabled(true);
-		promptRelaunchRB->SetEnabled(true);
-		dontRelaunchRB->SetEnabled(true);
-		switch(selectedItem->settings->relaunchAction)
+		fAutoRelaunchRB->SetEnabled(true);
+		fPromptRelaunchRB->SetEnabled(true);
+		fDontRelaunchRB->SetEnabled(true);
+		switch(fSelectedItem->fSettings->relaunchAction)
 		{
 			case ACTION_AUTO: {
-				autoRelaunchRB->SetValue(true);
+				fAutoRelaunchRB->SetValue(true);
 				break;
 			}
 			case ACTION_PROMPT: {
-				promptRelaunchRB->SetValue(true);
+				fPromptRelaunchRB->SetValue(true);
 				break;
 			}
 			case ACTION_IGNORE: {
-				dontRelaunchRB->SetValue(true);
+				fDontRelaunchRB->SetValue(true);
 				break;
 			}
 			default: {
 				// default to prompt
-				promptRelaunchRB->SetValue(true);
+				fPromptRelaunchRB->SetValue(true);
 				break;
 			}
 		}
 		// Disable the Remove button for the default settings list item (index 0) and no selection
-		if(appsLView->CurrentSelection()) removeAppB->SetEnabled(true);
-		else removeAppB->SetEnabled(false);
+		if(fAppsLView->CurrentSelection())
+			fRemoveAppB->SetEnabled(true);
+		else
+			fRemoveAppB->SetEnabled(false);
 	}
-	return;
 }
 
 
 RelaunchAppItem::RelaunchAppItem(const char* sig, BPath path)
-	:BListItem()
+	:
+	BListItem()
 {
-	settings = new AppRelaunchSettings(sig, path);
+	fSettings = new AppRelaunchSettings(sig, path);
 }
 
 
 RelaunchAppItem::RelaunchAppItem(AppRelaunchSettings *set)
-	:BListItem()
+	:
+	BListItem()
 {
-	settings = new AppRelaunchSettings(set);
+	fSettings = new AppRelaunchSettings(set);
 }
 
 
 RelaunchAppItem::~RelaunchAppItem()
 {
-	delete settings;
+	delete fSettings;
 }
 
 
-void RelaunchAppItem::DrawItem(BView* owner, BRect item_rect, bool complete)
-{	rgb_color color;
+void
+RelaunchAppItem::DrawItem(BView* owner, BRect item_rect, bool complete)
+{
+	rgb_color color;
 	bool selected = IsSelected();
 	// Background redraw
-	if(selected) color = selected_color;
-	else color = owner->ViewColor();
+	if(selected)
+		color = selected_color;
+	else
+		color = owner->ViewColor();
 	owner->SetLowColor(color);
 	owner->SetDrawingMode(B_OP_COPY);
 	if(selected || complete)
@@ -328,7 +346,7 @@ void RelaunchAppItem::DrawItem(BView* owner, BRect item_rect, bool complete)
 		owner->FillRect(item_rect);
 	}
 	// Text redraw
-	switch(settings->relaunchAction)
+	switch(fSettings->relaunchAction)
 	{
 		case ACTION_AUTO: {
 			owner->SetHighColor(auto_relaunch_color);
@@ -343,22 +361,25 @@ void RelaunchAppItem::DrawItem(BView* owner, BRect item_rect, bool complete)
 			break;
 		}
 	}
-	BString text(settings->name);
-	text.Append(" (").Append(settings->appSig).Append(")");
+	BString text(fSettings->name);
+	text.Append(" (").Append(fSettings->appSig).Append(")");
 	owner->DrawString(text.String(), BPoint(item_rect.left+5.0,item_rect.bottom - 2.0));
 }
 
 
-int RelaunchAppItem::ICompare(RelaunchAppItem *item)
+int
+RelaunchAppItem::ICompare(RelaunchAppItem *item)
 {
 	// Always set the default list item before all others
-	if(settings->appPath.Compare("/dummy/Default setting") == 0) return -1;
-	if(item->settings->appPath.Compare("/dummy/Default setting") == 0) return 1;
+	if(fSettings->appPath.Compare("/dummy/Default setting") == 0) return -1;
+	if(item->fSettings->appPath.Compare("/dummy/Default setting") == 0) return 1;
 	// sort by app name
-	return settings->name.ICompare(item->settings->name);
+	return fSettings->name.ICompare(item->fSettings->name);
 }
 
-int SortRelaunchAppItems(const void* item1, const void* item2)
+
+int
+SortRelaunchAppItems(const void* item1, const void* item2)
 {
 	RelaunchAppItem *first = *(RelaunchAppItem**)item1, *second = *(RelaunchAppItem**)item2;
 	return (first->ICompare(second));

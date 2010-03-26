@@ -1,31 +1,38 @@
-/*DeskbarSettingsView.cpp
-
-*/
+/* DeskbarSettingsView.cpp
+ * Copyright 2010 Brian Hill
+ * All rights reserved. Distributed under the terms of the BSD License.
+ */
 #include "DeskbarSettingsView.h"
 
+
 DeskbarSettingsView::DeskbarSettingsView(BRect size)
-	:BView(size, "Deskbar Settings", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
-{	SetViewColor(bg_color);
+	:
+	BView(size, "Deskbar Settings", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
+{
+	SetViewColor(bg_color);
 	BRect viewRect;
-	deskbarBox = new BBox("Deskbar");
-	deskbarBox->SetLabel("Deskbar Settings");
-	showDeskbarCB = new BCheckBox(viewRect, "Show Deskbar",
-								"Show a list of ranked applications in the Deskbar",
-								new BMessage(EE_DESKBAR_CHANGED));
-	itemCountTC = new BTextControl("Show this many applications:", "",
-								new BMessage(EE_DESKBAR_CHANGED));
-	//itemCountTC->SetDivider(be_plain_font->StringWidth(itemCountTC->Label()) + 4);
-	itemCountTC->SetExplicitMaxSize(BSize(be_plain_font->StringWidth(itemCountTC->Label())
+	fDeskbarBox = new BBox("Deskbar");
+	fDeskbarBox->SetLabel("Deskbar Settings");
+	fShowDeskbarCB = new BCheckBox(viewRect, "Show Deskbar",
+						"Show a list of ranked applications in the Deskbar",
+						new BMessage(EE_DESKBAR_CHANGED));
+	fItemCountTC = new BTextControl("Show this many applications:", "",
+						new BMessage(EE_DESKBAR_CHANGED));
+	//fItemCountTC->SetDivider(be_plain_font->StringWidth(fItemCountTC->Label()) + 4);
+	fItemCountTC->SetExplicitMaxSize(BSize(be_plain_font->StringWidth(fItemCountTC->Label())
 				+ be_plain_font->StringWidth("00000000"), B_SIZE_UNSET));
 	long i;
-	for (i = 0; i < 256; i++) itemCountTC->TextView()->DisallowChar(i);
-	for (i = '0'; i <= '9'; i++) itemCountTC->TextView()->AllowChar(i);
-	itemCountTC->TextView()->AllowChar(B_BACKSPACE);
+	BTextView *textView = fItemCountTC->TextView();
+	for (i = 0; i < 256; i++)
+		textView->DisallowChar(i);
+	for (i = '0'; i <= '9'; i++)
+		textView->AllowChar(i);
+	textView->AllowChar(B_BACKSPACE);
 
-	deskbarBox->AddChild(BGroupLayoutBuilder(B_VERTICAL, 5)
-		.Add(showDeskbarCB)
+	fDeskbarBox->AddChild(BGroupLayoutBuilder(B_VERTICAL, 5)
+		.Add(fShowDeskbarCB)
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 5)
-			.Add(itemCountTC)
+			.Add(fItemCountTC)
 			.AddGlue()
 			.SetInsets(15, 0, 0, 0)
 		)
@@ -34,23 +41,24 @@ DeskbarSettingsView::DeskbarSettingsView(BRect size)
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
-		.Add(deskbarBox)
+		.Add(fDeskbarBox)
 		.AddGlue()
 	);
 }
 
+
 /*DeskbarSettingsView::~DeskbarSettingsView()
 {
+}*/
 
-}
-*/
 
-void DeskbarSettingsView::MessageReceived(BMessage* msg)
+void
+DeskbarSettingsView::MessageReceived(BMessage* msg)
 {	switch(msg->what)
 	{
 		case EE_DESKBAR_CHANGED: {
-			bool showDeskbar = showDeskbarCB->Value();
-			int16 count = strtol(itemCountTC->Text(), NULL, 0);
+			bool showDeskbar = fShowDeskbarCB->Value();
+			int16 count = strtol(fItemCountTC->Text(), NULL, 0);
 			EESettingsFile settings;
 			settings.SaveDeskbarSettings(showDeskbar, count);
 
@@ -66,19 +74,21 @@ void DeskbarSettingsView::MessageReceived(BMessage* msg)
 				messenger.SendMessage(&msg);
 			}
 
-			itemCountTC->SetEnabled(showDeskbar);
-
+			fItemCountTC->SetEnabled(showDeskbar);
 			break;
 		}
 	}
 }
 
-void DeskbarSettingsView::SetDeskbarValues(bool show, int count)
+
+void
+DeskbarSettingsView::SetDeskbarValues(bool show, int count)
 {
-	showDeskbarCB->SetValue(show);
+	fShowDeskbarCB->SetValue(show);
 	char *number = new char[16];
 	sprintf(number, "%i", count);
-	itemCountTC->SetText(number);
-	itemCountTC->SetEnabled(show);
+	// TODO use BString << operator
+	fItemCountTC->SetText(number);
+	fItemCountTC->SetEnabled(show);
 	delete[] number;
 }

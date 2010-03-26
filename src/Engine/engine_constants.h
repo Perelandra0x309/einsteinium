@@ -1,8 +1,11 @@
-/*constants.h
-	Any global constants should be declared here
-*/
+/* engine_constants.h
+ * Copyright 2010 Brian Hill
+ * All rights reserved. Distributed under the terms of the BSD License.
+ */
 #ifndef EE_CONSTANTS_H
 #define EE_CONSTANTS_H
+
+/*	Any global constants should be declared here */
 
 //Einsteinium_engine application signature
 #define e_engine_sig "application/x-vnd.Einsteinium_Engine"
@@ -10,7 +13,7 @@
 //Main directory for all Einsteinium settings
 #define e_settings_dir "Einsteinium"
 #define e_settings_app_dir "Applications"
-//settings file
+//Engine settings file
 #define ee_settings_file "engine_settings"
 
 //XML Text

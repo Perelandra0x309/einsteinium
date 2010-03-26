@@ -1,14 +1,23 @@
+/* db_interface.cpp
+ * Copyright 2010 Brian Hill
+ * All rights reserved. Distributed under the terms of the BSD License.
+ */
 #include "db_interface.h"
 
+/*	These functions provide the interface to the sqlite3 database files
+	used to record start and quit times of applications
+*/
 
-int Edb_open(sqlite3** dbpp, const char* file_path)
-{	int ret=0;
+int
+Edb_open(sqlite3** dbpp, const char* file_path)
+{
+	int ret=0;
 //	printf("Opening database %s\n", file_path);
 	// Check to see if database file already exists before attempting to open it.
 	BEntry fileEntry(file_path);
 	bool newDatabase = !fileEntry.Exists();
 
-	// Open datebase
+	// Open database
 	ret = sqlite3_open(file_path, dbpp);
 	if( ret ){
     	fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(*dbpp));
@@ -18,7 +27,6 @@ int Edb_open(sqlite3** dbpp, const char* file_path)
 	// Need to create table for new database
 	if(newDatabase)
 	{
-		//create table time_data(app_time_data blob);
 		BString sqlcmd("create table time_data(app_time_data blob);");
 		char *errorMsg = NULL;
 		ret = sqlite3_exec(*dbpp, sqlcmd.String(), NULL, NULL, &errorMsg);
@@ -33,17 +41,19 @@ int Edb_open(sqlite3** dbpp, const char* file_path)
 }
 
 
-int Edb_close(sqlite3* dbp)
-{	int ret=0;
+int
+Edb_close(sqlite3* dbp)
+{
+	int ret=0;
 	ret = sqlite3_close(dbp);
-	if( ret ){
+	if( ret )
     	fprintf(stderr, "Can't close database: %s\n", sqlite3_errmsg(dbp));
-	}
 	return ret;
 }
 
 
-int Edb_print(sqlite3* dbp)
+int
+Edb_print(sqlite3* dbp)
 {
 	int ret;
 	BString sqlcmd("select * from time_data;");
@@ -54,7 +64,8 @@ int Edb_print(sqlite3* dbp)
 	ret = sqlite3_prepare_v2(dbp, sqlcmd.String(), -1, &stmt, 0);
 	if( ret ){
 		fprintf(stderr, "SQL Select error: %s: %d : %s\n", sqlcmd.String(), ret, sqlite3_errmsg(dbp));
-	}else{
+	}
+	else{
 		// execute the statement
 		do{
 			ret = sqlite3_step(stmt);
@@ -114,7 +125,8 @@ int Edb_print(sqlite3* dbp)
 }*/
 
 
-int Edb_insertData(sqlite3* dbp, app_time_data* tm_data, long long int row_key = 0)
+int
+Edb_insertData(sqlite3* dbp, app_time_data* tm_data, long long int row_key = 0)
 {
 	int ret=1;
 	sqlite3_stmt *stmt;
@@ -151,10 +163,9 @@ int Edb_insertData(sqlite3* dbp, app_time_data* tm_data, long long int row_key =
 		}
 
 		ret = sqlite3_step(stmt);
-		if( ret!= SQLITE_DONE ){
+		if( ret!= SQLITE_DONE ) {
 			fprintf(stderr, "SQL Step error: %d : %s\n", ret, sqlite3_errmsg(dbp));
 		}
-
 		// finalize the statement to release resources
 		sqlite3_finalize(stmt);
 
@@ -164,7 +175,8 @@ int Edb_insertData(sqlite3* dbp, app_time_data* tm_data, long long int row_key =
 }
 
 
-int Edb_getLastData(sqlite3* dbp, app_time_data* tm_data, long long int* row_key)
+int
+Edb_getLastData(sqlite3* dbp, app_time_data* tm_data, long long int* row_key)
 {
 	int ret = 1;
 	sqlite3_stmt *stmt;
@@ -228,27 +240,32 @@ int Edb_getLastData(sqlite3* dbp, app_time_data* tm_data, long long int* row_key
 }
 
 
-void Edb_Add_Launch_Time(const char* file_path, time_t session_tm, time_t launch_tm)
-{	sqlite3 *dbp = NULL;
+void
+Edb_Add_Launch_Time(const char* file_path, time_t session_tm, time_t launch_tm)
+{
+	sqlite3 *dbp = NULL;
 	app_time_data tm_data;
 	memset(&tm_data, 0, sizeof(tm_data));
 	tm_data.ee_session = session_tm;
 	tm_data.launch_time = launch_tm;
 	int ret = Edb_open(&dbp, file_path);
-	if( ret != 0 ) return;
+	if( ret != 0 )
+		return;
 	Edb_insertData(dbp, &tm_data);
 //	Edb_print(dbp);
 	Edb_close(dbp);
 }
 
 
-void Edb_Add_Quit_Time(const char* file_path, time_t session_tm, time_t quit_tm)
+void
+Edb_Add_Quit_Time(const char* file_path, time_t session_tm, time_t quit_tm)
 {
 	int ret;
 	sqlite3 *dbp = NULL;
 	app_time_data tm_data;
 	ret = Edb_open(&dbp, file_path);
-	if( ret != 0 ) return;
+	if( ret != 0 )
+		return;
 	memset(&tm_data, 0, sizeof(tm_data));
 	long long int key;
 	if( Edb_getLastData(dbp, &tm_data, &key) == SQLITE_DONE)
@@ -272,13 +289,15 @@ void Edb_Add_Quit_Time(const char* file_path, time_t session_tm, time_t quit_tm)
 	Edb_close(dbp);
 }
 
-void Edb_Rescan_Data(const char* file_path, AppStats* stats)
+void
+Edb_Rescan_Data(const char* file_path, AppStats* stats)
 {
 	int ret;
 	sqlite3 *dbp = NULL;
 
 	ret = Edb_open(&dbp, file_path);
-	if( ret != 0 ) return;
+	if( ret != 0 )
+		return;
 
 	BString sqlcmd("select * from time_data order by rowid;");
 	sqlite3_stmt *stmt;

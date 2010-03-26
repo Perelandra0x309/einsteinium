@@ -1,11 +1,13 @@
-/*methods.cpp
-
-*/
+/* methods.cpp
+ * Copyright 2010 Brian Hill
+ * All rights reserved. Distributed under the terms of the BSD License.
+ */
 #include "methods.h"
 
 
 //Get entry for application with signature sig
-BEntry getEntryFromSig(const char* sig)
+BEntry
+GetEntryFromSig(const char* sig)
 {
 	entry_ref ref;
 	be_roster->FindApp(sig, &ref);
@@ -32,6 +34,7 @@ BEntry getEntryFromSig(const char* sig)
 	}
 	return entry;*/
 }
+
 /*
 template < class itemType >
 void deleteList(BList& list, itemType* item)

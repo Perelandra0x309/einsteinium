@@ -1,11 +1,15 @@
+/* db_interface.h
+ * Copyright 2010 Brian Hill
+ * All rights reserved. Distributed under the terms of the BSD License.
+ */
 #ifndef EINSTEINIUM_BERKELEYDB_INTERFACE_H
 #define EINSTEINIUM_BERKELEYDB_INTERFACE_H
 
 #include <Entry.h>
 #include <String.h>
 #include <sqlite3.h>
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 #include "AppStats.h"
 
 struct app_time_data{

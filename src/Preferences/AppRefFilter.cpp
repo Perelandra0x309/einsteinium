@@ -1,37 +1,61 @@
-/*AppRefFilter.cpp
-	Filters only applications in an open file panel
-*/
+/* AppRefFilter.cpp
+ * Copyright 2010 Brian Hill
+ * All rights reserved. Distributed under the terms of the BSD License.
+ */
 
 #include "AppRefFilter.h"
 
+/*	This class filters only applications in an open file panel */
 AppRefFilter::AppRefFilter()
-	:BRefFilter()
+	:
+	BRefFilter()
 {
-
 }
 
 bool AppRefFilter::Filter(const entry_ref *ref, BNode *node, struct stat_beos *st,
 							const char *filetype)
-{	if(strcmp("application/x-vnd.Be-directory", filetype)==0) { return true; }//folders
-	else if(strcmp("application/x-vnd.Be-volume", filetype)==0) { return true; }//volumes
-	else if(strcmp("application/x-vnd.Be-elfexecutable", filetype)==0) { return true; }//apps
-	else if(strcmp("application/x-vnd.be-elfexecutable", filetype)==0) { return true; }//hack for Haiku?
-	else if(strcmp("application/x-vnd.Be-symlink", filetype)==0)//symlinks
-	{	BEntry linkedEntry(ref, true);
-		if(linkedEntry.InitCheck()!=B_OK) { return false; }
+{
+	char *type;
+	const char *constFileType;
+	// resolve symlinks
+	bool isSymlink = strcmp("application/x-vnd.Be-symlink", filetype)==0;
+	if(isSymlink)
+	{
+		BEntry linkedEntry(ref, true);
+		if(linkedEntry.InitCheck()!=B_OK)
+			return false;
 		BNode linkedNode(&linkedEntry);
-		if(linkedNode.InitCheck()!=B_OK) { return false; }
+		if(linkedNode.InitCheck()!=B_OK)
+			return false;
 		BNodeInfo linkedNodeInfo(&linkedNode);
-		if(linkedNodeInfo.InitCheck()!=B_OK) { return false; }
-		char *type = new char[B_ATTR_NAME_LENGTH];
-		bool pass(false);
-		if(linkedNodeInfo.GetType(type)!=B_OK) { pass = false; }
-		else if(strcmp("application/x-vnd.Be-directory", type)==0) { pass = true; }//folders
-		else if(strcmp("application/x-vnd.Be-volume", type)==0) { pass = true; }//volumes
-		else if(strcmp("application/x-vnd.Be-elfexecutable", type)==0) { pass = true; }//apps
-		else if(strcmp("application/x-vnd.be-elfexecutable", type)==0) { pass = true; }//hack for Haiku??
-		delete[] type;
-		return pass;
+		if(linkedNodeInfo.InitCheck()!=B_OK)
+			return false;
+		type = new char[B_ATTR_NAME_LENGTH];
+		if(linkedNodeInfo.GetType(type)!=B_OK)
+		{
+			delete[] type;
+			return false;
+		}
+		constFileType = type;
 	}
-	return false;
+	else
+		constFileType = filetype;
+
+	bool pass = false;
+	//folders
+	if(strcmp("application/x-vnd.Be-directory", constFileType)==0)
+		pass = true;
+	//volumes
+	else if(strcmp("application/x-vnd.Be-volume", constFileType)==0)
+		pass = true;
+	//apps
+	else if(strcmp("application/x-vnd.Be-elfexecutable", constFileType)==0)
+		pass = true;
+	//hack for Haiku?  Some apps are defined by MIME this way
+	else if(strcmp("application/x-vnd.be-elfexecutable", constFileType)==0)
+		pass = true;
+
+	if(isSymlink)
+		delete[] type;
+	return pass;
 }

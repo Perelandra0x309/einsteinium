@@ -1,91 +1,97 @@
-/*EESettingsFile.cpp
-
-*/
+/* EESettingsFile.cpp
+ * Copyright 2010 Brian Hill
+ * All rights reserved. Distributed under the terms of the BSD License.
+ */
 #include "EESettingsFile.h"
 
 
 EESettingsFile::EESettingsFile()
-	: BHandler("name")
-	,_status(B_ERROR)
-	,launch_scale(DEFAULTVALUE_LAUNCHES)
-	,first_scale(DEFAULTVALUE_LAUNCHES)
-	,last_scale(DEFAULTVALUE_LAUNCHES)
-	,interval_scale(DEFAULTVALUE_LAUNCHES)
-	,runtime_scale(DEFAULTVALUE_LAUNCHES)
-	,inclusionDefault(EE_XMLTEXT_VALUE_PROMPT)
-	,showDeskbarMenu(false)
-	,deskbarMenuCount(0)
+	:
+	BHandler("name"),
+	fStatus(B_ERROR),
+	fLaunchScale(DEFAULTVALUE_LAUNCHES),
+	fFirstScale(DEFAULTVALUE_LAUNCHES),
+	fLastScale(DEFAULTVALUE_LAUNCHES),
+	fIntervalScale(DEFAULTVALUE_LAUNCHES),
+	fRuntimeScale(DEFAULTVALUE_LAUNCHES),
+	fInclusionDefault(EE_XMLTEXT_VALUE_PROMPT),
+	fShowDeskbarMenu(false),
+	fDeskbarMenuCount(0)
 {
 	// find path for settings directory
-	find_directory(B_USER_SETTINGS_DIRECTORY, &settingsPath);
-	settingsPath.Append(e_settings_dir);
+	find_directory(B_USER_SETTINGS_DIRECTORY, &fSettingsPath);
+	fSettingsPath.Append(e_settings_dir);
 	BDirectory settingsDir;
-	status_t result = settingsDir.SetTo(settingsPath.Path());
-	if( result == B_ENTRY_NOT_FOUND )//if directory doesn't exist
+	status_t result = settingsDir.SetTo(fSettingsPath.Path());
+	if( result == B_ENTRY_NOT_FOUND )
 	{	printf("Settings directory not found, creating directory\n    %s\n",
-					settingsPath.Path());
+					fSettingsPath.Path());
 		//Create directory
-		result = settingsDir.CreateDirectory(settingsPath.Path(), &settingsDir);
+		result = settingsDir.CreateDirectory(fSettingsPath.Path(), &settingsDir);
 		if(result!=B_OK)
-		{	//Creating directory failed
+		{
 			printf("Error creating Einsteinium settings folder.  Cannot continue.\n");
-			return;//Cannot continue, exit constructor
+			return;
+				//Cannot continue, exit constructor
 		}
 	}
 
 	// create path for settings file
-	settingsPath.Append(ee_settings_file);
-	BEntry settingsEntry(settingsPath.Path());
-	if(!settingsEntry.Exists())//settings file doesn't exist, create default
+	fSettingsPath.Append(ee_settings_file);
+	BEntry settingsEntry(fSettingsPath.Path());
+	if(!settingsEntry.Exists())
 	{
-		//settings file doesn't exist, create default
-		WriteSettingsToFile();
+		//settings file doesn't exist, create default file
+		_WriteSettingsToFile();
 	}
 	else
 	{
-		ReadSettingsFromFile(settingsPath);
+		_ReadSettingsFromFile(fSettingsPath);
 	}
-	settingsEntry.GetNodeRef(&settingsNodeRef);
+	settingsEntry.GetNodeRef(&fSettingsNodeRef);
 
 	//Start the Looper running
-	watchingLooper = new BLooper("settings");
-	watchingLooper->AddHandler(this);
-	watchingLooper->Run();
+	fWatchingLooper = new BLooper("settings");
+	fWatchingLooper->AddHandler(this);
+	fWatchingLooper->Run();
 
-	//watch the settings file for changes
-	StartWatching();
-
-	_status = B_OK;
+	_StartWatching();
+	fStatus = B_OK;
 }
 
 
 EESettingsFile::~EESettingsFile()
 {
-	StopWatching();
-	watchingLooper->Lock();
-	watchingLooper->Quit();
+	_StopWatching();
+	fWatchingLooper->Lock();
+	fWatchingLooper->Quit();
 }
 
-void EESettingsFile::StartWatching(){
-	status_t error = watch_node(&settingsNodeRef, B_WATCH_STAT, this, watchingLooper);
-	watchingSettingsNode = (error==B_OK);
-	printf("Watching engine settings node was %ssuccessful.\n", watchingSettingsNode? "": "not ");
-	if(!watchingSettingsNode) printf("Error=%i (B_BAD_VALUE=%i, B_NO_MEMORY=%i, B_ERROR=%i)\n",
+
+void
+EESettingsFile::_StartWatching(){
+	status_t error = watch_node(&fSettingsNodeRef, B_WATCH_STAT, this, fWatchingLooper);
+	fWatchingSettingsNode = (error==B_OK);
+	printf("Watching engine settings node was %ssuccessful.\n", fWatchingSettingsNode? "": "not ");
+	if(!fWatchingSettingsNode)
+		printf("Error=%i (B_BAD_VALUE=%i, B_NO_MEMORY=%i, B_ERROR=%i)\n",
 			error, B_BAD_VALUE, B_NO_MEMORY, B_ERROR);
 }
 
-void EESettingsFile::StopWatching(){
-	if(watchingSettingsNode)//settings file is being watched
-	{	watch_node(&settingsNodeRef, B_STOP_WATCHING, this, watchingLooper);
+
+void
+EESettingsFile::_StopWatching(){
+	if(fWatchingSettingsNode)
+	{	watch_node(&fSettingsNodeRef, B_STOP_WATCHING, this, fWatchingLooper);
 		printf("Stopped watching engine settings node\n");
-		watchingSettingsNode = false;
+		fWatchingSettingsNode = false;
 	}
 }
 
 
-void EESettingsFile::ReadSettingsFromFile(BPath file)
+void
+EESettingsFile::_ReadSettingsFromFile(BPath file)
 {
-	//Parse XML
 	xmlDocPtr doc;
 	xmlNodePtr cur;
 
@@ -117,23 +123,23 @@ void EESettingsFile::ReadSettingsFromFile(BPath file)
 		{
 			xmlChar *value = xmlGetProp(cur,
 							(const xmlChar *) EE_XMLTEXT_PROPERTY_INCLUSION_DEFAULT);
-			inclusionDefault.SetTo((char *)value);
+			fInclusionDefault.SetTo((char *)value);
 		}
 		// scale settings
 		if (!xmlStrcmp(cur->name, (const xmlChar *) EE_XMLTEXT_CHILD_NAME_RANK))
 		{
-			launch_scale = xmlGetIntProp(cur, EE_XMLTEXT_PROPERTY_LAUNCHES);
-			first_scale = xmlGetIntProp(cur, EE_XMLTEXT_PROPERTY_FIRSTLAUNCH);
-			last_scale = xmlGetIntProp(cur, EE_XMLTEXT_PROPERTY_LASTLAUNCH);
-			interval_scale = xmlGetIntProp(cur, EE_XMLTEXT_PROPERTY_INTERVAL);
-			runtime_scale = xmlGetIntProp(cur, EE_XMLTEXT_PROPERTY_RUNTIME);
+			fLaunchScale = _XmlGetIntProp(cur, EE_XMLTEXT_PROPERTY_LAUNCHES);
+			fFirstScale = _XmlGetIntProp(cur, EE_XMLTEXT_PROPERTY_FIRSTLAUNCH);
+			fLastScale = _XmlGetIntProp(cur, EE_XMLTEXT_PROPERTY_LASTLAUNCH);
+			fIntervalScale = _XmlGetIntProp(cur, EE_XMLTEXT_PROPERTY_INTERVAL);
+			fRuntimeScale = _XmlGetIntProp(cur, EE_XMLTEXT_PROPERTY_RUNTIME);
 		}
 		// deskbar settings
 		if (!xmlStrcmp(cur->name, (const xmlChar *) EE_XMLTEXT_CHILD_NAME_DESKBAR))
 		{
 			xmlChar *value = xmlGetProp(cur, (const xmlChar *) EE_XMLTEXT_PROPERTY_SHOW);
-			showDeskbarMenu = strcmp("true", (char *)value)==0;
-			deskbarMenuCount = xmlGetIntProp(cur, EE_XMLTEXT_PROPERTY_COUNT);
+			fShowDeskbarMenu = strcmp("true", (char *)value)==0;
+			fDeskbarMenuCount = _XmlGetIntProp(cur, EE_XMLTEXT_PROPERTY_COUNT);
 		}
 
 		cur = cur->next;
@@ -142,7 +148,9 @@ void EESettingsFile::ReadSettingsFromFile(BPath file)
 }
 
 
-int EESettingsFile::xmlGetIntProp(xmlNodePtr cur, char *name){
+int
+EESettingsFile::_XmlGetIntProp(xmlNodePtr cur, char *name)
+{
 	int intValue;
 	xmlChar *xmlValue = xmlGetProp(cur, (const xmlChar *) name);
 	if(xmlValue==NULL){
@@ -157,26 +165,29 @@ int EESettingsFile::xmlGetIntProp(xmlNodePtr cur, char *name){
 }
 
 
-status_t EESettingsFile::WriteSettingsToFile()
+status_t
+EESettingsFile::_WriteSettingsToFile()
 {
 	char launchChar[32], firstChar[32], lastChar[32], intervalChar[32], runtimeChar[32];
-	sprintf(launchChar, "%ld", launch_scale);
-	sprintf(firstChar, "%ld", first_scale);
-	sprintf(lastChar, "%ld", last_scale);
-	sprintf(intervalChar, "%ld", interval_scale);
-	sprintf(runtimeChar, "%ld", runtime_scale);
+	sprintf(launchChar, "%ld", fLaunchScale);
+	sprintf(firstChar, "%ld", fFirstScale);
+	sprintf(lastChar, "%ld", fLastScale);
+	sprintf(intervalChar, "%ld", fIntervalScale);
+	sprintf(runtimeChar, "%ld", fRuntimeScale);
 	BString showDeskbar;
-	if(showDeskbarMenu) showDeskbar.SetTo("true");
-	else showDeskbar.SetTo("false");
+	if(fShowDeskbarMenu)
+		showDeskbar.SetTo("true");
+	else
+		showDeskbar.SetTo("false");
 	char countChar[32];
-	sprintf(countChar, "%i", deskbarMenuCount);
+	sprintf(countChar, "%i", fDeskbarMenuCount);
 
 	BString xml_text("<?xml version=\"1.0\"?>\n");
 	xml_text.Append("<").Append(EE_XMLTEXT_ROOT_NAME).Append(">\n");
 	// write default link inclusion value
 	xml_text.Append("	<").Append(EE_XMLTEXT_CHILD_NAME_INCLUSION)
 			.Append(" ").Append(EE_XMLTEXT_PROPERTY_INCLUSION_DEFAULT)
-			.Append("=\"").Append(inclusionDefault).Append("\"/>\n");
+			.Append("=\"").Append(fInclusionDefault).Append("\"/>\n");
 
 	// write scale values
 	xml_text.Append("	<").Append(EE_XMLTEXT_CHILD_NAME_RANK)
@@ -202,30 +213,27 @@ status_t EESettingsFile::WriteSettingsToFile()
 
 	xml_text.Append("</").Append(EE_XMLTEXT_ROOT_NAME).Append(">\n");
 
-
-	//Stop watching file
-	StopWatching();
+	_StopWatching();
 
 	BFile eds_file;
-	status_t result = eds_file.SetTo(settingsPath.Path(),
+	status_t result = eds_file.SetTo(fSettingsPath.Path(),
 				B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 	if(result != B_OK)
 	{
-		StartWatching();
+		_StartWatching();
 		return B_ERROR;
 	}
 	eds_file.Write(xml_text.String(), xml_text.Length());
 	eds_file.Unset();
 
-	//Start watching file
-	StartWatching();
-
+	_StartWatching();
 	return B_OK;
 }
 
 
-void EESettingsFile::MessageReceived(BMessage *msg)
-{	switch(msg->what)//act according to the Message command
+void
+EESettingsFile::MessageReceived(BMessage *msg)
+{	switch(msg->what)
 	{
 		case B_NODE_MONITOR: {//a watched node_ref has changed
 			int32 opcode;
@@ -233,11 +241,11 @@ void EESettingsFile::MessageReceived(BMessage *msg)
 			{	switch (opcode)
 				{	case B_STAT_CHANGED: {//file contents modified
 						node_ref nref;
-						msg->FindInt32("device", &nref.device);//create node from msg
+						msg->FindInt32("device", &nref.device);
 						msg->FindInt64("node", &nref.node);
-						if(nref == settingsNodeRef)//settings node changed
+						if(nref == fSettingsNodeRef)
 						{	printf("Engine settings file changed, loading new settings...\n");
-							ReadSettingsFromFile(settingsPath);
+							_ReadSettingsFromFile(fSettingsPath);
 						}
 						break; }
 				}
@@ -248,56 +256,70 @@ void EESettingsFile::MessageReceived(BMessage *msg)
 }
 
 
-status_t EESettingsFile::CheckStatus(){
-	return _status;
+status_t
+EESettingsFile::CheckStatus()
+{
+	return fStatus;
 }
 
-int* EESettingsFile::GetScales(){
-	scales[LAUNCH_INDEX]=launch_scale;
-	scales[FIRST_INDEX]=first_scale;
-	scales[LAST_INDEX]=last_scale;
-	scales[INTERVAL_INDEX]=interval_scale;
-	scales[RUNTIME_INDEX]=runtime_scale;
 
+int*
+EESettingsFile::GetScales()
+{
+	scales[LAUNCH_INDEX]=fLaunchScale;
+	scales[FIRST_INDEX]=fFirstScale;
+	scales[LAST_INDEX]=fLastScale;
+	scales[INTERVAL_INDEX]=fIntervalScale;
+	scales[RUNTIME_INDEX]=fRuntimeScale;
 	return scales;
 }
 
-void EESettingsFile::SaveScales(int *scales)
+
+void
+EESettingsFile::SaveScales(int *scales)
 {
-	launch_scale=scales[LAUNCH_INDEX];
-	first_scale=scales[FIRST_INDEX];
-	last_scale=scales[LAST_INDEX];
-	interval_scale=scales[INTERVAL_INDEX];
-	runtime_scale=scales[RUNTIME_INDEX];
-	WriteSettingsToFile();
+	fLaunchScale=scales[LAUNCH_INDEX];
+	fFirstScale=scales[FIRST_INDEX];
+	fLastScale=scales[LAST_INDEX];
+	fIntervalScale=scales[INTERVAL_INDEX];
+	fRuntimeScale=scales[RUNTIME_INDEX];
+	_WriteSettingsToFile();
 }
 
-const char* EESettingsFile::GetLinkInclusionDefaultValue()
+
+const char*
+EESettingsFile::GetLinkInclusionDefaultValue()
 {
-	return inclusionDefault.String();
+	return fInclusionDefault.String();
 }
 
-void EESettingsFile::SaveLinkInclusionDefaultValue(const char *value)
+
+void
+EESettingsFile::SaveLinkInclusionDefaultValue(const char *value)
 {
 	// Only save setting when one of these three values
 	if( strcmp(value,EE_XMLTEXT_VALUE_INCLUDE)==0
 		|| strcmp(value,EE_XMLTEXT_VALUE_PROMPT)==0
 		|| strcmp(value,EE_XMLTEXT_VALUE_EXCLUDE)==0 )
 	{
-		inclusionDefault.SetTo(value);
-		WriteSettingsToFile();
+		fInclusionDefault.SetTo(value);
+		_WriteSettingsToFile();
 	}
 }
 
-void EESettingsFile::GetDeskbarSettings(bool &show, int &count)
+
+void
+EESettingsFile::GetDeskbarSettings(bool &show, int &count)
 {
-	show = showDeskbarMenu;
-	count = deskbarMenuCount;
+	show = fShowDeskbarMenu;
+	count = fDeskbarMenuCount;
 }
 
-void EESettingsFile::SaveDeskbarSettings(bool show, int count)
+
+void
+EESettingsFile::SaveDeskbarSettings(bool show, int count)
 {
-	showDeskbarMenu = show;
-	deskbarMenuCount = count;
-	WriteSettingsToFile();
+	fShowDeskbarMenu = show;
+	fDeskbarMenuCount = count;
+	_WriteSettingsToFile();
 }

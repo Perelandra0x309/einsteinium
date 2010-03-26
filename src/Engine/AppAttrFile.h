@@ -1,49 +1,48 @@
-/*AppAttrFile.h
-	This is a subclass of a BFile which contains all functions for
-	initializing, reading, changing, and writing the attributes
-	for each application which is monitored
-*/
+/* AppAttrFile.h
+ * Copyright 2010 Brian Hill
+ * All rights reserved. Distributed under the terms of the BSD License.
+ */
 #ifndef EINSTEINIUM_ENGINE_APPATTRFILE_H
 #define EINSTEINIUM_ENGINE_APPATTRFILE_H
 
-
+#include <Alert.h>
 #include <StorageKit.h>
 #include <SupportKit.h>
-#include <Alert.h>
-#include <stdlib.h>
-#include <iostream.h>
 #include <fs_attr.h>
 #include <fstream>
+#include <iostream.h>
+#include <stdlib.h>
 #include "db_interface.h"
 #include "einsteinium_engine.h"
 
-class AppAttrFile : public BFile
-{public:
+
+class AppAttrFile : public BFile {
+public:
 					AppAttrFile(const char*, const BEntry*);
 					AppAttrFile(const BEntry*);
 					~AppAttrFile();
 	void			UpdateAppLaunched();
 	void			UpdateAppQuit();
-	uint32			getScore() { return appStats.getScore(); }
-	const char*		getSig() { return appStats.getSig(); }
-	const char*		getPath() { return appStats.getPath(); }
-	const char*		getFilename() { return appStats.getFilename(); }
-	bool			getIgnore() { return E_ignore; }
-	void			setIgnore(bool ignore);
-	void			rescanData();
-	void			calculateScore();
+	uint32			GetScore() { return fAppStats.GetScore(); }
+	const char*		GetSig() { return fAppStats.GetSig(); }
+	const char*		GetPath() { return fAppStats.GetPath(); }
+	const char*		GetFilename() { return fAppStats.GetFilename(); }
+	bool			GetIgnore() { return fIgnoreInLists; }
+	void			SetIgnore(bool ignore);
+	void			RescanData();
+	void			CalculateScore();
 	void			CopyAppStatsInto(AppStats*);
 private:
-	bool			/*dirty_data, */new_session;
-	AppStats		appStats;
-	BEntry			app_entry, appAttrEntry, appDataEntry;
-	bool			E_ignore;
-	time_t			EE_session, session;
+	bool			/*dirty_data, */fNewSession;
+	AppStats		fAppStats;
+	BEntry			fAppEntry, fAppAttrEntry, fAppDataEntry;
+	bool			fIgnoreInLists;
+	time_t			fEngineCurrentSession;
 	//Functions
-	void			initData(bool);
-	float			getQuartileVal(const double*, double);
-	void			readAttrValues();
-	void			writeAttrValues();
+	void			_InitData(bool);
+	float			_GetQuartileVal(const double*, double);
+	void			_ReadAttrValues();
+	void			_WriteAttrValues();
 };
 
 #endif

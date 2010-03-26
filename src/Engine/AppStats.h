@@ -1,7 +1,7 @@
-/*AppStats.h
-	This will contain functions for calculating various statistics
-	for each AppAttrFile.
-*/
+/* AppStats.h
+ * Copyright 2010 Brian Hill
+ * All rights reserved. Distributed under the terms of the BSD License.
+ */
 #ifndef EINSTEINIUM_ENGINE_APPSTATS_H
 #define EINSTEINIUM_ENGINE_APPSTATS_H
 
@@ -10,26 +10,26 @@
 #include <StorageKit.h>
 #include <String.h>
 
-class AppStats
-{public:
+class AppStats {
+public:
 					AppStats();
-	const char*		getSig() { return app_sig.String(); }
-	const char*		getPath() { return app_path.String(); }
-	const char*		getFilename() { return app_filename.String(); }
+	const char*		GetSig() { return app_sig.String(); }
+	const char*		GetPath() { return app_path.String(); }
+	const char*		GetFilename() { return app_filename.String(); }
 
-	time_t			getLastLaunch() { return last_launch; }
-	time_t			getFirstLaunch() { return first_launch; }
-	uint32			getLaunchCount() { return launch_count; }
-	uint32			getLastInterval() { return last_interval; }
-	uint32			getRunningTime() { return total_run_time; }
-	int				getScore() { return score; }
+	time_t			GetLastLaunch() { return last_launch; }
+	time_t			GetFirstLaunch() { return first_launch; }
+	uint32			GetLaunchCount() { return launch_count; }
+	uint32			GetLastInterval() { return last_interval; }
+	uint32			GetRunningTime() { return total_run_time; }
+	int				GetScore() { return score; }
 //	status_t		InitCheck() { return dataOK; }
-/*	void			setSig(const char *sig) { app_sig.SetTo(sig); }
-	void			setFilename(const char *name) { app_filename.SetTo(name); }
-	void			setPath(const char *path) { app_path.SetTo(path); }
-	void			setLastLaunch(time_t tm) { last_launch = tm; }
-	void			setFirstLaunch(time_t tm) { first_launch = tm; }
-	void			setLastInterval(uint32 tm) { last_interval = tm; }
+/*	void			SetSig(const char *sig) { app_sig.SetTo(sig); }
+	void			SetFilename(const char *name) { app_filename.SetTo(name); }
+	void			SetPath(const char *path) { app_path.SetTo(path); }
+	void			SetLastLaunch(time_t tm) { last_launch = tm; }
+	void			SetFirstLaunch(time_t tm) { first_launch = tm; }
+	void			SetLastInterval(uint32 tm) { last_interval = tm; }
 	void			IncrementLaunchCount() { launch_count++; }
 	void			IncreaseTotalRunTime(uint32 tm) { total_run_time += tm; }
 	*/
@@ -48,21 +48,21 @@ template < class itemType >
 int AppStatsSort(itemType (*getFunc)(AppStats*), const void*, const void*);
 //Sort AppStats objects by their score
 int AppStatsSortScore(const void*, const void*);
-int getStatsScore(AppStats*);
+int GetStatsScore(AppStats*);
 //Sort AppStats objects by their last time run
 int AppStatsSortLastLaunch(const void*, const void*);
-time_t getStatsLastLaunch(AppStats*);
+time_t GetStatsLastLaunch(AppStats*);
 //Sort AppStats objects by their first launch time
 int AppStatsSortFirstLaunch(const void*, const void*);
-time_t getStatsFirstLaunch(AppStats*);
+time_t GetStatsFirstLaunch(AppStats*);
 //Sort AppStats objects by their launch count
 int AppStatsSortLaunchCount(const void*, const void*);
-uint32 getStatsLaunchCount(AppStats*);
+uint32 GetStatsLaunchCount(AppStats*);
 //Sort AppStats objects by their last interval
 int AppStatsSortLastInterval(const void*, const void*);
-uint32 getStatsLastInterval(AppStats*);
+uint32 GetStatsLastInterval(AppStats*);
 //Sort AppStats objects by their total running time
 int AppStatsSortRunningTime(const void*, const void*);
-uint32 getStatsRunningTime(AppStats*);
+uint32 GetStatsRunningTime(AppStats*);
 
 #endif

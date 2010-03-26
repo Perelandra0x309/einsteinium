@@ -1,79 +1,93 @@
-/*EDSettingsFile.cpp
-
-*/
+/* EDSettingsFile.cpp
+ * Copyright 2010 Brian Hill
+ * All rights reserved. Distributed under the terms of the BSD License.
+ */
 #include "EDSettingsFile.h"
 
+
 EDSettingsFile::EDSettingsFile()
-	: BHandler("name")
-	,defaultRelaunchAction(ACTION_PROMPT)
-	,_initStatus(B_ERROR)
+	:
+	BHandler("name"),
+	fDefaultRelaunchAction(ACTION_PROMPT),
+	fInitStatus(B_ERROR)
 {
 	// find path for settings directory
-	find_directory(B_USER_SETTINGS_DIRECTORY, &settingsPath);
-	settingsPath.Append(e_settings_dir);
+	find_directory(B_USER_SETTINGS_DIRECTORY, &fSettingsPath);
+	fSettingsPath.Append(e_settings_dir);
 	BDirectory settingsDir;
-	status_t result = settingsDir.SetTo(settingsPath.Path());
-	if( result == B_ENTRY_NOT_FOUND )//if directory doesn't exist
+	status_t result = settingsDir.SetTo(fSettingsPath.Path());
+	if( result == B_ENTRY_NOT_FOUND )
 	{	printf("Settings directory not found, creating directory\n    %s\n",
-					settingsPath.Path());
-		//Create directory
-		result = settingsDir.CreateDirectory(settingsPath.Path(), &settingsDir);
+					fSettingsPath.Path());
+		result = settingsDir.CreateDirectory(fSettingsPath.Path(), &settingsDir);
 		if(result!=B_OK)
-		{	//Creating directory failed
+		{
 			printf("Error creating Einsteinium settings folder.  Cannot continue.\n");
-			return;//Cannot continue, exit constructor
+			return;
+				//Cannot continue, exit constructor
 		}
 	}
 
 	// create path for settings file
-	settingsPath.Append(ed_settings_file);
-	BEntry settingsEntry(settingsPath.Path());
-	if(!settingsEntry.Exists())//settings file doesn't exist, create default
+	fSettingsPath.Append(ed_settings_file);
+	BEntry settingsEntry(fSettingsPath.Path());
+	if(!settingsEntry.Exists())
 	{
-		WriteSettingsToFile(settingsPath);
+		_WriteSettingsToFile(fSettingsPath);
+			//settings file doesn't exist, create default settings file
 	}
-	settingsEntry.GetNodeRef(&settingsNodeRef);
+	settingsEntry.GetNodeRef(&fSettingsNodeRef);
 
 	//Start the Looper running
-	watchingLooper = new BLooper("settings");
-	watchingLooper->AddHandler(this);
-	watchingLooper->Run();
+	fWatchingLooper = new BLooper("settings");
+	fWatchingLooper->AddHandler(this);
+	fWatchingLooper->Run();
 
 	//watch the settings file for changes
-	StartWatching();
+	_StartWatching();
 
-	ReadSettingsFromFile(settingsPath);
+	_ReadSettingsFromFile(fSettingsPath);
 
 }
 
-EDSettingsFile::~EDSettingsFile(){
-	StopWatching();
-	watchingLooper->Lock();
-	watchingLooper->Quit();
+
+EDSettingsFile::~EDSettingsFile()
+{
+	_StopWatching();
+	fWatchingLooper->Lock();
+	fWatchingLooper->Quit();
 }
 
-void EDSettingsFile::StartWatching(){
-	status_t result = watch_node(&settingsNodeRef, B_WATCH_STAT, this, watchingLooper);
-	watchingSettingsNode = (result==B_OK);
-//	printf("Watching daemon settings node was %ssuccessful.\n", watchingSettingsNode? "": "not ");
+
+void
+EDSettingsFile::_StartWatching()
+{
+	status_t result = watch_node(&fSettingsNodeRef, B_WATCH_STAT, this, fWatchingLooper);
+	fWatchingSettingsNode = (result==B_OK);
+//	printf("Watching daemon settings node was %ssuccessful.\n", fWatchingSettingsNode? "": "not ");
 }
 
-void EDSettingsFile::StopWatching(){
-	if(watchingSettingsNode)//settings file is being watched
-	{	watch_node(&settingsNodeRef, B_STOP_WATCHING, this, watchingLooper);
+
+void
+EDSettingsFile::_StopWatching()
+{
+	if(fWatchingSettingsNode)//settings file is being watched
+	{	watch_node(&fSettingsNodeRef, B_STOP_WATCHING, this, fWatchingLooper);
 //		printf("Stopped watching daemon settings node\n");
-		watchingSettingsNode = false;
+		fWatchingSettingsNode = false;
 	}
 }
 
-status_t EDSettingsFile::ReadSettingsFromFile(BPath file)
+
+status_t
+EDSettingsFile::_ReadSettingsFromFile(BPath file)
 {
-	_initStatus = B_ERROR;
+	fInitStatus = B_ERROR;
 
 	//Delete existing list objects
 	AppRelaunchSettings *dummyPtr;
-	deleteList(settingsList, dummyPtr);
-	settingsList.MakeEmpty();
+	DeleteList(fSettingsList, dummyPtr);
+	fSettingsList.MakeEmpty();
 
 	//Parse XML
 	xmlDocPtr doc;
@@ -82,14 +96,14 @@ status_t EDSettingsFile::ReadSettingsFromFile(BPath file)
 	doc = xmlParseFile(file.Path());
 	if (doc == NULL ) {
 		fprintf(stderr,"Einsteinium Daemon settings not parsed successfully. \n");
-		return _initStatus;
+		return fInitStatus;
 	}
 
 	cur = xmlDocGetRootElement(doc);
 	if (cur == NULL) {
 		fprintf(stderr,"empty document\n");
 		xmlFreeDoc(doc);
-		return _initStatus;
+		return fInitStatus;
 	}
 
 	if (xmlStrcmp(cur->name, (const xmlChar *) ED_XMLTEXT_ROOT_NAME)) {
@@ -97,25 +111,25 @@ status_t EDSettingsFile::ReadSettingsFromFile(BPath file)
 		errorMessage.Append(ED_XMLTEXT_ROOT_NAME);
 		fprintf(stderr, errorMessage.String());
 		xmlFreeDoc(doc);
-		return _initStatus;
+		return fInitStatus;
 	}
 
 	cur = cur->xmlChildrenNode;
 	while (cur != NULL) {
 		if (!xmlStrcmp(cur->name, (const xmlChar *) ED_XMLTEXT_CHILD1_NAME)){
-			//parse application settings
-			parseSettings (doc, cur);
+			_ParseSettings (doc, cur);
 		}
 		cur = cur->next;
 	}
 	xmlFreeDoc(doc);
 
-	_initStatus = B_OK;
-	return _initStatus;
+	fInitStatus = B_OK;
+	return fInitStatus;
 }
 
 
-void EDSettingsFile::parseSettings (xmlDocPtr doc, xmlNodePtr cur)
+void
+EDSettingsFile::_ParseSettings (xmlDocPtr doc, xmlNodePtr cur)
 {
 	xmlChar *sigValue, *relaunchValue;
 	AppRelaunchSettings *appSettings;
@@ -130,18 +144,19 @@ void EDSettingsFile::parseSettings (xmlDocPtr doc, xmlNodePtr cur)
 			if( xmlStrcmp(sigValue, (const xmlChar *) ED_XMLTEXT_VALUE_DEFAULT) == 0 )
 			{
 				if(!strcmp((char *)relaunchValue, ED_XMLTEXT_VALUE_AUTO))
-				{	defaultRelaunchAction = ACTION_AUTO; }
+				{	fDefaultRelaunchAction = ACTION_AUTO; }
 				else if(!strcmp((char *)relaunchValue, ED_XMLTEXT_VALUE_PROMPT))
-				{	defaultRelaunchAction = ACTION_PROMPT; }
+				{	fDefaultRelaunchAction = ACTION_PROMPT; }
 				else if(!strcmp((char *)relaunchValue, ED_XMLTEXT_VALUE_IGNORE))
-				{	defaultRelaunchAction = ACTION_IGNORE; }
-				else// default to prompt
-				{	defaultRelaunchAction = ACTION_PROMPT; }
+				{	fDefaultRelaunchAction = ACTION_IGNORE; }
+				else
+				// set default to prompt
+				{	fDefaultRelaunchAction = ACTION_PROMPT; }
 			}
 			else
 			{
 				appSettings = new AppRelaunchSettings((char *)sigValue, (char *)relaunchValue);
-				settingsList.AddItem(appSettings);
+				fSettingsList.AddItem(appSettings);
 			}
 			xmlFree(sigValue);
 			xmlFree(relaunchValue);
@@ -152,24 +167,19 @@ void EDSettingsFile::parseSettings (xmlDocPtr doc, xmlNodePtr cur)
 }
 
 
-status_t EDSettingsFile::WriteSettingsToFile(BPath file)
+status_t
+EDSettingsFile::_WriteSettingsToFile(BPath file)
 {
-	xmlDocPtr doc = NULL;       /* document pointer */
-	xmlNodePtr root_node = NULL, child1node = NULL, child2node = NULL;/* node pointers */
-	xmlDtdPtr dtd = NULL;       /* DTD pointer */
+	xmlDocPtr doc = NULL;
+	xmlNodePtr root_node = NULL, child1node = NULL, child2node = NULL;
+	xmlDtdPtr dtd = NULL;
 
-	/*
-	* Creates a new document, a node and set it as a root node
-	*/
+	//Creates a new document, a node and set it as a root node
 	doc = xmlNewDoc(BAD_CAST "1.0");
 	root_node = xmlNewNode(NULL, BAD_CAST ED_XMLTEXT_ROOT_NAME);
 	xmlDocSetRootElement(doc, root_node);
 	dtd = xmlCreateIntSubset(doc, BAD_CAST ED_XMLTEXT_ROOT_NAME, NULL, BAD_CAST "tree.dtd");
 
-	/*
-     * xmlNewProp() creates attributes, which is "attached" to an node.
-     * It returns xmlAttrPtr, which isn't used here.
-     */
 	child1node = xmlNewChild(root_node, NULL, BAD_CAST ED_XMLTEXT_CHILD1_NAME, NULL);
 
 	// Write default relaunch setting
@@ -177,7 +187,7 @@ status_t EDSettingsFile::WriteSettingsToFile(BPath file)
 	child2node = xmlNewChild(child1node, NULL, BAD_CAST ED_XMLTEXT_CHILD2_NAME, NULL);
 	xmlNewProp(child2node, BAD_CAST ED_XMLTEXT_PROPERTY_SIGNATURE,
 				BAD_CAST ED_XMLTEXT_VALUE_DEFAULT );
-	switch(defaultRelaunchAction)
+	switch(fDefaultRelaunchAction)
 	{
 		case ACTION_AUTO: {
 			relaunchTextValue.SetTo(ED_XMLTEXT_VALUE_AUTO);
@@ -202,9 +212,9 @@ status_t EDSettingsFile::WriteSettingsToFile(BPath file)
 
 	// Write each app settings
 	AppRelaunchSettings *appSettings = NULL;
-	int index = 0, count = settingsList.CountItems();//search each item in list
-	for(index=0; index<count; index++)//search each item in list
-	{	appSettings = static_cast<AppRelaunchSettings *>(settingsList.ItemAt(index));
+	int index = 0, count = fSettingsList.CountItems();
+	for(index=0; index<count; index++)
+	{	appSettings = static_cast<AppRelaunchSettings *>(fSettingsList.ItemAt(index));
 		child2node = xmlNewChild(child1node, NULL, BAD_CAST ED_XMLTEXT_CHILD2_NAME, NULL);
 		xmlNewProp(child2node, BAD_CAST ED_XMLTEXT_PROPERTY_SIGNATURE,
 				BAD_CAST appSettings->appSig.String() );
@@ -236,7 +246,9 @@ status_t EDSettingsFile::WriteSettingsToFile(BPath file)
 	xmlCleanupParser();
 }
 
-void EDSettingsFile::UpdateActionForApp(const char *_signature, const char *_relaunch)
+
+void
+EDSettingsFile::UpdateActionForApp(const char *_signature, const char *_relaunch)
 {
 	AppRelaunchSettings *appSettings = FindSettingsForApp(_signature);
 	if(appSettings!=NULL){
@@ -244,67 +256,62 @@ void EDSettingsFile::UpdateActionForApp(const char *_signature, const char *_rel
 	}
 	else {
 		appSettings = new AppRelaunchSettings(_signature, _relaunch);
-		settingsList.AddItem(appSettings);
+		fSettingsList.AddItem(appSettings);
 	}
 
-	//Stop watching file
-	StopWatching();
-
-	// Write to file
-	WriteSettingsToFile(settingsPath);
-
-	//Start watching file
-	StartWatching();
+	_StopWatching();
+	_WriteSettingsToFile(fSettingsPath);
+	_StartWatching();
 }
 
-void EDSettingsFile::RemoveApp(const char *_signature)
+
+void
+EDSettingsFile::RemoveApp(const char *_signature)
 {
 	AppRelaunchSettings *appSettings = FindSettingsForApp(_signature);
 	if(appSettings==NULL) return;
-	settingsList.RemoveItem(appSettings);
+	fSettingsList.RemoveItem(appSettings);
 	delete appSettings;
 
-	//Stop watching file
-	StopWatching();
-
-	// Write to file
-	WriteSettingsToFile(settingsPath);
-
-	//Start watching file
-	StartWatching();
+	_StopWatching();
+	_WriteSettingsToFile(fSettingsPath);
+	_StartWatching();
 }
 
-AppRelaunchSettings* EDSettingsFile::FindSettingsForApp(const char *sig)
+
+AppRelaunchSettings*
+EDSettingsFile::FindSettingsForApp(const char *sig)
 {
 	AppRelaunchSettings *appSettings = NULL;
-	int index = 0, count = settingsList.CountItems();//search each item in list
-	for(index=0; index<count; index++)//search each item in list
-	{	appSettings = static_cast<AppRelaunchSettings *>(settingsList.ItemAt(index));
-		if(strcmp(sig,appSettings->appSig.String()) == 0)//Found a match for the app sig
-		{
+	int index = 0, count = fSettingsList.CountItems();
+	for(index=0; index<count; index++)
+	{	appSettings = static_cast<AppRelaunchSettings *>(fSettingsList.ItemAt(index));
+		if(strcmp(sig,appSettings->appSig.String()) == 0)
 			return appSettings;
-		}
 	}
 	return NULL;
 }
 
 
-void EDSettingsFile::MessageReceived(BMessage *msg)
+void
+EDSettingsFile::MessageReceived(BMessage *msg)
 {	switch(msg->what)
 	{
-		case B_NODE_MONITOR: {//a watched node_ref has changed
+		//the settings file node_ref has changed
+		case B_NODE_MONITOR: {
 			int32 opcode;
 			if (msg->FindInt32("opcode", &opcode) == B_OK)
 			{	switch (opcode)
-				{	case B_STAT_CHANGED: {//file contents modified
+				{	case B_STAT_CHANGED: {
 						node_ref nref;
-						msg->FindInt32("device", &nref.device);//create node from msg
+						msg->FindInt32("device", &nref.device);
 						msg->FindInt64("node", &nref.node);
-						if(nref == settingsNodeRef)//settings node changed
+						if(nref == fSettingsNodeRef)
 						{	printf("Daemon settings file changed, loading new settings...\n");
-							ReadSettingsFromFile(settingsPath);
+							_ReadSettingsFromFile(fSettingsPath);
 						}
-						break; }
+						break;
+					}
 				}
 			}
 			break;

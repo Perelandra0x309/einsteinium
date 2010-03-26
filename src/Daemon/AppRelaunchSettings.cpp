@@ -1,13 +1,16 @@
 /*AppRelaunchSettings.cpp
-	Settings read from file
-*/
+ * Copyright 2010 Brian Hill
+ * All rights reserved. Distributed under the terms of the BSD License.
+ */
 #include "AppRelaunchSettings.h"
 
 AppRelaunchSettings::AppRelaunchSettings()
-	:appPath("")
-	,name("<App not found>")
-	,relaunchAction(ACTION_PROMPT)
+	:
+	appPath(""),
+	name("<App not found>"),
+	relaunchAction(ACTION_PROMPT)
 {	}
+
 
 AppRelaunchSettings::AppRelaunchSettings(AppRelaunchSettings* sourceSettings)
 {
@@ -19,15 +22,16 @@ AppRelaunchSettings::AppRelaunchSettings(AppRelaunchSettings* sourceSettings)
 
 
 AppRelaunchSettings::AppRelaunchSettings(const char *_signature, const char *_relaunch = NULL)
-	:appPath("")
-	,name("<App not found>")
-	,relaunchAction(ACTION_PROMPT)
+	:
+	appPath(""),
+	name("<App not found>"),
+	relaunchAction(ACTION_PROMPT)
 {
 	appSig.SetTo(_signature);
 	SetRelaunchAction(_relaunch);
 
 	//Get the path and file name based on application signature
-	BEntry appEntry = getEntryFromSig(appSig);
+	BEntry appEntry = _GetEntryFromSig(appSig);
 	if(appEntry.Exists()){
 		BPath path;
 		appEntry.GetPath(&path);
@@ -38,7 +42,8 @@ AppRelaunchSettings::AppRelaunchSettings(const char *_signature, const char *_re
 
 
 AppRelaunchSettings::AppRelaunchSettings(const char *_signature, BPath _path, char *action = NULL)
-	:relaunchAction(ACTION_PROMPT)
+	:
+	relaunchAction(ACTION_PROMPT)
 {
 	appSig.SetTo(_signature);
 	appPath.SetTo(_path.Path());
@@ -46,7 +51,9 @@ AppRelaunchSettings::AppRelaunchSettings(const char *_signature, BPath _path, ch
 	SetRelaunchAction(action);
 }
 
-status_t AppRelaunchSettings::SetRelaunchAction(const char *action)
+
+status_t
+AppRelaunchSettings::SetRelaunchAction(const char *action)
 {
 	if (action == NULL) { return B_ERROR; }
 
@@ -60,8 +67,11 @@ status_t AppRelaunchSettings::SetRelaunchAction(const char *action)
 	{	return B_ERROR; }
 	return B_OK;
 }
+
+
 // TODO improve code so we don't have to do this translation
-BString AppRelaunchSettings::GetRelaunchActionString()
+BString
+AppRelaunchSettings::GetRelaunchActionString()
 {
 	BString text;
 	switch(relaunchAction){
@@ -78,7 +88,9 @@ BString AppRelaunchSettings::GetRelaunchActionString()
 	return text;
 }
 
-bool AppRelaunchSettings::Equals(AppRelaunchSettings* compare)
+
+bool
+AppRelaunchSettings::Equals(AppRelaunchSettings* compare)
 {
 	bool equal = (appPath == compare->appPath
 				&& appSig == compare->appSig
@@ -88,7 +100,8 @@ bool AppRelaunchSettings::Equals(AppRelaunchSettings* compare)
 }
 
 
-BEntry AppRelaunchSettings::getEntryFromSig(const char* sig)
+BEntry
+AppRelaunchSettings::_GetEntryFromSig(const char* sig)
 {
 	entry_ref ref;
 	be_roster->FindApp(sig, &ref);

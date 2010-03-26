@@ -1,15 +1,17 @@
-/*SystemStatusBox.h
-
-*/
+/* SystemStatusBox.h
+ * Copyright 2010 Brian Hill
+ * All rights reserved. Distributed under the terms of the BSD License.
+ */
 #ifndef EP_SYSTEMSTATUS_BOX
 #define EP_SYSTEMSTATUS_BOX
 
 #include <InterfaceKit.h>
-#include <Roster.h>
 #include <Path.h>
+#include <Roster.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include "prefs_constants.h"
+
 
 enum {
 	STATE_NONE = 0,
@@ -24,8 +26,7 @@ enum {
 	STATE_ERROR_STARTING__IS_NOT_RUNNING
 };
 
-class SystemStatusBox : public BBox
-{
+class SystemStatusBox : public BBox {
 public:
 							SystemStatusBox(BEntry entry, const char * sig);
 //							~SystemStatusBox();
@@ -34,16 +35,16 @@ public:
 	virtual void			MessageReceived(BMessage*);
 	virtual	void			Draw(BRect updateRect){ BBox::Draw(updateRect); }
 private:
-	BStringView				*statusSV;
-	BString					signature, name, stringViewText;
-	BButton					*restartB, *startstopB;
-	float					usedWidth;
-	int						currentState;
-	status_t				StopService();
-	status_t				StartService();
-	void					SetStatusText(const char*);
-	void					GetRunningState();
-	void					SetState(int);
+	BStringView				*fStatusSV;
+	BString					fSignature, fName, fStringViewText;
+	BButton					*fRestartB, *fStartstopB;
+	float					fUsedWidth;
+	int						fCurrentState;
+	status_t				_StopService();
+	status_t				_StartService();
+	void					_SetStatusText(const char*);
+	void					_GetRunningState();
+	void					_SetState(int);
 
 };
 
