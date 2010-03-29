@@ -135,11 +135,9 @@ Edb_insertData(sqlite3* dbp, app_time_data* tm_data, long long int row_key = 0)
 	//create sql to replace row defined by row_key
 	if(row_key)
 	{
-		char keyStr[64];
-		sprintf(keyStr, "%lld", row_key);
-//		printf("keyStr=%s\n", keyStr);
-		sqlcmd.SetTo("REPLACE INTO time_data (ROWID, app_time_data) VALUES(")
-				.Append(keyStr).Append(", ?);");
+		sqlcmd.SetTo("REPLACE INTO time_data (ROWID, app_time_data) VALUES(");
+		sqlcmd << row_key;
+		sqlcmd.Append(", ?);");
 //		printf("Replace sql: %s\n", sqlcmd.String());
 	}
 	//create sql to insert a new record
@@ -205,9 +203,9 @@ Edb_getLastData(sqlite3* dbp, app_time_data* tm_data, long long int* row_key)
 	sqlite3_finalize(stmt);
 
 	// Get the data from the last rowid record
-	char keyStr[64];
-	sprintf(keyStr, "%lld", *row_key);
-	sqlcmd.SetTo("select * from time_data where rowid = ").Append(keyStr).Append(";");
+	sqlcmd.SetTo("select * from time_data where rowid = ");
+	sqlcmd << *row_key;
+	sqlcmd.Append(";");
 //	printf("Running sql: %s\n", sqlcmd.String());
 	ret = sqlite3_prepare_v2(dbp, sqlcmd.String(), -1, &stmt, 0);
 	if( ret ){

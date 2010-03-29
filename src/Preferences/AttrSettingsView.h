@@ -26,11 +26,14 @@ class AttrSettingsView : public BView {
 public:
 					AttrSettingsView(BRect);
 					~AttrSettingsView();
+	virtual void	AllAttached();
 	virtual void	MessageReceived(BMessage*);
 	void			SetLinkInclusionDefault(const char*);
 	BSize			GetMinSize();
 private:
-	BPath			fSettingsPath;
+	BPath			fAppAttrDirPath;
+	node_ref		fAttrDirNodeRef;//node_ref to watch for changes to atributes directory
+	bool			fWatchingAttributesDir;
 	AppRefFilter	*fAppFilter;
 	BFilePanel		*fAppsPanel;
 	BBox			*fDefaultSettingsBox, *fSettingsBox;
@@ -40,6 +43,8 @@ private:
 	BListView		*fAttrLView;
 	BScrollView		*fAttrSView;
 	AppAttrItem		*fSelectedItem;
+	void			_StartWatching();
+	void			_StopWatching();
 	void			_RebuildAttrList();
 	void			_EmptyAttrList();
 	void			_SaveChangedItem(AppAttrItem *item);

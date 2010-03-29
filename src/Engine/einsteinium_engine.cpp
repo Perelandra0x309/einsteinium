@@ -783,12 +783,10 @@ void
 einsteinium_engine::_WriteQuartilesNamed(BFile* file, double* Q, const char* name)
 {
 	BString nameStr;
-	char num[2];
 	for(int i=0; i<5; i++)
-	{	sprintf(num, "%i", i);
-		nameStr.SetTo(name);
+	{	nameStr.SetTo(name);
 		nameStr.Append("_Q");
-		nameStr.Append(num);
+		nameStr << i;
 		file->WriteAttr(nameStr.String(), B_DOUBLE_TYPE, 0, Q+i, sizeof(double));
 	}
 }
@@ -808,12 +806,11 @@ bool einsteinium_engine::_ReadQuartilesNamed(BFile* statsFile, double* Q, const 
 {
 	attr_info info;
 	BString nameStr;
-	char num[2];
 	for(int i=0; i<5; i++)
-	{	sprintf(num, "%i", i);
+	{
 		nameStr.SetTo(name);
 		nameStr.Append("_Q");
-		nameStr.Append(num);
+		nameStr << i;
 		if(statsFile->GetAttrInfo(nameStr.String(), &info) != B_NO_ERROR) { return false; }
 		statsFile->ReadAttr(nameStr.String(), B_DOUBLE_TYPE, 0, Q+i, sizeof(double));
 	}

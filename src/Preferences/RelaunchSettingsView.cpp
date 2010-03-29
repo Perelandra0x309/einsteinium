@@ -68,6 +68,8 @@ RelaunchSettingsView::RelaunchSettingsView(BRect size)
 	//Settings file
 	fDaemonSettings = new EDSettingsFile();
 	ReadSettings();
+
+	// TODO watch daemon settings file for changes to reload list
 }
 
 

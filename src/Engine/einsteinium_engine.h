@@ -8,7 +8,6 @@
 #include <AppKit.h>
 #include <StorageKit.h>
 #include <Deskbar.h>
-#include <stdio.h>
 #include "AppStats.h"
 #include "AppAttrFile.h"
 #include "EESettingsFile.h"

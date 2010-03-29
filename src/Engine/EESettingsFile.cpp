@@ -168,19 +168,20 @@ EESettingsFile::_XmlGetIntProp(xmlNodePtr cur, char *name)
 status_t
 EESettingsFile::_WriteSettingsToFile()
 {
-	char launchChar[32], firstChar[32], lastChar[32], intervalChar[32], runtimeChar[32];
-	sprintf(launchChar, "%ld", fLaunchScale);
-	sprintf(firstChar, "%ld", fFirstScale);
-	sprintf(lastChar, "%ld", fLastScale);
-	sprintf(intervalChar, "%ld", fIntervalScale);
-	sprintf(runtimeChar, "%ld", fRuntimeScale);
+	BString launchChar, firstChar, lastChar, intervalChar, runtimeChar;
+	launchChar << fLaunchScale;
+	firstChar << fFirstScale;
+	lastChar << fLastScale;
+	intervalChar << fIntervalScale;
+	runtimeChar << fRuntimeScale;
+
 	BString showDeskbar;
 	if(fShowDeskbarMenu)
 		showDeskbar.SetTo("true");
 	else
 		showDeskbar.SetTo("false");
-	char countChar[32];
-	sprintf(countChar, "%i", fDeskbarMenuCount);
+	BString countChar;
+	countChar << fDeskbarMenuCount;
 
 	BString xml_text("<?xml version=\"1.0\"?>\n");
 	xml_text.Append("<").Append(EE_XMLTEXT_ROOT_NAME).Append(">\n");

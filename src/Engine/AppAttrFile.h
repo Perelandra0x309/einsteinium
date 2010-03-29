@@ -5,13 +5,8 @@
 #ifndef EINSTEINIUM_ENGINE_APPATTRFILE_H
 #define EINSTEINIUM_ENGINE_APPATTRFILE_H
 
-#include <Alert.h>
 #include <StorageKit.h>
 #include <SupportKit.h>
-#include <fs_attr.h>
-#include <fstream>
-#include <iostream.h>
-#include <stdlib.h>
 #include "db_interface.h"
 #include "einsteinium_engine.h"
 

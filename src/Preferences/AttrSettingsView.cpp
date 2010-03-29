@@ -12,8 +12,12 @@ AttrSettingsView::AttrSettingsView(BRect size)
 	SetViewColor(bg_color);
 	BRect viewRect;
 
-	find_directory(B_USER_SETTINGS_DIRECTORY, &fSettingsPath);
-	fSettingsPath.Append(e_settings_dir);
+	// TODO create directory if not found
+	find_directory(B_USER_SETTINGS_DIRECTORY, &fAppAttrDirPath);
+	fAppAttrDirPath.Append(e_settings_dir);
+	fAppAttrDirPath.Append(e_settings_app_dir);
+	BEntry dirEntry(fAppAttrDirPath.Path());
+	dirEntry.GetNodeRef(&fAttrDirNodeRef);
 
 	// Default Settings
 	fDefaultSettingsBox = new BBox("Default Settings BBox");
@@ -74,16 +78,47 @@ AttrSettingsView::AttrSettingsView(BRect size)
 	// Build app list
 	_RebuildAttrList();
 
-	// TODO watch the settings folder for added or removed attribute files to trigger
-	// rebuilding the list
+	// TODO how to watch the settings folder for attributes in files changing to trigger
+	// rebuilding the list?
+
 }
 
 
 AttrSettingsView::~AttrSettingsView()
 {
+	_StopWatching();
 	_EmptyAttrList();
 	delete fAppsPanel;
 	delete fAppFilter;
+}
+
+
+void
+AttrSettingsView::AllAttached()
+{
+	BView::AllAttached();
+	_StartWatching();
+}
+
+
+void
+AttrSettingsView::_StartWatching(){
+	status_t error = watch_node(&fAttrDirNodeRef, B_WATCH_DIRECTORY, BMessenger(this));
+	fWatchingAttributesDir = (error==B_OK);
+	printf("Watching attributes folder was %ssuccessful.\n", fWatchingAttributesDir? "": "not ");
+	if(!fWatchingAttributesDir)
+		printf("Error=%i (B_BAD_VALUE=%i, B_NO_MEMORY=%i, B_ERROR=%i)\n",
+			error, B_BAD_VALUE, B_NO_MEMORY, B_ERROR);
+}
+
+
+void
+AttrSettingsView::_StopWatching(){
+	if(fWatchingAttributesDir)
+	{	watch_node(&fAttrDirNodeRef, B_STOP_WATCHING, BMessenger(this));
+		printf("Stopped watching engine settings node\n");
+		fWatchingAttributesDir = false;
+	}
 }
 
 
@@ -129,8 +164,7 @@ AttrSettingsView::MessageReceived(BMessage* msg)
 			if( (size = node.ReadAttr("BEOS:APP_SIG",0,0,buf,B_ATTR_NAME_LENGTH)) > 0 )
 			{
 				BString sigString(buf);
-				BPath appPath(&srcEntry), appAttrPath(fSettingsPath);
-				appAttrPath.Append(e_settings_app_dir);
+				BPath appPath(&srcEntry), appAttrPath(fAppAttrDirPath);
 				appAttrPath.Append(appPath.Leaf());
 				BFile appAttrFile;
 				status_t result = appAttrFile.SetTo(appAttrPath.Path(),
@@ -190,11 +224,34 @@ AttrSettingsView::MessageReceived(BMessage* msg)
 			if(entry.InitCheck()==B_OK)
 				entry.MoveTo(&trashDir);
 			fAttrLView->RemoveItem(index);
+			// TODO update engine subscribers
 			delete item;
 			break; }
 		case EE_IGNORE_ATTR_CHANGED: {
 			_SaveItemSettings();
 			break; }
+		case B_NODE_MONITOR: {
+			//the attributes directory has changed
+			int32 opcode;
+			if (msg->FindInt32("opcode", &opcode) == B_OK)
+			{	switch (opcode)
+				{
+					case B_ENTRY_CREATED:
+					case B_ENTRY_REMOVED:
+					case B_ENTRY_MOVED:{
+						node_ref nref;
+						msg->FindInt32("device", &nref.device);
+						msg->FindInt64("directory", &nref.node);
+						if(nref == fAttrDirNodeRef)
+						{	printf("An attribute file changed, reloading...\n");
+							_RebuildAttrList();
+						}
+						break;
+					}
+				}
+			}
+			break;
+		}
 	}
 }
 
@@ -228,10 +285,8 @@ AttrSettingsView::_RebuildAttrList()
 {
 	_EmptyAttrList();
 
-	BPath appAttrDirPath(fSettingsPath), attrPath;
-		//create path for the application attribute files directory
-	appAttrDirPath.Append(e_settings_app_dir);
-	BDirectory appAttrDir(appAttrDirPath.Path());
+	BDirectory appAttrDir(fAppAttrDirPath.Path());
+	BPath attrPath;
 	BEntry attrEntry;
 	BNode attrNode;
 	BNodeInfo attrNodeInfo;

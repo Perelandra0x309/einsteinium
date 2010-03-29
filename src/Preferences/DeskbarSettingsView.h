@@ -10,7 +10,6 @@
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <GridLayoutBuilder.h>
-#include <stdlib.h>
 #include "EESettingsFile.h"
 #include "engine_constants.h"
 #include "prefs_constants.h"

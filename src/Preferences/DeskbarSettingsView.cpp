@@ -85,10 +85,8 @@ void
 DeskbarSettingsView::SetDeskbarValues(bool show, int count)
 {
 	fShowDeskbarCB->SetValue(show);
-	char *number = new char[16];
-	sprintf(number, "%i", count);
-	// TODO use BString << operator
-	fItemCountTC->SetText(number);
+	BString number;
+	number << count;
+	fItemCountTC->SetText(number.String());
 	fItemCountTC->SetEnabled(show);
-	delete[] number;
 }
