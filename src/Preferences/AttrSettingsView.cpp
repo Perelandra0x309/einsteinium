@@ -211,20 +211,27 @@ AttrSettingsView::MessageReceived(BMessage* msg)
 			str.Append(item->fAppName);
 			if((new BAlert("",str.String(), "Yes", "No!"))->Go())
 				break;
+			// move attribute files to trash
 			BPath trashPath;
 			find_directory(B_TRASH_DIRECTORY, &trashPath);
 			BDirectory trashDir(trashPath.Path());
 			BString ent(item->fAttrPath.String());
 			BEntry entry(ent.String());
-			// TODO move to trash doesn't work if there is already a file of the same name in the trash
 			if(entry.InitCheck()==B_OK)
-				entry.MoveTo(&trashDir);
+				entry.MoveTo(&trashDir, NULL, true);
 			ent.Append(".db");
 			entry.SetTo(ent.String());
 			if(entry.InitCheck()==B_OK)
-				entry.MoveTo(&trashDir);
+				entry.MoveTo(&trashDir, NULL, true);
+			// update engine subscribers
+			if(!item->fIgnore && be_roster->IsRunning(e_engine_sig))
+			{
+				BMessenger messenger(e_engine_sig);
+				BMessage msg(E_UPDATE_SUBSCRIBERS);
+				messenger.SendMessage(&msg);
+			}
+			// remove from list
 			fAttrLView->RemoveItem(index);
-			// TODO update engine subscribers
 			delete item;
 			break; }
 		case EE_IGNORE_ATTR_CHANGED: {
@@ -243,7 +250,7 @@ AttrSettingsView::MessageReceived(BMessage* msg)
 						msg->FindInt32("device", &nref.device);
 						msg->FindInt64("directory", &nref.node);
 						if(nref == fAttrDirNodeRef)
-						{	printf("An attribute file changed, reloading...\n");
+						{//	printf("An attribute file changed, reloading...\n");
 							_RebuildAttrList();
 						}
 						break;
@@ -342,9 +349,7 @@ AttrSettingsView::_SaveChangedItem(AppAttrItem *item)
 	if(attrNode.InitCheck()!=B_OK)
 		// TODO error message?
 		return;
-	app_info info;
-	status_t result = be_roster->GetAppInfo(e_engine_sig, &info);
-	if(result==B_OK)
+	if(be_roster->IsRunning(e_engine_sig))
 	{
 		BMessenger messenger(e_engine_sig);
 		BMessage msg(E_SET_IGNORE_ATTR);

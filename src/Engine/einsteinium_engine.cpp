@@ -440,9 +440,9 @@ einsteinium_engine::MessageReceived(BMessage *msg)
 		case E_UPDATE_QUARTILES:
 			_UpdateQuartiles();
 		case E_UPDATE_SCORES:
-		{
 			_UpdateAllAttrScores();
-			// update subscribers
+		case E_UPDATE_SUBSCRIBERS:
+		{
 			int subscribersCount = fSubscribersList.CountItems();
 			if(subscribersCount>0)
 			{
