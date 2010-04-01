@@ -44,6 +44,7 @@ private:
 //	BQuery			fRankQuery;
 	int32			fShelfViewId;
 	// functions
+	void			_Unsubscribe(int32 uniqueID);
 	void			_SendListToSubscriber(BList *appStatsList, Subscriber *subscriber);
 	void			_PopulateAppRankMessage(BList *appStatsList, BMessage *message, int count);
 	void			_ShowShelfView(bool showShelfView, int shelfViewCount);

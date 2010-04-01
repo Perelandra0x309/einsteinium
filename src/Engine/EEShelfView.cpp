@@ -4,13 +4,11 @@
  */
 #include "EEShelfView.h"
 
-const char* kTrackerSignature = "application/x-vnd.Be-TRAK";
-
 
 EEShelfView::EEShelfView(BRect frame, int16 count)
 	:
 	BView(frame, EE_SHELFVIEW_NAME, B_FOLLOW_NONE,
-		B_WILL_DRAW/* | B_FRAME_EVENTS /*B_PULSE_NEEDED*/),
+		B_WILL_DRAW/* | B_PULSE_NEEDED*/),
 	fIcon(NULL)
 {
 	fInitialCount = count;
@@ -54,7 +52,8 @@ EEShelfView::EEShelfView(BRect frame, int16 count)
 EEShelfView::EEShelfView(BMessage *message)
 	:
 	BView(message),
-	fIcon(NULL)
+	fIcon(NULL),
+	fMenu(NULL)
 {
 	BMessage iconArchive;
 	status_t result = message->FindMessage("fIconArchive", &iconArchive);
@@ -70,6 +69,9 @@ EEShelfView::~EEShelfView()
 {
 	if(fIcon)
 		delete fIcon;
+
+	if(fMenu)
+		delete fMenu;
 }
 
 
@@ -82,6 +84,8 @@ EEShelfView::AttachedToWindow()
 	else
 		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ViewColor());
+
+	_BuildMenu(NULL);
 
 	fUniqueID = time(NULL);
 	if (!be_roster->IsRunning(e_engine_sig)) {
@@ -96,7 +100,10 @@ EEShelfView::AttachedToWindow()
 		subscribeMsg.AddInt16("count", fInitialCount);
 		subscribeMsg.AddMessenger("messenger", BMessenger(this));
 		BMessenger EsMessenger(e_engine_sig);
-		EsMessenger.SendMessage(&subscribeMsg);
+		EsMessenger.SendMessage(&subscribeMsg, this);
+		// TODO trying to get reply synchronously freezes
+	//	BMessage reply;
+	//	EsMessenger.SendMessage(&subscribeMsg, &reply);
 		Invalidate();
 	}
 }
@@ -108,10 +115,10 @@ EEShelfView::DetachedFromWindow()
 	// Unsubscribe from the Einsteinium Engine
 	if (be_roster->IsRunning(e_engine_sig))
 	{
-		BMessage subscribeMsg(E_UNSUBSCRIBE_RANKED_APPS);
-		subscribeMsg.AddInt32("uniqueID", fUniqueID);
+		BMessage unsubscribeMsg(E_UNSUBSCRIBE_RANKED_APPS);
+		unsubscribeMsg.AddInt32("uniqueID", fUniqueID);
 		BMessenger EsMessenger(e_engine_sig);
-		EsMessenger.SendMessage(&subscribeMsg);
+		EsMessenger.SendMessage(&unsubscribeMsg, this);
 	}
 }
 
@@ -159,6 +166,11 @@ EEShelfView::MessageReceived(BMessage* msg)
 {
 	switch(msg->what)
 	{
+		case E_SUBSCRIBE_FAILED: {
+			BDeskbar deskbar;
+			deskbar.RemoveItem(EE_SHELFVIEW_NAME);
+			break;
+		}
 		case E_SHELFVIEW_OPENPREFS: {
 			be_roster->Launch("application/x-vnd.Einsteinium_Preferences");
 			break;
@@ -196,45 +208,46 @@ EEShelfView::MouseDown(BPoint pos)
 			pos.x + 2, pos.y + 2), true);
 }
 
-BPopUpMenu*
+
+void
 EEShelfView::_BuildMenu(BMessage *message)
 {
+	if(fMenu)
+		delete fMenu;
+
 	fMenu = new BPopUpMenu(B_EMPTY_STRING, false, false);
 	fMenu->SetFont(be_plain_font);
 
 	// Add any refs found
-	int32 countFound;
-	type_code typeFound;
-	message->GetInfo("refs", &typeFound, &countFound);
-	printf("Found %i refs\n", countFound);
-	entry_ref newref;
-	for(int i=0; i<countFound; i++)
+	if(message)
 	{
-		message->FindRef("refs", i, &newref);
-		printf("Found ref %s\n", newref.name);
-		BNode refNode(&newref);
-		BNodeInfo refNodeInfo(&refNode);
-		BMessage *newMsg = new BMessage(E_SHELFVIEW_OPEN);
-		newMsg->AddRef("refs", &newref);
-		fMenu->AddItem(new IconMenuItem(newref.name, newMsg, &refNodeInfo, B_MINI_ICON));
-		// TODO does this also get a vector icon?
+		int32 countFound;
+		type_code typeFound;
+		message->GetInfo("refs", &typeFound, &countFound);
+	//	printf("Found %i refs\n", countFound);
+		entry_ref newref;
+		for(int i=0; i<countFound; i++)
+		{
+			message->FindRef("refs", i, &newref);
+	//		printf("Found ref %s\n", newref.name);
+			BNode refNode(&newref);
+			BNodeInfo refNodeInfo(&refNode);
+			BMessage *newMsg = new BMessage(E_SHELFVIEW_OPEN);
+			newMsg->AddRef("refs", &newref);
+			fMenu->AddItem(new IconMenuItem(newref.name, newMsg, &refNodeInfo, B_MINI_ICON));
+		}
 	}
 
+	// Preferences link
 	fMenu->AddSeparatorItem();
 	fMenu->AddItem(new BMenuItem("Preferences"B_UTF8_ELLIPSIS,
 		new BMessage(E_SHELFVIEW_OPENPREFS)));
 
-//	BMessenger tracker(kTrackerSignature);
 	BMenuItem* item;
 	BMessage* msg;
 	for (int32 i = fMenu->CountItems(); i-- > 0;) {
 		item = fMenu->ItemAt(i);
-		if (item && (msg = item->Message()) != NULL) {
-			//if (msg->what == B_REFS_RECEIVED)
-			//	item->SetTarget(tracker);
-			//else
-				item->SetTarget(this);
-		}
+		if (item && (msg = item->Message()) != NULL)
+			item->SetTarget(this);
 	}
-	return fMenu;
 }

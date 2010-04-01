@@ -34,7 +34,7 @@ public:
 //	virtual void			Pulse();
 
 private:
-	BPopUpMenu*				_BuildMenu(BMessage *message);
+	void					_BuildMenu(BMessage *message);
 	BBitmap*				fIcon;
 	BPopUpMenu*				fMenu;
 	int16					fInitialCount;

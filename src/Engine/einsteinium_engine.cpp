@@ -331,12 +331,20 @@ einsteinium_engine::MessageReceived(BMessage *msg)
 			if(result1 != B_OK || result2 != B_OK || result3 != B_OK)
 			{
 				printf("Einsteinium Engine received invalid subscribe message.\n");
+				// Attempt to deliver a reply
+				status_t result = B_ERROR;
+				if(msg->IsSourceWaiting())
+					result = msg->SendReply(E_SUBSCRIBE_FAILED);
+				if(result != B_OK && newSubscriber->messenger.IsValid())
+					newSubscriber->messenger.SendMessage(E_SUBSCRIBE_FAILED);
 				delete newSubscriber;
-				// TODO send reply?
 				break;
 			}
-			// TODO if there already is a subscriber with the unique ID update it
+			_Unsubscribe(newSubscriber->uniqueID);
+				// if there already is a subscriber listed with the unique ID remove it
 			fSubscribersList.AddItem(newSubscriber);
+		//	printf("Sending subscribe confirmed reply\n");
+			newSubscriber->messenger.SendMessage(E_SUBSCRIBE_CONFIRMED);
 			BList appStatsList = _CreateAppStatsList(SORT_BY_SCORE);
 			_SendListToSubscriber(&appStatsList, newSubscriber);
 			_EmptyAppStatsList(appStatsList);
@@ -349,20 +357,11 @@ einsteinium_engine::MessageReceived(BMessage *msg)
 			if(result!=B_OK)
 			{
 				printf("Einsteinium Engine received invalid unsubscribe message.\n");
+				msg->SendReply(E_UNSUBSCRIBE_FAILED);
 				break;
 			}
-			int subscribersCount = fSubscribersList.CountItems();
-			for(int j=0; j<subscribersCount; j++)
-			{
-				Subscriber *currentSub = (Subscriber*)fSubscribersList.ItemAt(j);
-				if( uniqueID==currentSub->uniqueID )
-				{
-					fSubscribersList.RemoveItem(currentSub);
-					delete currentSub;
-					j = subscribersCount;
-				//	printf("Successful unsubscribe\n");
-				}
-			}
+			_Unsubscribe(uniqueID);
+			msg->SendReply(E_UNSUBSCRIBE_CONFIRMED);
 			break;
 		}
 
@@ -458,6 +457,24 @@ einsteinium_engine::MessageReceived(BMessage *msg)
 		}
 		default:
 			BApplication::MessageReceived(msg);
+	}
+}
+
+
+void
+einsteinium_engine::_Unsubscribe(int32 uniqueID)
+{
+	int subscribersCount = fSubscribersList.CountItems();
+	for(int j=0; j<subscribersCount; j++)
+	{
+		Subscriber *currentSub = (Subscriber*)fSubscribersList.ItemAt(j);
+		if( uniqueID==currentSub->uniqueID )
+		{
+			fSubscribersList.RemoveItem(currentSub);
+			delete currentSub;
+			j = subscribersCount;
+		//	printf("Successful unsubscribe\n");
+		}
 	}
 }
 
