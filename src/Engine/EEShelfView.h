@@ -14,9 +14,7 @@
 #include <Roster.h>
 #include <stdio.h>
 #include "engine_constants.h"
-#include "EsIcons.h"
 #include "IconMenuItem.h"
-#include "IconUtils.h"
 
 class _EXPORT EEShelfView : public BView {
 public:

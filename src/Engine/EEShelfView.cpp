@@ -15,35 +15,23 @@ EEShelfView::EEShelfView(BRect frame, int16 count)
 
 	app_info info;
 	be_app->GetAppInfo(&info);
-	BFile file(&info.ref, B_READ_ONLY);
-	if (file.InitCheck() != B_OK)
-		return;
-
-	BResources resources(&file);
-	size_t size = 0;
-	const uint8* rawIcon;
-	rawIcon = (const uint8*)resources.LoadResource(B_VECTOR_ICON_TYPE,
-		ES_ICON_ENGINE_SHELF, &size);
-
-	if (rawIcon != NULL)
+	fIcon = new BBitmap(Bounds(), B_RGBA32);
+	if (fIcon->InitCheck() == B_OK)
 	{
-		fIcon = new BBitmap(Bounds(), B_RGBA32);
-		if (fIcon->InitCheck() == B_OK)
+		status_t result = BNodeInfo::GetTrackerIcon(&info.ref, fIcon, B_MINI_ICON);
+		if(result != B_OK)
 		{
-			if(BIconUtils::GetVectorIcon(rawIcon, size, fIcon) != B_OK)
-			{
-				printf("Error getting Vector\n");
-				delete fIcon;
-				fIcon = NULL;
-			}
-		}
-		else
-		{
-			printf("Error creating bitmap\n");
+			printf("Error getting tracker icon\n");
+			delete fIcon;
+			fIcon = NULL;
 		}
 	}
 	else
-		printf("rawIcon was NULL\n");
+	{
+		printf("Error creating bitmap\n");
+		delete fIcon;
+		fIcon = NULL;
+	}
 
 	SetToolTip("Einsteinium  \nRanked\nApplications");
 }

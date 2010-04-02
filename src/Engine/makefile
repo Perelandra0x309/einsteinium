@@ -10,7 +10,7 @@ SRCS := methods.cpp \
 		main.cpp
 LIBS := be tracker stdc++.r4 xml2 sqlite3
 OPTIMIZE := FULL
-RSRCS := einsteinium_engine.rsrc ../Icons/EsIcons.rsrc
+RSRCS := einsteinium_engine.rsrc
 
 #       Specify your RDEF files, if any.
 RDEFS :=
