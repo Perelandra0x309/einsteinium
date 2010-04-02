@@ -15,12 +15,10 @@ class AppRelaunchSettings {
 public:
 					AppRelaunchSettings();
 					AppRelaunchSettings(AppRelaunchSettings*);
-					AppRelaunchSettings(const char *_signature, const char *_relaunch = NULL);
-					AppRelaunchSettings(const char *_signature, BPath _path, char *action = NULL);
+					AppRelaunchSettings(const char *_signature, int _relaunch = ACTION_PROMPT);
+					AppRelaunchSettings(const char *_signature, BPath _path, int _relaunch = ACTION_PROMPT);
 	int				relaunchAction;
 	BString			appPath, appSig, name;
-	status_t		SetRelaunchAction(const char *action);
-	BString			GetRelaunchActionString();
 	bool			Equals(AppRelaunchSettings*);
 private:
 	BEntry			_GetEntryFromSig(const char* sig);

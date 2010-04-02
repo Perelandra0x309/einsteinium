@@ -143,19 +143,12 @@ EDSettingsFile::_ParseSettings (xmlDocPtr doc, xmlNodePtr cur)
 			// Default action for apps not specified in settings file
 			if( xmlStrcmp(sigValue, (const xmlChar *) ED_XMLTEXT_VALUE_DEFAULT) == 0 )
 			{
-				if(!strcmp((char *)relaunchValue, ED_XMLTEXT_VALUE_AUTO))
-				{	fDefaultRelaunchAction = ACTION_AUTO; }
-				else if(!strcmp((char *)relaunchValue, ED_XMLTEXT_VALUE_PROMPT))
-				{	fDefaultRelaunchAction = ACTION_PROMPT; }
-				else if(!strcmp((char *)relaunchValue, ED_XMLTEXT_VALUE_IGNORE))
-				{	fDefaultRelaunchAction = ACTION_IGNORE; }
-				else
-				// set default to prompt
-				{	fDefaultRelaunchAction = ACTION_PROMPT; }
+				fDefaultRelaunchAction = _TranslateRelaunchXML(relaunchValue);
 			}
 			else
 			{
-				appSettings = new AppRelaunchSettings((char *)sigValue, (char *)relaunchValue);
+				appSettings = new AppRelaunchSettings((char *)sigValue,
+					_TranslateRelaunchXML(relaunchValue));
 				fSettingsList.AddItem(appSettings);
 			}
 			xmlFree(sigValue);
@@ -164,6 +157,21 @@ EDSettingsFile::_ParseSettings (xmlDocPtr doc, xmlNodePtr cur)
 		cur = cur->next;
 	}
     return;
+}
+
+
+int
+EDSettingsFile::_TranslateRelaunchXML(xmlChar *value)
+{
+	if(!strcmp((char *)value, ED_XMLTEXT_VALUE_AUTO))
+		return ACTION_AUTO;
+	else if(!strcmp((char *)value, ED_XMLTEXT_VALUE_PROMPT))
+		return ACTION_PROMPT;
+	else if(!strcmp((char *)value, ED_XMLTEXT_VALUE_IGNORE))
+		return ACTION_IGNORE;
+	else
+	// set default to prompt
+		return ACTION_PROMPT;
 }
 
 
@@ -248,11 +256,11 @@ EDSettingsFile::_WriteSettingsToFile(BPath file)
 
 
 void
-EDSettingsFile::UpdateActionForApp(const char *_signature, const char *_relaunch)
+EDSettingsFile::UpdateActionForApp(const char *_signature, int _relaunch)
 {
 	AppRelaunchSettings *appSettings = FindSettingsForApp(_signature);
 	if(appSettings!=NULL){
-		appSettings->SetRelaunchAction(_relaunch);
+		appSettings->relaunchAction = _relaunch;
 	}
 	else {
 		appSettings = new AppRelaunchSettings(_signature, _relaunch);

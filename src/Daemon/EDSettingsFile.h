@@ -18,7 +18,7 @@ class EDSettingsFile : public BHandler {
 public:
 							EDSettingsFile();
 							~EDSettingsFile();
-	void					UpdateActionForApp(const char *_signature, const char *_relaunch);
+	void					UpdateActionForApp(const char *_signature, int _relaunch);
 	void					RemoveApp(const char *_signature);
 	AppRelaunchSettings*	FindSettingsForApp(const char *sig);
 	status_t				CheckInitStatus() { return fInitStatus; }
@@ -37,6 +37,7 @@ private:
 	void					_StopWatching();
 	status_t				_ReadSettingsFromFile(BPath file);
 	void					_ParseSettings(xmlDocPtr doc, xmlNodePtr cur);
+	int						_TranslateRelaunchXML(xmlChar *value);
 	status_t				_WriteSettingsToFile(BPath file);
 };
 

@@ -21,14 +21,13 @@ AppRelaunchSettings::AppRelaunchSettings(AppRelaunchSettings* sourceSettings)
 }
 
 
-AppRelaunchSettings::AppRelaunchSettings(const char *_signature, const char *_relaunch = NULL)
+AppRelaunchSettings::AppRelaunchSettings(const char *_signature, int _relaunch = ACTION_PROMPT)
 	:
 	appPath(""),
-	name("<App not found>"),
-	relaunchAction(ACTION_PROMPT)
+	name("<App not found>")
 {
 	appSig.SetTo(_signature);
-	SetRelaunchAction(_relaunch);
+	relaunchAction = _relaunch;
 
 	//Get the path and file name based on application signature
 	BEntry appEntry = _GetEntryFromSig(appSig);
@@ -41,51 +40,13 @@ AppRelaunchSettings::AppRelaunchSettings(const char *_signature, const char *_re
 }
 
 
-AppRelaunchSettings::AppRelaunchSettings(const char *_signature, BPath _path, char *action = NULL)
-	:
-	relaunchAction(ACTION_PROMPT)
+AppRelaunchSettings::AppRelaunchSettings(const char *_signature, BPath _path,
+	int _relaunch = ACTION_PROMPT)
 {
 	appSig.SetTo(_signature);
 	appPath.SetTo(_path.Path());
 	name.SetTo(_path.Leaf());
-	SetRelaunchAction(action);
-}
-
-
-status_t
-AppRelaunchSettings::SetRelaunchAction(const char *action)
-{
-	if (action == NULL) { return B_ERROR; }
-
-	if(!strcmp(action, ED_XMLTEXT_VALUE_AUTO))
-	{	relaunchAction = ACTION_AUTO; }
-	else if(!strcmp(action, ED_XMLTEXT_VALUE_PROMPT))
-	{	relaunchAction = ACTION_PROMPT; }
-	else if(!strcmp(action, ED_XMLTEXT_VALUE_IGNORE))
-	{	relaunchAction = ACTION_IGNORE; }
-	else
-	{	return B_ERROR; }
-	return B_OK;
-}
-
-
-// TODO improve code so we don't have to do this translation
-BString
-AppRelaunchSettings::GetRelaunchActionString()
-{
-	BString text;
-	switch(relaunchAction){
-		case ACTION_AUTO:
-			text.SetTo(ED_XMLTEXT_VALUE_AUTO);
-			break;
-		case ACTION_PROMPT:
-			text.SetTo(ED_XMLTEXT_VALUE_PROMPT);
-			break;
-		case ACTION_IGNORE:
-				text.SetTo(ED_XMLTEXT_VALUE_IGNORE);
-			break;
-	}
-	return text;
+	relaunchAction = _relaunch;
 }
 
 

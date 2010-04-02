@@ -130,7 +130,7 @@ einsteinium_daemon::MessageReceived(BMessage *msg)
 			{
 			//	printf("ED: Found alert choice: %d\n", rememberChoice);
 				fSettingsFile->UpdateActionForApp(sig,
-						selection? ED_XMLTEXT_VALUE_AUTO : ED_XMLTEXT_VALUE_IGNORE);
+						selection? ACTION_AUTO : ACTION_IGNORE);
 			}
 			break;
 		}

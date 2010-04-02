@@ -121,8 +121,7 @@ RelaunchSettingsView::MessageReceived(BMessage* msg)
 				fAppsLView->Select(fAppsLView->IndexOf(item));
 				fAppsLView->ScrollToSelection();
 				Window()->Unlock();
-				fDaemonSettings->UpdateActionForApp(buf,
-					item->fSettings->GetRelaunchActionString().String());
+				fDaemonSettings->UpdateActionForApp(buf, item->fSettings->relaunchAction);
 			}
 			else (new BAlert("","Excecutable does not have an application signature","OK"))->Go();
 			delete[] buf;
@@ -145,7 +144,7 @@ RelaunchSettingsView::MessageReceived(BMessage* msg)
 		case ED_AUTO_RELAUNCH_CHANGED: {
 			_SaveSelectedItemSettings();
 			fDaemonSettings->UpdateActionForApp(fSelectedItem->fSettings->appSig.String(),
-									fSelectedItem->fSettings->GetRelaunchActionString().String());
+									fSelectedItem->fSettings->relaunchAction);
 			break; }
 		default: { break; }
 	}
