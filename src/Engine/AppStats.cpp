@@ -23,6 +23,21 @@ AppStats::AppStats()
 //	dataOK = B_OK;
 }
 
+
+AppStats::AppStats(AppStats *sourceStats)
+{
+	app_sig.SetTo(sourceStats->app_sig);
+	app_path.SetTo(sourceStats->app_path);
+	app_filename.SetTo(sourceStats->app_filename);
+	score = sourceStats->score;
+	launch_count = sourceStats->launch_count;
+	last_launch = sourceStats->last_launch;
+	first_launch = sourceStats->first_launch;
+	last_interval = sourceStats->last_interval;
+	total_run_time = sourceStats->total_run_time;
+}
+
+
 //Main sorting method
 template < class itemType >
 int

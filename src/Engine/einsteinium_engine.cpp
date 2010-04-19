@@ -214,8 +214,7 @@ einsteinium_engine::MessageReceived(BMessage *msg)
 				if(haveSubscribers && !ignoredApp)
 				{
 					// Get the new rank
-					AppStats *newStats = new AppStats();
-					appFile.CopyAppStatsInto(newStats);
+					AppStats *newStats = appFile.CloneAppStats();
 					appStatsList.AddItem(newStats);
 					_SortAppStatsList(appStatsList, SORT_BY_SCORE);
 					uint current_rank = _FindAppStatsRank(appStatsList, sig);
@@ -277,8 +276,7 @@ einsteinium_engine::MessageReceived(BMessage *msg)
 						if(!ignore)
 						{
 							//add stats to apps list
-							AppStats *appStatsData = new AppStats();
-							attrFile.CopyAppStatsInto(appStatsData);
+							AppStats *appStatsData = attrFile.CloneAppStats();
 							appStatsList.AddItem(appStatsData);
 							_SortAppStatsList(appStatsList, SORT_BY_SCORE);
 						}
@@ -583,8 +581,7 @@ einsteinium_engine::_ForEachAttrFile(int action, BList *appStatsList = NULL)
 				// check ignore value- skip if ignore flag is true
 				if(attrFile.GetIgnore() == false)
 				{
-					AppStats *appStatsData = new AppStats();
-					attrFile.CopyAppStatsInto(appStatsData);
+					AppStats *appStatsData = attrFile.CloneAppStats();
 					appStatsList->AddItem(appStatsData);
 //					attrEntry.GetPath(&appAttrDirPath);//create path from entry
 //					printf("Adding app %s to list\n", appAttrDirPath.Path());//debug info

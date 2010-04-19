@@ -26,7 +26,7 @@ public:
 	void			SetIgnore(bool ignore);
 	void			RescanData();
 	void			CalculateScore();
-	void			CopyAppStatsInto(AppStats*);
+	AppStats*		CloneAppStats();
 private:
 	bool			/*dirty_data, */fNewSession;
 	AppStats		fAppStats;

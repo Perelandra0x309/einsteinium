@@ -348,18 +348,9 @@ AppAttrFile::_WriteAttrValues()
 }
 
 
-// TODO change this to a DuplicateStats function, move duplication code to AppStats class
-void
-AppAttrFile::CopyAppStatsInto(AppStats* targetStats)
+AppStats*
+AppAttrFile::CloneAppStats()
 {
-	targetStats->app_sig.SetTo(fAppStats.app_sig);
-	targetStats->app_path.SetTo(fAppStats.app_path);
-	targetStats->app_filename.SetTo(fAppStats.app_filename);
-	targetStats->score = fAppStats.score;
-	targetStats->launch_count = fAppStats.launch_count;
-	targetStats->last_launch = fAppStats.last_launch;
-	targetStats->first_launch = fAppStats.first_launch;
-	targetStats->last_interval = fAppStats.last_interval;
-	targetStats->total_run_time = fAppStats.total_run_time;
+	AppStats* newStats = new AppStats(&fAppStats);
+	return newStats;
 }
-

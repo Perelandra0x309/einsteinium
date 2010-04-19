@@ -13,6 +13,7 @@
 class AppStats {
 public:
 					AppStats();
+					AppStats(AppStats *sourceStats);
 	const char*		GetSig() { return app_sig.String(); }
 	const char*		GetPath() { return app_path.String(); }
 	const char*		GetFilename() { return app_filename.String(); }
