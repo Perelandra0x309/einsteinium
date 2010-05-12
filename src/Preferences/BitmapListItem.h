@@ -6,12 +6,15 @@
 #define EP_BITMAPLISTITEM_H
 
 #include <InterfaceKit.h>
+#include "methods.h"
 #include "prefs_constants.h"
+#include "IconUtils.h"
 
 class BitmapListItem : public BStringItem {
 public:
 					BitmapListItem(const uint8 *iconBits, BRect iconRect,
-									const color_space colorSpace, char *text);
+									const color_space colorSpace, const char *text);
+					BitmapListItem(const char *signature, const char *text);
 	virtual			~BitmapListItem();
 	virtual void	DrawItem(BView *owner, BRect item_rect, bool complete = false);
 	virtual void	Update(BView *owner, const BFont *font);
@@ -20,6 +23,7 @@ private:
 	static const float kIconInset = 2;
 	BBitmap			*fIcon;
 	float			fIconSize, fTextHeight;
+	void			_GetIcon(entry_ref entryRef);
 };
 
 #endif

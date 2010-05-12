@@ -256,6 +256,17 @@ EDSettingsFile::_WriteSettingsToFile(BPath file)
 
 
 void
+EDSettingsFile::UpdateDefaultAction(int _relaunch)
+{
+	fDefaultRelaunchAction = _relaunch;
+
+	_StopWatching();
+	_WriteSettingsToFile(fSettingsPath);
+	_StartWatching();
+}
+
+
+void
 EDSettingsFile::UpdateActionForApp(const char *_signature, int _relaunch)
 {
 	AppRelaunchSettings *appSettings = FindSettingsForApp(_signature);

@@ -9,7 +9,8 @@ EEShelfView::EEShelfView(BRect frame, int16 count)
 	:
 	BView(frame, EE_SHELFVIEW_NAME, B_FOLLOW_NONE,
 		B_WILL_DRAW/* | B_PULSE_NEEDED*/),
-	fIcon(NULL)
+	fIcon(NULL),
+	fMenu(NULL)
 {
 	fInitialCount = count;
 
@@ -48,18 +49,15 @@ EEShelfView::EEShelfView(BMessage *message)
 	if(result == B_OK)
 		fIcon = new BBitmap(&iconArchive);
 	message->FindInt16("count", &fInitialCount);
-	// Apparently Haiku does not yet archive tool tips (Alpha-1 R1)
+	// Apparently Haiku does not yet archive tool tips (Release 1 Alpha 2)
 	SetToolTip("Einsteinium  \nRanked\nApplications");
 }
 
 
 EEShelfView::~EEShelfView()
 {
-	if(fIcon)
-		delete fIcon;
-
-	if(fMenu)
-		delete fMenu;
+	delete fIcon;
+	delete fMenu;
 }
 
 

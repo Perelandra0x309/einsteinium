@@ -9,17 +9,19 @@
 #include "AttrSettingsView.h"
 #include "BitmapListItem.h"
 #include "DeskbarSettingsView.h"
-#include "engine_constants.h"
 #include "EESettingsFile.h"
 #include "EMaintenanceView.h"
 #include "RelaunchSettingsView.h"
 #include "RankingSettingsView.h"
 
+#include "daemon_constants.h"
+#include "engine_constants.h"
+
 
 class prefsWindow : public BWindow {
 public:
 							prefsWindow(BRect);
-							~prefsWindow();
+//							~prefsWindow();
 	virtual	bool			QuitRequested();
 	virtual void			FrameResized(float width, float height);
 	virtual void			MessageReceived(BMessage*);
@@ -35,8 +37,6 @@ private:
 	AttrSettingsView		*fAttrView;
 	DeskbarSettingsView		*fDeskbarView;
 	EMaintenanceView		*fMaintenanceView;
-	BitmapListItem*			_CreateDaemonBLI();
-	BitmapListItem*			_CreateEngineBLI();
 	void					_StoreSettings();
 	void					_ReadSettings();
 	void					_ReadEngineSettings();

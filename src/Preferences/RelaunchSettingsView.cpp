@@ -143,8 +143,15 @@ RelaunchSettingsView::MessageReceived(BMessage* msg)
 			break; }
 		case ED_AUTO_RELAUNCH_CHANGED: {
 			_SaveSelectedItemSettings();
-			fDaemonSettings->UpdateActionForApp(fSelectedItem->fSettings->appSig.String(),
+			if(fSelectedItem != NULL)
+			{
+				int32 index = fAppsLView->CurrentSelection();
+				if(index == 0)
+					fDaemonSettings->UpdateDefaultAction(fSelectedItem->fSettings->relaunchAction);
+				else
+					fDaemonSettings->UpdateActionForApp(fSelectedItem->fSettings->appSig.String(),
 									fSelectedItem->fSettings->relaunchAction);
+			}
 			break; }
 		default: { break; }
 	}

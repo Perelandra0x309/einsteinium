@@ -15,8 +15,8 @@ EESettingsFile::EESettingsFile()
 	fIntervalScale(DEFAULTVALUE_LAUNCHES),
 	fRuntimeScale(DEFAULTVALUE_LAUNCHES),
 	fInclusionDefault(EE_XMLTEXT_VALUE_PROMPT),
-	fShowDeskbarMenu(false),
-	fDeskbarMenuCount(0)
+	fShowDeskbarMenu(true),
+	fDeskbarMenuCount(20)
 {
 	// find path for settings directory
 	find_directory(B_USER_SETTINGS_DIRECTORY, &fSettingsPath);

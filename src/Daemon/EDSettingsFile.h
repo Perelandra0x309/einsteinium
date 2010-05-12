@@ -18,6 +18,7 @@ class EDSettingsFile : public BHandler {
 public:
 							EDSettingsFile();
 							~EDSettingsFile();
+	void					UpdateDefaultAction(int _relaunch);
 	void					UpdateActionForApp(const char *_signature, int _relaunch);
 	void					RemoveApp(const char *_signature);
 	AppRelaunchSettings*	FindSettingsForApp(const char *sig);
