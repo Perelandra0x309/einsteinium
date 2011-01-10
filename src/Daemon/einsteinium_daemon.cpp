@@ -87,7 +87,41 @@ einsteinium_daemon::MessageReceived(BMessage *msg)
 				break;
 			AppRelaunchSettings *appSettings = fSettingsFile->FindSettingsForApp(sig);
 			if(appSettings == NULL)
-				appSettings = new AppRelaunchSettings(sig);
+			{
+				entry_ref appRef;
+				BEntry appEntry;
+				if (msg->FindRef("be:ref", &appRef) != B_OK)
+				{	printf("App entry not found in message.\n");
+					break;
+				}
+				else
+					appEntry.SetTo(&appRef);
+						//entry_ref found in Message
+
+				//Entry doesn't exist.  Shouldn't happen, but just in case.
+				if(!appEntry.Exists())
+				{	printf("Entry for app %s could not be found.\n", sig);
+					break;
+						//Can't do anything, so exit switch
+				}
+
+				//Automatically ignore binary commands, preferences, tracker addons
+				BPath path(&appEntry);
+				BString appPath(path.Path());
+				if(appPath.FindFirst(PATH_SYSTEM_BIN) == 0 ||
+					appPath.FindFirst(PATH_SYSTEM_PREFERENCES) == 0 ||
+					appPath.FindFirst(PATH_SYSTEM_TRACKER_ADDONS) == 0 ||
+					appPath.FindFirst(PATH_COMMON_BIN) == 0 ||
+					appPath.FindFirst(PATH_COMMON_TRACKER_ADDONS) == 0 ||
+					appPath.FindFirst(PATH_HOME_BIN) == 0 ||
+					appPath.FindFirst(PATH_HOME_TRACKER_ADDONS) == 0 )
+				{
+					break;
+				}
+
+				int relaunchAction = fSettingsFile->GetDefaultRelaunchAction();
+				appSettings = new AppRelaunchSettings(sig, path, relaunchAction);
+			}
 			int actionToTake = appSettings->relaunchAction;
 		//	printf("Taking care of quit app %s with action %i...\n", sig, actionToTake);
 			if(actionToTake == ACTION_IGNORE)

@@ -15,8 +15,9 @@ class AppRelaunchSettings {
 public:
 					AppRelaunchSettings();
 					AppRelaunchSettings(AppRelaunchSettings*);
-					AppRelaunchSettings(const char *_signature, int _relaunch = ACTION_PROMPT);
-					AppRelaunchSettings(const char *_signature, BPath _path, int _relaunch = ACTION_PROMPT);
+					AppRelaunchSettings(const char *_signature, int _relaunch = ACTION_DEFAULT);
+					AppRelaunchSettings(const char *_signature, BPath _path,
+							int _relaunch = ACTION_DEFAULT);
 	int				relaunchAction;
 	BString			appPath, appSig, name;
 	bool			Equals(AppRelaunchSettings*);

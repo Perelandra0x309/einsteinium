@@ -170,8 +170,7 @@ EDSettingsFile::_TranslateRelaunchXML(xmlChar *value)
 	else if(!strcmp((char *)value, ED_XMLTEXT_VALUE_IGNORE))
 		return ACTION_IGNORE;
 	else
-	// set default to prompt
-		return ACTION_PROMPT;
+		return ACTION_DEFAULT;
 }
 
 
@@ -210,9 +209,24 @@ EDSettingsFile::_WriteSettingsToFile(BPath file)
 			break;
 		}
 		default: {
-			// default to prompt
-			relaunchTextValue.SetTo(ED_XMLTEXT_VALUE_PROMPT);
-			break;
+			switch(ACTION_DEFAULT)
+			{
+				case ACTION_AUTO: {
+					relaunchTextValue.SetTo(ED_XMLTEXT_VALUE_AUTO);
+					break;
+				}
+				case ACTION_PROMPT: {
+					relaunchTextValue.SetTo(ED_XMLTEXT_VALUE_PROMPT);
+					break;
+				}
+				case ACTION_IGNORE: {
+					relaunchTextValue.SetTo(ED_XMLTEXT_VALUE_IGNORE);
+					break;
+				}
+				default: {
+					relaunchTextValue.SetTo("error");
+				}
+			}
 		}
 	}
 	xmlNewProp(child2node, BAD_CAST ED_XMLTEXT_PROPERTY_RELAUNCH,
@@ -241,8 +255,24 @@ EDSettingsFile::_WriteSettingsToFile(BPath file)
 				break;
 			}
 			default: {
-				relaunchTextValue.SetTo(ED_XMLTEXT_VALUE_PROMPT);
-				break;
+				switch(ACTION_DEFAULT)
+				{
+					case ACTION_AUTO: {
+						relaunchTextValue.SetTo(ED_XMLTEXT_VALUE_AUTO);
+						break;
+					}
+					case ACTION_PROMPT: {
+						relaunchTextValue.SetTo(ED_XMLTEXT_VALUE_PROMPT);
+						break;
+					}
+					case ACTION_IGNORE: {
+						relaunchTextValue.SetTo(ED_XMLTEXT_VALUE_IGNORE);
+						break;
+					}
+					default: {
+						relaunchTextValue.SetTo("error");
+					}
+				}
 			}
 		}
 		xmlNewProp(child2node, BAD_CAST ED_XMLTEXT_PROPERTY_RELAUNCH,

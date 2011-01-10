@@ -181,6 +181,19 @@ einsteinium_engine::MessageReceived(BMessage *msg)
 					break;
 						//Can't do anything, so exit switch
 				}
+				// Automatically ignore binary commands, tracker addons and system servers
+				BPath appPath(&appEntry);
+				BString pathString(appPath.Path());
+				if(pathString.FindFirst(PATH_SYSTEM_BIN) == 0 ||
+					pathString.FindFirst(PATH_SYSTEM_SERVERS) == 0 ||
+					pathString.FindFirst(PATH_SYSTEM_TRACKER_ADDONS) == 0 ||
+					pathString.FindFirst(PATH_COMMON_BIN) == 0 ||
+					pathString.FindFirst(PATH_COMMON_TRACKER_ADDONS) == 0 ||
+					pathString.FindFirst(PATH_HOME_BIN) == 0 ||
+					pathString.FindFirst(PATH_HOME_TRACKER_ADDONS) == 0 )
+				{
+					break;
+				}
 
 				AppAttrFile appFile(sig, &appEntry);
 					//Open application's Einsteinium attribute file

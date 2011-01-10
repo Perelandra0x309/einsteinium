@@ -22,7 +22,8 @@ enum {
 //	ACTION_NONE = 0,
 	ACTION_AUTO,
 	ACTION_PROMPT,
-	ACTION_IGNORE
+	ACTION_IGNORE,
+	ACTION_DEFAULT = ACTION_PROMPT
 };
 
 //Text
@@ -36,5 +37,15 @@ enum {
 #define ED_XMLTEXT_VALUE_PROMPT "prompt"
 #define ED_XMLTEXT_VALUE_AUTO "auto"
 #define ED_ALERT_REMEMBER "remember"
+
+//Paths of executables to ignore by default
+#define PATH_SYSTEM_BIN "/boot/system/bin"
+#define PATH_SYSTEM_SERVERS "/boot/system/servers"
+#define PATH_SYSTEM_PREFERENCES "/boot/system/preferences"
+#define PATH_SYSTEM_TRACKER_ADDONS "/boot/system/add-ons/Tracker"
+#define PATH_COMMON_BIN "/boot/common/bin"
+#define PATH_COMMON_TRACKER_ADDONS "/boot/common/add-ons/Tracker"
+#define PATH_HOME_BIN "/boot/home/config/bin"
+#define PATH_HOME_TRACKER_ADDONS "/boot/home/config/add-ons/Tracker"
 
 #endif

@@ -21,7 +21,7 @@ AppRelaunchSettings::AppRelaunchSettings(AppRelaunchSettings* sourceSettings)
 }
 
 
-AppRelaunchSettings::AppRelaunchSettings(const char *_signature, int _relaunch = ACTION_PROMPT)
+AppRelaunchSettings::AppRelaunchSettings(const char *_signature, int _relaunch = ACTION_DEFAULT)
 	:
 	appPath(""),
 	name("<App not found>")
@@ -41,7 +41,7 @@ AppRelaunchSettings::AppRelaunchSettings(const char *_signature, int _relaunch =
 
 
 AppRelaunchSettings::AppRelaunchSettings(const char *_signature, BPath _path,
-	int _relaunch = ACTION_PROMPT)
+	int _relaunch = ACTION_DEFAULT)
 {
 	appSig.SetTo(_signature);
 	appPath.SetTo(_path.Path());

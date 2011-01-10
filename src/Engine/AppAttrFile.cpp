@@ -45,20 +45,39 @@ AppAttrFile::AppAttrFile(const char *appSig, const BEntry *appEntry)
 		BNodeInfo attrNodeInfo(&attrNode);
 		attrNodeInfo.SetType(e_app_attr_filetype);
 			//Set the file MIME type
+
+		// Set standard attributes
 		fAppStats.app_sig.SetTo(appSig);
 		fAppStats.app_filename.SetTo(appPath.Leaf());
 		fAppStats.app_path.SetTo(appPath.Path());
-		_WriteAttrValues();
+
+		// Automatically ignore binary commands, preferences, tracker addons and system servers
+		if(fAppStats.app_path.FindFirst(PATH_SYSTEM_BIN) == 0 ||
+			fAppStats.app_path.FindFirst(PATH_SYSTEM_SERVERS) == 0 ||
+			fAppStats.app_path.FindFirst(PATH_SYSTEM_PREFERENCES) == 0 ||
+			fAppStats.app_path.FindFirst(PATH_SYSTEM_TRACKER_ADDONS) == 0 ||
+			fAppStats.app_path.FindFirst(PATH_COMMON_BIN) == 0 ||
+			fAppStats.app_path.FindFirst(PATH_COMMON_TRACKER_ADDONS) == 0 ||
+			fAppStats.app_path.FindFirst(PATH_HOME_BIN) == 0 ||
+			fAppStats.app_path.FindFirst(PATH_HOME_TRACKER_ADDONS) == 0 )
+		{
+			fIgnoreInLists = true;
+		}
+		else
+			// Ask if executable should be included in ranked lists
+		{
+			BString text("Einsteinium detected a new application, \"");
+			text.Append(appPath.Leaf());
+			text.Append("\".  Would you like this app to be included in ranking lists?");
+			BMessage *msg = new BMessage(E_SET_IGNORE_ATTR);
+			msg->AddString("app_signature", appSig);
+			(new BAlert("",text.String(), "Ignore", "Include"))
+					->Go(new BInvoker(msg, be_app_messenger));
+				// BInvoker takes ownership of the message so don't delete it
+		}
 
 		fNewSession = true;
-		BString text("Einsteinium detected a new application, \"");
-		text.Append(appPath.Leaf());
-		text.Append("\".  Would you like this app to be included in ranking lists?");
-		BMessage *msg = new BMessage(E_SET_IGNORE_ATTR);
-		msg->AddString("app_signature", appSig);
-		(new BAlert("",text.String(), "Ignore", "Include"))
-				->Go(new BInvoker(msg, be_app_messenger));
-			// BInvoker takes ownership of the message so don't delete it
+		_WriteAttrValues();
 	}
 	// TODO if file exists, verify signature matches to catch applications with identical names
 
