@@ -2,7 +2,6 @@ NAME := einsteinium_engine
 TYPE := APP
 SRCS := methods.cpp \
 		db_interface.cpp \
-		EEShelfView.cpp \
 		EESettingsFile.cpp \
 		AppStats.cpp \
 		AppAttrFile.cpp \

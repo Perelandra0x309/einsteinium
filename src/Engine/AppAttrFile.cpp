@@ -16,7 +16,7 @@ AppAttrFile::AppAttrFile(const char *appSig, const BEntry *appEntry)
 	fNewSession(false),
 	fAppStats(),
 	fAppEntry(*appEntry),
-	fIgnoreInLists(false),
+//	fIgnoreInLists(false),
 	fEngineCurrentSession(0)
 {
 	BPath appPath(appEntry), appAttrPath;
@@ -52,7 +52,7 @@ AppAttrFile::AppAttrFile(const char *appSig, const BEntry *appEntry)
 		fAppStats.app_path.SetTo(appPath.Path());
 
 		// Automatically ignore binary commands, preferences, tracker addons and system servers
-		if(fAppStats.app_path.FindFirst(PATH_SYSTEM_BIN) == 0 ||
+/*		if(fAppStats.app_path.FindFirst(PATH_SYSTEM_BIN) == 0 ||
 			fAppStats.app_path.FindFirst(PATH_SYSTEM_SERVERS) == 0 ||
 			fAppStats.app_path.FindFirst(PATH_SYSTEM_PREFERENCES) == 0 ||
 			fAppStats.app_path.FindFirst(PATH_SYSTEM_TRACKER_ADDONS) == 0 ||
@@ -71,10 +71,9 @@ AppAttrFile::AppAttrFile(const char *appSig, const BEntry *appEntry)
 			text.Append("\".  Would you like this app to be included in ranking lists?");
 			BMessage *msg = new BMessage(E_SET_IGNORE_ATTR);
 			msg->AddString("app_signature", appSig);
-			(new BAlert("",text.String(), "Ignore", "Include"))
-					->Go(new BInvoker(msg, be_app_messenger));
+			(new BAlert("",text.String(), "Ignore", "Include"))->Go(new BInvoker(msg, be_app_messenger));
 				// BInvoker takes ownership of the message so don't delete it
-		}
+		}*/
 
 		fNewSession = true;
 		_WriteAttrValues();
@@ -94,7 +93,7 @@ AppAttrFile::AppAttrFile(const BEntry *attrEntry)
 	fAppStats(),
 	fAppEntry(),
 	fAppAttrEntry(*attrEntry),
-	fIgnoreInLists(false),
+//	fIgnoreInLists(false),
 	fEngineCurrentSession(0)
 {
 	_InitData(false);
@@ -147,7 +146,8 @@ AppAttrFile::UpdateAppLaunched()
 			//update the time interval between the last two launches
 	fAppStats.last_launch = now;
 
-	CalculateScore();
+//	CalculateScore();
+	_WriteAttrValues();
 }
 
 
@@ -164,10 +164,11 @@ AppAttrFile::UpdateAppQuit()
 	if( (!fNewSession) && (fAppStats.last_launch!=0) )
 		fAppStats.total_run_time += (now - fAppStats.last_launch);
 
-	CalculateScore();
+//	CalculateScore();
+	_WriteAttrValues();
 }
 
-
+/*
 void
 AppAttrFile::CalculateScore()
 {
@@ -204,9 +205,9 @@ AppAttrFile::CalculateScore()
 
 	}
 	_WriteAttrValues();
-}
+}*/
 
-
+/*
 // Calculate the quartile value of where d lies in the quartile range Q
 float
 AppAttrFile::_GetQuartileVal(const double *Q, double d)
@@ -229,7 +230,7 @@ AppAttrFile::_GetQuartileVal(const double *Q, double d)
 	else { return .5; }
 
 	return (.25*index + .25*((d - Q[index])/(Q[index+1-index_offset] - Q[index-index_offset])));
-}
+}*/
 
 
 void
@@ -237,16 +238,17 @@ AppAttrFile::RescanData()
 {
 	BPath appDataPath(&fAppDataEntry);
 	Edb_Rescan_Data(appDataPath.Path(), &fAppStats);
-	CalculateScore();
+//	CalculateScore();
+	_WriteAttrValues();
 }
 
 
-void
+/*void
 AppAttrFile::SetIgnore(bool ignore)
 {
 	fIgnoreInLists = ignore;
 	WriteAttr(ATTR_IGNORE_NAME, B_BOOL_TYPE, 0, &fIgnoreInLists, sizeof(fIgnoreInLists));
-}
+}*/
 
 
 void
@@ -286,13 +288,13 @@ AppAttrFile::_ReadAttrValues()
 	if(GetAttrInfo(ATTR_LAUNCHES_NAME, &info) == B_NO_ERROR)
 	{	ReadAttr(ATTR_LAUNCHES_NAME, B_INT32_TYPE, 0, &fAppStats.launch_count, sizeof(uint32)); }
 	//Score
-	if(GetAttrInfo(ATTR_SCORE_NAME, &info) == B_NO_ERROR)
-	{	ReadAttr(ATTR_SCORE_NAME, B_INT32_TYPE, 0, &fAppStats.score, sizeof(int)); }
+//	if(GetAttrInfo(ATTR_SCORE_NAME, &info) == B_NO_ERROR)
+//	{	ReadAttr(ATTR_SCORE_NAME, B_INT32_TYPE, 0, &fAppStats.score, sizeof(int)); }
 	//Checksum
 	//Class (app_sig, mimeype)
 	//Ignore (default, not app specific)
-	if(GetAttrInfo(ATTR_IGNORE_NAME, &info) == B_NO_ERROR)
-	{	ReadAttr(ATTR_IGNORE_NAME, B_BOOL_TYPE, 0, &fIgnoreInLists, sizeof(fIgnoreInLists)); }
+//	if(GetAttrInfo(ATTR_IGNORE_NAME, &info) == B_NO_ERROR)
+//	{	ReadAttr(ATTR_IGNORE_NAME, B_BOOL_TYPE, 0, &fIgnoreInLists, sizeof(fIgnoreInLists)); }
 	//Owner?? this might need to be app specific
 	//Date last activated
 	if(GetAttrInfo(ATTR_LAST_LAUNCH_NAME, &info) == B_NO_ERROR)
@@ -342,11 +344,11 @@ AppAttrFile::_WriteAttrValues()
 	WriteAttr(ATTR_LAUNCHES_NAME, B_INT32_TYPE, 0, &fAppStats.launch_count,
 		sizeof(fAppStats.launch_count));
 	//Score
-	WriteAttr(ATTR_SCORE_NAME, B_INT32_TYPE, 0, &fAppStats.score, sizeof(fAppStats.score));
+//	WriteAttr(ATTR_SCORE_NAME, B_INT32_TYPE, 0, &fAppStats.score, sizeof(fAppStats.score));
 	//Checksum
 	//Class (app_sig, mimeype)
 	//Ignore (default, not app specific)
-	WriteAttr(ATTR_IGNORE_NAME, B_BOOL_TYPE, 0, &fIgnoreInLists, sizeof(fIgnoreInLists));
+//s	WriteAttr(ATTR_IGNORE_NAME, B_BOOL_TYPE, 0, &fIgnoreInLists, sizeof(fIgnoreInLists));
 	//Owner?? this might need to be app specific
 	//Date last activated
 	WriteAttr(ATTR_LAST_LAUNCH_NAME, B_INT32_TYPE, 0, &fAppStats.last_launch,

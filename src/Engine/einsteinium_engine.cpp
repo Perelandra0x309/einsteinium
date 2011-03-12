@@ -1,5 +1,5 @@
 /* einsteinium_engine.cpp
- * Copyright 2010 Brian Hill
+ * Copyright 2011 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "einsteinium_engine.h"
@@ -9,10 +9,9 @@ einsteinium_engine::einsteinium_engine()//Einsteinium Engine Constructor
 	:
 	BApplication(e_engine_sig),
 	fWatchingRoster(false),
-	fEngineSession(time(NULL)),
-	fShelfViewId(0)
+	fEngineSession(time(NULL))
 {
-//	printf("ee_session=%i\n", ee_session);
+//	printf("fEngineSession=%i\n", fEngineSession);
 	//Create settings directories if they are not found
 	BDirectory settingsDir;
 	find_directory(B_USER_SETTINGS_DIRECTORY, &fSettingsDirPath);
@@ -47,7 +46,8 @@ einsteinium_engine::einsteinium_engine()//Einsteinium Engine Constructor
 	status_t result = fSettingsFile->CheckStatus();
 	if(result!=B_OK){
 		printf("Error creating Einsteinium Daemon settings file.  Cannot continue.\n");
-		be_app->PostMessage(B_QUIT_REQUESTED);//Quit. Can we do anthything w/o settings?
+		be_app->PostMessage(B_QUIT_REQUESTED);
+			//Quit. Can we do anthything w/o settings?
 	}
 
 	// TODO Register the signature of the preferences application
@@ -66,17 +66,21 @@ einsteinium_engine::QuitRequested()
 	{	be_roster->StopWatching(be_app_messenger); }
 
 	//disable timer
-	if(fQuartileRunner != NULL)
-		delete fQuartileRunner;
+//	if(fQuartileRunner != NULL)
+//		delete fQuartileRunner;
 
 	// TODO wait for all messages to clear the message queue?
 
 	// Delete subscribers list items
 	Subscriber *sub;
+	AppStats *stats;
+	int subscribersCount = fSubscribersList.CountItems();
+	for(int i=0; i<subscribersCount; i++)
+	{
+		sub = (Subscriber*)fSubscribersList.ItemAt(i);
+		DeleteList(sub->appStatsList, stats);
+	}
 	DeleteList(fSubscribersList, sub);
-
-	// Remove shelf view
-	_ShowShelfView(false, 0);
 
 	delete fSettingsFile;
 
@@ -88,14 +92,6 @@ einsteinium_engine::QuitRequested()
 void
 einsteinium_engine::ReadyToRun()
 {
-	// Create the attribute file indexes
-/*	BVolumeRoster v_roster;
-	BVolume vol;
-	v_roster.GetBootVolume(&vol);
-	dev_t device = vol.Device();
-	//fs_create_index(device, stringIndices[i], B_STRING_TYPE, 0);
-	fs_create_index(device, ATTR_IGNORE_NAME, B_BOOL_TYPE, 0);*/
-
 	//Start watching the application roster for launches/quits/activations
 	if (be_roster->StartWatching(be_app_messenger,
 				B_REQUEST_QUIT | B_REQUEST_LAUNCHED/* | B_REQUEST_ACTIVATED*/) != B_OK)
@@ -108,20 +104,6 @@ einsteinium_engine::ReadyToRun()
 			//set the flag to indicate we're watching the roster
 		printf("Einsteinium engine running.\n");
 	}
-
-	//update quartiles, set up timer to update quartiles regularly
-	_UpdateQuartiles();
-	fQuartileRunner = new BMessageRunner(this, new BMessage(E_UPDATE_QUARTILES), 3600*10e6, -1);
-	if(fQuartileRunner->InitCheck()!=B_OK)
-	{	delete fQuartileRunner;
-		fQuartileRunner = NULL;
-	}
-
-	// Add the shelf view
-	bool showShelfView;
-	int shelfViewCount;
-	fSettingsFile->GetDeskbarSettings(showShelfView, shelfViewCount);
-	_ShowShelfView(showShelfView, shelfViewCount);
 }
 
 
@@ -130,25 +112,21 @@ einsteinium_engine::ArgvReceived(int32 argc, char** argv)
 {	if(argc>1)
 	{	if(strcmp(argv[1],"-q")==0 || strcmp(argv[1],"--quit")==0)//option to quit
 		{	PostMessage(B_QUIT_REQUESTED); }
-		else if(strcmp(argv[1], "--rank")==0)//request list of apps printed to terminal
+/*		else if(strcmp(argv[1], "--rank")==0)//request list of apps printed to terminal
 		{	PostMessage(E_PRINT_RANKING_APPS); }
 		else if(strcmp(argv[1], "--recent")==0)//request list of apps printed to terminal
-		{	PostMessage(E_PRINT_RECENT_APPS); }
-		else if(strcmp(argv[1], "--updateQuart")==0)//
-		{	PostMessage(E_UPDATE_QUARTILES); }
-		else if(strcmp(argv[1], "--rescanData")==0)//
-		{	PostMessage(E_RESCAN_DATA_FILES); }
-		else if(strcmp(argv[1], "--updateScores")==0)//
-		{	PostMessage(E_UPDATE_SCORES); }
+		{	PostMessage(E_PRINT_RECENT_APPS); }*/
+//		else if(strcmp(argv[1], "--rescanData")==0)//
+//		{	PostMessage(E_RESCAN_DATA_FILES); }
+		else if(strcmp(argv[1], "--testMode")==0)
+		{	PostMessage(E_TEST_MODE_INIT); }
 		else//option is not recognized
 		{	printf("Usage: einsteinium_engine [option]\n"
-					"Options:/n"
-					"-q or --quit		Quit/n"
-					"--rank				List apps by overall rank/n"
-					"--recent			List most recent apps/n"
-					"--updateScores		Recalculate app scores/n"
-					"--updateQuart		Recalculate quartiles, update scores/n"
-					"--rescanData		Rescan database files, update quartiles & scores/n"); }
+					"Options:\n"
+					"-q or --quit		Quit\n"
+//					"--rank				List apps by overall rank\n"
+//					"--recent			List most recent apps\n"
+					"--rescanData		Rescan database files\n"); }
 	}
 }
 
@@ -197,19 +175,23 @@ einsteinium_engine::MessageReceived(BMessage *msg)
 
 				AppAttrFile appFile(sig, &appEntry);
 					//Open application's Einsteinium attribute file
-
-				// If this app is not ignored, get the current rank
-				uint previous_rank;
-				bool haveSubscribers = fSubscribersList.CountItems() > 0;
-				bool ignoredApp = appFile.GetIgnore();
-				BList appStatsList;
-				if(haveSubscribers && !ignoredApp)
+				bool appHasWatchers = false;
+				int subscribersCount = fSubscribersList.CountItems();
+				for(int i=0; i<subscribersCount; i++)
 				{
-					appStatsList = _CreateAppStatsList(SORT_BY_SCORE);
-					previous_rank = _FindAppStatsRank(appStatsList, sig);
-					AppStats *ptr = (AppStats*)(appStatsList.RemoveItem(previous_rank - 1));
-					if(ptr)
-						delete ptr;
+					Subscriber *currentSub = (Subscriber*)fSubscribersList.ItemAt(i);
+					currentSub->currentAppIsExcluded = _DetermineExclusion(currentSub, sig);
+					if(!currentSub->currentAppIsExcluded)
+					{
+						// Only if the list is not already sorted by score do we need to sort
+						if(currentSub->appStatsSortOrder!=SORT_BY_SCORE)
+							_SortAppStatsList(currentSub, SORT_BY_SCORE);
+						currentSub->currentAppPreviousRank = _FindAppStatsRank(currentSub, sig);
+						// Indicate that at least one subscriber may need to be updated later
+						appHasWatchers = true;
+					}
+					else
+						currentSub->currentAppPreviousRank = 0;
 				}
 
 				//Update object's data (times, score)
@@ -224,28 +206,34 @@ einsteinium_engine::MessageReceived(BMessage *msg)
 					}
 				}
 
-				if(haveSubscribers && !ignoredApp)
+				if(appHasWatchers)
 				{
-					// Get the new rank
-					AppStats *newStats = appFile.CloneAppStats();
-					appStatsList.AddItem(newStats);
-					_SortAppStatsList(appStatsList, SORT_BY_SCORE);
-					uint current_rank = _FindAppStatsRank(appStatsList, sig);
-					if(previous_rank != current_rank)
+					int subscribersCount = fSubscribersList.CountItems();
+					for(int i=0; i<subscribersCount; i++)
 					{
-						// The rank has changed, so we may need to update subscribers
-						int subscribersCount = fSubscribersList.CountItems();
-						for(int i=0; i<subscribersCount; i++)
+						Subscriber *currentSub = (Subscriber*)fSubscribersList.ItemAt(i);
+						if(!currentSub->currentAppIsExcluded)
 						{
-							Subscriber *currentSub = (Subscriber*)fSubscribersList.ItemAt(i);
-							if( (previous_rank<=currentSub->count)
-								|| (current_rank<=currentSub->count) )
+							// Get the new rank
+							AppStats *newStats = appFile.CloneAppStats();
+							_CalculateScore(currentSub, newStats);
+							AppStats *oldStats = (AppStats*)(currentSub->appStatsList.RemoveItem(currentSub->currentAppPreviousRank - 1));
+							if(oldStats)
+								delete oldStats;
+							currentSub->appStatsList.AddItem(newStats);
+							_SortAppStatsList(currentSub, SORT_BY_SCORE);
+							uint currentRank = _FindAppStatsRank(currentSub, sig);
+							if(currentSub->currentAppPreviousRank != currentRank)
 							{
-								_SendListToSubscriber(&appStatsList, currentSub);
+								// The rank has changed, so we may need to update subscriber
+								if( (currentSub->currentAppPreviousRank<=currentSub->count)
+									|| (currentRank<=currentSub->count) )
+								{
+									_SendListToSubscriber(currentSub);
+								}
 							}
 						}
 					}
-					_EmptyAppStatsList(appStatsList);
 				}
 			}
 			//no signature found in message
@@ -253,93 +241,33 @@ einsteinium_engine::MessageReceived(BMessage *msg)
 				printf("Application has no signature.\n");
 			break;
 		}
-	/*	case B_SOME_APP_ACTIVATED: {//An application brought to the front??
-			break; }*/
-		case E_SET_IGNORE_ATTR: {
-			char* sig;
-			BEntry appEntry;
-			int32 which;
-			bool ignore;
-			int i=0;
-			BList appStatsList;
-			uint lowestRankChanged = 0-1;
-				//make this uint the largest number possible
-			bool haveSubscribers = fSubscribersList.CountItems() > 0;
-			if(haveSubscribers)
-				appStatsList = _CreateAppStatsList(SORT_BY_SCORE);
-			while(msg->FindString("app_signature", i++, (const char**)&sig) == B_OK)
-			{
-				appEntry = GetEntryFromSig(sig);
-				if(!appEntry.Exists())
-				{	printf("Entry for app %s could not be found.\n", sig);
-					continue;
-						//Can't do anything, so go to next sig
-				}
-				if(msg->FindInt32("which", &which) == B_OK)
-				{	ignore = (which == 0); }
-				else continue;
-				AppAttrFile attrFile(sig, &appEntry);
-				bool currentIgnoreVal = attrFile.GetIgnore();
-				// if the value has changed
-				if(ignore != currentIgnoreVal)
-				{
-					attrFile.SetIgnore(ignore);
-					if(haveSubscribers)
-					{
-						if(!ignore)
-						{
-							//add stats to apps list
-							AppStats *appStatsData = attrFile.CloneAppStats();
-							appStatsList.AddItem(appStatsData);
-							_SortAppStatsList(appStatsList, SORT_BY_SCORE);
-						}
-						uint currentRank = _FindAppStatsRank(appStatsList, sig);
-						lowestRankChanged = min_c(lowestRankChanged, currentRank);
-						if(ignore)
-						{
-							//remove from list
-							AppStats *ptr = (AppStats*)(appStatsList.RemoveItem(currentRank - 1));
-							if(ptr)
-								delete ptr;
-						}
-					}
-				}
-			}
-			if(haveSubscribers)
-			{
-				int subscribersCount = fSubscribersList.CountItems();
-				for(int j=0; j<subscribersCount; j++)
-				{
-					Subscriber *currentSub = (Subscriber*)fSubscribersList.ItemAt(j);
-					if( lowestRankChanged<=currentSub->count )
-						_SendListToSubscriber(&appStatsList, currentSub);
-				}
-				_EmptyAppStatsList(appStatsList);
-			}
-			break; }
-		case E_UPDATE_SHELFVIEW_SETTINGS:
-		{
-			bool showShelfView;
-			int16 count;
-			status_t result1 = msg->FindBool("show", &showShelfView);
-			status_t result2 = msg->FindInt16("count", &count);
-			if(result1 != B_OK || result2 != B_OK)
-			{
-				printf("Einsteinium Engine received invalid ShelfView settings message.\n");
-				break;
-			}
-			_ShowShelfView(showShelfView, count);
-			break;
-		}
 
 		//---- Subscriber messages ----//
 		case E_SUBSCRIBE_RANKED_APPS: {
-		//	printf("Received subscription message\n");
+			printf("Received subscription message\n");
 			Subscriber* newSubscriber = new Subscriber();
-			status_t result1 = msg->FindMessenger("messenger", &(newSubscriber->messenger));
-			status_t result2 = msg->FindInt16("count", &(newSubscriber->count));
+			status_t result1 = msg->FindMessenger(E_SUBSCRIPTION_MESSENGER, &(newSubscriber->messenger));
+			status_t result2 = msg->FindInt16(E_SUBSCRIPTION_COUNT, &(newSubscriber->count));
+			// TODO create a unique ID and pass back to the subscriber
 			status_t result3 = msg->FindInt32("uniqueID", &(newSubscriber->uniqueID));
-			if(result1 != B_OK || result2 != B_OK || result3 != B_OK)
+			// Get the settings for scale values (default to 0 for any not defined)
+			newSubscriber->launch_scale = 0;
+			msg->FindInt8(E_SUBSCRIPTION_LAUNCH_SCALE, &(newSubscriber->launch_scale));
+			newSubscriber->first_scale = 0;
+			msg->FindInt8(E_SUBSCRIPTION_FIRST_SCALE, &(newSubscriber->first_scale));
+			newSubscriber->last_scale = 0;
+			msg->FindInt8(E_SUBSCRIPTION_LAST_SCALE, &(newSubscriber->last_scale));
+			newSubscriber->interval_scale = 0;
+			msg->FindInt8(E_SUBSCRIPTION_INTERVAL_SCALE, &(newSubscriber->interval_scale));
+			newSubscriber->runtime_scale = 0;
+			msg->FindInt8(E_SUBSCRIPTION_RUNTIME_SCALE, &(newSubscriber->runtime_scale));
+			// There must be at least one scale defined to a non zero value
+			bool noScalesDefined = ( newSubscriber->launch_scale == 0
+									&& newSubscriber->first_scale == 0
+									&& newSubscriber->last_scale == 0
+									&& newSubscriber->interval_scale == 0
+									&& newSubscriber->runtime_scale == 0 );
+			if(result1 != B_OK || result2 != B_OK || result3 != B_OK || noScalesDefined)
 			{
 				printf("Einsteinium Engine received invalid subscribe message.\n");
 				// Attempt to deliver a reply
@@ -356,9 +284,8 @@ einsteinium_engine::MessageReceived(BMessage *msg)
 			fSubscribersList.AddItem(newSubscriber);
 		//	printf("Sending subscribe confirmed reply\n");
 			newSubscriber->messenger.SendMessage(E_SUBSCRIBE_CONFIRMED);
-			BList appStatsList = _CreateAppStatsList(SORT_BY_SCORE);
-			_SendListToSubscriber(&appStatsList, newSubscriber);
-			_EmptyAppStatsList(appStatsList);
+			_CreateAppStatsList(newSubscriber, SORT_BY_SCORE);
+			_SendListToSubscriber(newSubscriber);
 			break;
 		}
 		case E_UNSUBSCRIBE_RANKED_APPS: {
@@ -377,7 +304,8 @@ einsteinium_engine::MessageReceived(BMessage *msg)
 		}
 
 		//---- External requests ----//
-		case E_PRINT_RECENT_APPS:
+		// TODO Impliment these
+/*		case E_PRINT_RECENT_APPS:
 		case E_PRINT_RANKING_APPS: {
 		//	printf("Constructing Recent Apps List:\n");
 			//create list of eligible apps
@@ -430,39 +358,60 @@ einsteinium_engine::MessageReceived(BMessage *msg)
 				replyCount = min_c(replyCount, appStatsList.CountItems());
 					//add only requested count or number of apps in list, whichever is least
 
-		/*	AppStats *stats;
-			for(int i=0; i<recent_count; i++)//for each AppAttrFile object starting at index 0
-			{	stats = (AppStats*)appsList.ItemAt(i);
-				replymsg.AddString("app_signature", stats->getSig());//add app signature to message
-				replymsg.AddString("app_path", stats->getPath());//add app path to message
-				replymsg.AddInt32("score", stats->getScore());//add app score to message
-				replymsg.AddInt32("rank", i+1);//add app rank
-				replymsg.AddInt32("last_launch", stats->getLastLaunch());//add app last_date to message
-			}*/
-
 			//Send message
 			_PopulateAppRankMessage(&appStatsList, &replyMessage, replyCount);
 			msg->SendReply(&replyMessage);
 			_EmptyAppStatsList(appStatsList);
-			break; }
-		case E_RESCAN_DATA_FILES:
-			_RescanAllAttrFiles();
-		case E_UPDATE_QUARTILES:
-			_UpdateQuartiles();
-		case E_UPDATE_SCORES:
-			_UpdateAllAttrScores();
-		case E_UPDATE_SUBSCRIBERS:
+			break; }*/
+/*		case E_RESCAN_DATA_FILES:
 		{
-			int subscribersCount = fSubscribersList.CountItems();
-			if(subscribersCount>0)
+			_RescanAllAttrFiles();
+			break;
+		}*/
+		// TODO Make these subscriber specific
+//		case E_UPDATE_QUARTILES:
+//			_UpdateQuartiles();
+//		case E_UPDATE_SCORES:
+//			_UpdateAllAttrScores();
+
+		//---- Test Mode ----//
+		case E_TEST_MODE_INIT:
+		{
+			printf("EE Test mode init request received\n");
+			BMessage subscribeMsg(E_SUBSCRIBE_RANKED_APPS);
+			subscribeMsg.AddInt32("uniqueID", 777);
+			subscribeMsg.AddInt16(E_SUBSCRIPTION_COUNT, 20);
+			subscribeMsg.AddInt8(E_SUBSCRIPTION_LAST_SCALE, 1);
+			subscribeMsg.AddMessenger(E_SUBSCRIPTION_MESSENGER, BMessenger(this));
+			BMessenger EsMessenger(e_engine_sig);
+			EsMessenger.SendMessage(&subscribeMsg, this);
+
+			break;
+		}
+		case E_SUBSCRIBE_FAILED:
+		{
+			printf("EE Test mode init failed!\n");
+			break;
+		}
+		case E_SUBSCRIBE_CONFIRMED:
+		{
+			printf("EE Test mode confirmed!\n");
+			break;
+		}
+		case E_SUBSCRIBER_UPDATE_RANKED_APPS:
+		{
+			printf("\nTest mode subscriber updated:\n");
+			int32 countFound;
+			type_code typeFound;
+			msg->GetInfo("refs", &typeFound, &countFound);
+//			printf("Found %i refs\n", countFound);
+			printf("Highest %i ranked applications:\n", countFound);
+			entry_ref newref;
+			for(int i=0; i<countFound; i++)
 			{
-				BList appStatsList = _CreateAppStatsList(SORT_BY_SCORE);
-				for(int j=0; j<subscribersCount; j++)
-				{
-					Subscriber *currentSub = (Subscriber*)fSubscribersList.ItemAt(j);
-					_SendListToSubscriber(&appStatsList, currentSub);
-				}
-				_EmptyAppStatsList(appStatsList);
+				msg->FindRef("refs", i, &newref);
+				printf("%i. %s\n", i+1, newref.name);
+
 			}
 			break;
 		}
@@ -491,11 +440,11 @@ einsteinium_engine::_Unsubscribe(int32 uniqueID)
 
 
 void
-einsteinium_engine::_SendListToSubscriber(BList *appStatsList, Subscriber *subscriber)
+einsteinium_engine::_SendListToSubscriber(Subscriber *subscriber)
 {
 	BMessage rankMsg(E_SUBSCRIBER_UPDATE_RANKED_APPS);
-	int appsCount = min_c(subscriber->count, appStatsList->CountItems());
-	_PopulateAppRankMessage(appStatsList, &rankMsg, appsCount);
+	int appsCount = min_c(subscriber->count, subscriber->appStatsList.CountItems());
+	_PopulateAppRankMessage(&subscriber->appStatsList, &rankMsg, appsCount);
 	subscriber->messenger.SendMessage(&rankMsg);
 }
 
@@ -517,55 +466,9 @@ einsteinium_engine::_PopulateAppRankMessage(BList *appStatsList, BMessage *messa
 	}
 }
 
-
+/*
 void
-einsteinium_engine::_ShowShelfView(bool showShelfView, int shelfViewCount)
-{
-	BDeskbar deskbar;
-	if(fShelfViewId)// shelf view is currently showing
-	{
-		deskbar.RemoveItem(fShelfViewId);
-		fShelfViewId = 0;
-	}
-	if(showShelfView)
-	{
-		BView *shelfView = new EEShelfView(BRect(0, 0, 15, 15), shelfViewCount);
-		deskbar.AddItem(shelfView, &fShelfViewId);
-		delete shelfView;
-	}
-}
-
-
-/*void
-einsteinium_engine::_DoRankQuery()
-{
-	printf("Running rank query\n");
-	BVolumeRoster v_roster;
-	BVolume vol;
-	v_roster.GetBootVolume(&vol);
-	rankQuery.Clear();
-	rankQuery.PushAttr("BEOS:TYPE");
-	rankQuery.PushString(e_app_attr_filetype);
-	rankQuery.PushOp(B_EQ);
-	rankQuery.SetVolume(&vol);
-	if(rankQuery.Fetch()!=B_OK)
-	{
-		printf("Error fetching query\n");
-		return;
-	}
-	entry_ref entry;
-
-	while(rankQuery.GetNextRef(&entry) == B_OK)
-	{
-		printf("Rank Query found entry %s\n", entry.name);
-	}
-	printf("Done query\n");
-
-}*/
-
-
-void
-einsteinium_engine::_ForEachAttrFile(int action, BList *appStatsList = NULL)
+//einsteinium_engine::_ForEachAttrFile(int action, BList *appStatsList = NULL)
 {
 	//create path for the application attribute files directory
 	BPath appAttrDirPath(fSettingsDirPath);
@@ -583,22 +486,22 @@ einsteinium_engine::_ForEachAttrFile(int action, BList *appStatsList = NULL)
 			strcmp(nodeType, e_app_attr_filetype) != 0) { continue; }
 		attrNode.Unset();
 		switch(action)
-		{	case UPDATE_ATTR_SCORE: {
-				_UpdateAttrScore(&attrEntry);
-				break; }
+		{//	case UPDATE_ATTR_SCORE: {
+		//		_UpdateAttrScore(&attrEntry);
+		//		break; }
 			case RESCAN_ATTR_DATA: {
 				_RescanAttrFile(&attrEntry);
 				break; }
 			case CREATE_APP_LIST: {
 				AppAttrFile attrFile(&attrEntry);
 				// check ignore value- skip if ignore flag is true
-				if(attrFile.GetIgnore() == false)
-				{
+//				if(attrFile.GetIgnore() == false)
+//				{
 					AppStats *appStatsData = attrFile.CloneAppStats();
 					appStatsList->AddItem(appStatsData);
 //					attrEntry.GetPath(&appAttrDirPath);//create path from entry
 //					printf("Adding app %s to list\n", appAttrDirPath.Path());//debug info
-				}
+//				}
 				break;
 			}
 		}
@@ -607,75 +510,100 @@ einsteinium_engine::_ForEachAttrFile(int action, BList *appStatsList = NULL)
 
 
 void
-einsteinium_engine::_RescanAllAttrFiles()
+//einsteinium_engine::_RescanAllAttrFiles()
 {
+	// TODO only do this if there are no subscribers
 	_ForEachAttrFile(RESCAN_ATTR_DATA);
 }
 
 void
-einsteinium_engine::_RescanAttrFile(BEntry* entry)
+//einsteinium_engine::_RescanAttrFile(BEntry* entry)
 {
 	AppAttrFile attrFile(entry);
 	attrFile.RescanData();
+}*/
+
+
+bool
+einsteinium_engine::_DetermineExclusion(Subscriber *subscriber, const char *signature)
+{
+	return false;
 }
 
 
 void
-einsteinium_engine::_UpdateAllAttrScores()
+einsteinium_engine::_CreateAppStatsList(Subscriber *subscriber, int sortAction=SORT_BY_NONE)
 {
-	_ForEachAttrFile(UPDATE_ATTR_SCORE);
+	_EmptyAppStatsList(subscriber->appStatsList);
+
+	// TODO what about missing app attribute files?
+
+	//create path for the application attribute files directory
+	BPath appAttrDirPath(fSettingsDirPath);
+	appAttrDirPath.Append(e_settings_app_dir);
+	BDirectory appAttrDir(appAttrDirPath.Path());
+	BEntry attrEntry;
+	BNode attrNode;
+	BNodeInfo attrNodeInfo;
+	char nodeType[B_MIME_TYPE_LENGTH];
+	appAttrDir.Rewind();
+	while(appAttrDir.GetNextEntry(&attrEntry) == B_OK)
+	{	if( (attrNode.SetTo(&attrEntry)) != B_OK) { continue; }
+		if( (attrNodeInfo.SetTo(&attrNode)) != B_OK) { continue; }
+		if( (attrNodeInfo.GetType(nodeType)) != B_OK ||
+			strcmp(nodeType, e_app_attr_filetype) != 0) { continue; }
+		attrNode.Unset();
+		AppAttrFile attrFile(&attrEntry);
+		// check ignore value- skip if ignore flag is true
+//		if(attrFile.GetIgnore() == false)
+//		{
+			AppStats *appStatsData = attrFile.CloneAppStats();
+			subscriber->appStatsList.AddItem(appStatsData);
+			attrEntry.GetPath(&appAttrDirPath);//create path from entry
+			printf("Adding app %s to list\n", appAttrDirPath.Path());//debug info
+//		}
+	}
+
+	_UpdateQuartiles(subscriber);
+	_CalculateScores(subscriber);
+	_SortAppStatsList(subscriber, sortAction);
 }
+
 
 void
-einsteinium_engine::_UpdateAttrScore(BEntry *entry)
+einsteinium_engine::_SortAppStatsList(Subscriber *subscriber, int sortAction)
 {
-//	BPath path(entry);
-//	printf("Updating attribute %s\n", path.Path());
-	AppAttrFile attrFile(entry);
-	attrFile.CalculateScore();
-}
-
-
-BList
-einsteinium_engine::_CreateAppStatsList(int sortAction=SORT_BY_NONE)
-{
-	BList newList;
-	_ForEachAttrFile(CREATE_APP_LIST, &newList);
-	_SortAppStatsList(newList, sortAction);
-	return newList;
-}
-
-
-void
-einsteinium_engine::_SortAppStatsList(BList &list, int sortAction)
-{
+	// TODO change to return a status_t?
 	switch(sortAction)
 	{
 		case SORT_BY_SCORE:
-		{	list.SortItems(AppStatsSortScore);
+		{	subscriber->appStatsList.SortItems(AppStatsSortScore);
 			break;
 		}
 		case SORT_BY_LAST_LAUNCHTIME:
-		{	list.SortItems(AppStatsSortLastLaunch);
+		{	subscriber->appStatsList.SortItems(AppStatsSortLastLaunch);
 			break;
 		}
 		case SORT_BY_FIRST_LAUNCHTIME:
-		{	list.SortItems(AppStatsSortFirstLaunch);
+		{	subscriber->appStatsList.SortItems(AppStatsSortFirstLaunch);
 			break;
 		}
 		case SORT_BY_LAUNCH_COUNT:
-		{	list.SortItems(AppStatsSortLaunchCount);
+		{	subscriber->appStatsList.SortItems(AppStatsSortLaunchCount);
 			break;
 		}
 		case SORT_BY_LAST_INTERVAL:
-		{	list.SortItems(AppStatsSortLastInterval);
+		{	subscriber->appStatsList.SortItems(AppStatsSortLastInterval);
 			break;
 		}
 		case SORT_BY_TOTAL_RUNNING_TIME:
-		{	list.SortItems(AppStatsSortRunningTime);
+		{	subscriber->appStatsList.SortItems(AppStatsSortRunningTime);
 			break;
 		}
+		default:
+			return;
 	}
+	subscriber->appStatsSortOrder = sortAction;
 }
 
 
@@ -687,13 +615,13 @@ einsteinium_engine::_EmptyAppStatsList(BList &list)
 }
 
 uint
-einsteinium_engine::_FindAppStatsRank(BList &appStatsList, const char* signature)
+einsteinium_engine::_FindAppStatsRank(Subscriber *subscriber, const char* signature)
 {
 	uint rank = 0-1;
-	int count = appStatsList.CountItems();
+	int count = subscriber->appStatsList.CountItems();
 	for(int i=0; i<count; i++)
 	{
-		AppStats* stats = (AppStats*)appStatsList.ItemAt(i);
+		AppStats* stats = (AppStats*)(subscriber->appStatsList.ItemAt(i));
 		if(stats->app_sig.Compare(signature) == 0)
 		{
 			rank = i + 1;
@@ -705,51 +633,38 @@ einsteinium_engine::_FindAppStatsRank(BList &appStatsList, const char* signature
 
 
 void
-einsteinium_engine::_UpdateQuartiles()
+einsteinium_engine::_UpdateQuartiles(Subscriber *subscriber)
 {
-	BList appsList = _CreateAppStatsList();
-	//Update Overall Score
-	printf("Getting quartiles for score\n");
-	appsList.SortItems(AppStatsSortScore);
-	_GetQuartiles(GetStatsScore, appsList, fQuartiles+Q_SCORE_INDEX);
 	//Update last launch time
 	printf("Getting quartiles for last launch time\n");
-	appsList.SortItems(AppStatsSortLastLaunch);
-	_GetQuartiles(GetStatsLastLaunch, appsList, fQuartiles+Q_LAST_LAUNCH_INDEX);
+	_SortAppStatsList(subscriber, SORT_BY_LAST_LAUNCHTIME);
+	_GetQuartiles(GetStatsLastLaunch, subscriber->appStatsList, subscriber->fQuartiles+Q_LAST_LAUNCH_INDEX);
 	//Update first launch time
 	printf("Getting quartiles for first launch time\n");
-	appsList.SortItems(AppStatsSortFirstLaunch);
-	_GetQuartiles(GetStatsFirstLaunch, appsList, fQuartiles+Q_FIRST_LAUNCH_INDEX);
+	_SortAppStatsList(subscriber, SORT_BY_FIRST_LAUNCHTIME);
+	_GetQuartiles(GetStatsFirstLaunch, subscriber->appStatsList, subscriber->fQuartiles+Q_FIRST_LAUNCH_INDEX);
 	//Update last interval
 	printf("Getting quartiles for last interval\n");
 	// Create a copy of the list and remove apps that have a last interval of 0 so they don't
 	// skew the quartiles with lots of 0's
 	BList intervalList;
-	for(int i=0; i<appsList.CountItems(); i++)
+	for(int i=0; i<subscriber->appStatsList.CountItems(); i++)
 	{
-		AppStats *stats = (AppStats*)appsList.ItemAt(i);
+		AppStats *stats = (AppStats*)(subscriber->appStatsList.ItemAt(i));
 		if(stats->last_interval != 0) intervalList.AddItem(stats);
 	}
 	intervalList.SortItems(AppStatsSortLastInterval);
-	_GetQuartiles(GetStatsLastInterval, intervalList, fQuartiles+Q_LAST_INTERVAL_INDEX);
+	_GetQuartiles(GetStatsLastInterval, intervalList, subscriber->fQuartiles+Q_LAST_INTERVAL_INDEX);
 	intervalList.MakeEmpty();
 	//Update Total Run Time
 	printf("Getting quartiles for total running time\n");
-	appsList.SortItems(AppStatsSortRunningTime);
-	_GetQuartiles(GetStatsRunningTime, appsList, fQuartiles+Q_TOTAL_RUN_TIME_INDEX);
+	_SortAppStatsList(subscriber, SORT_BY_TOTAL_RUNNING_TIME);
+	_GetQuartiles(GetStatsRunningTime, subscriber->appStatsList, subscriber->fQuartiles+Q_TOTAL_RUN_TIME_INDEX);
 	//Update Launch Count
 	printf("Getting quartiles for launch count\n");
-	appsList.SortItems(AppStatsSortLaunchCount);
-	_GetQuartiles(GetStatsLaunchCount, appsList, fQuartiles+Q_LAUNCHES_INDEX);
+	_SortAppStatsList(subscriber, SORT_BY_LAUNCH_COUNT);
+	_GetQuartiles(GetStatsLaunchCount, subscriber->appStatsList, subscriber->fQuartiles+Q_LAUNCHES_INDEX);
 
-	// Write to file
-	BPath EstatsPath(fSettingsDirPath);
-	EstatsPath.Append("engine_quartiles");
-	BFile statsFile(EstatsPath.Path(), B_READ_WRITE | B_CREATE_FILE);
-	if(statsFile.InitCheck() != B_OK) return;
-	_WriteQuartiles(&statsFile, fQuartiles);
-	statsFile.Unset();
-	_EmptyAppStatsList(appsList);
 }
 
 // TODO there is a bug when there are less than 10 data sets available- score becomes
@@ -765,26 +680,26 @@ einsteinium_engine::_GetQuartiles(itemType (*getFunc)(AppStats*), BList &working
 	if(count<5)
 		return;
 	double index;
-	itemType ql, qu;
+	itemType qLower, qUpper;
 	for(int i=0; i<5; i++)
 	{
 		index = ((4.0-i)/4.0)*(count-1);
 			// index is the location in workingList where the quartile Q0, Q1, Q2, Q3 or Q4
 			// falls.  index can be a non integer, in which case the quartile value actually
 			// falls in between the values of two items in workingList.
-		qu = getFunc( (AppStats*)workingList.ItemAt(int(index)) );
-			// qu is the upper level of the quartile value
+		qUpper = getFunc( (AppStats*)workingList.ItemAt(int(index)) );
+			// qUpper is the upper level of the quartile value
 		if(i==0 || i==4)
 			// For Q0 and Q4 the quartile value is exactly the value of the first and last
 			// item respectively
-		{	Q[i] = qu; }
+		{	Q[i] = qUpper; }
 		else
 			// Q1, Q2 and Q3 values usually fall in between item values
-		{	ql = getFunc( (AppStats*)workingList.ItemAt(int(index)+1) );
-				// ql is the value lower than the actual quartile value (remember index 0
+		{	qLower = getFunc( (AppStats*)workingList.ItemAt(int(index)+1) );
+				// qLower is the value lower than the actual quartile value (remember index 0
 				// is the highest value, then the values decrease as the index increases)
-			Q[i] = ql + double(qu - ql)*(index-int(index));
-				// double(qu - ql) is the difference between the two values.
+			Q[i] = qLower + double(qUpper - qLower)*(index-int(index));
+				// double(qUpper - qLower) is the difference between the two values.
 				// (index-int(index)) is the fractional place between the the items where the quartile falls
 				// Multiply the two and get the fraction of the difference to add to the lower
 				// item value to get the final quartile value.
@@ -795,54 +710,68 @@ einsteinium_engine::_GetQuartiles(itemType (*getFunc)(AppStats*), BList &working
 
 
 void
-einsteinium_engine::_WriteQuartiles(BFile* file, double *Q)
+einsteinium_engine::_CalculateScores(Subscriber *subscriber)
 {
-	_WriteQuartilesNamed(file, Q+Q_SCORE_INDEX, "EIN:SCORE");
-	_WriteQuartilesNamed(file, Q+Q_FIRST_LAUNCH_INDEX, "EIN:FIRST_LAUNCH");
-	_WriteQuartilesNamed(file, Q+Q_LAST_LAUNCH_INDEX, "EIN:LAST_LAUNCH");
-	_WriteQuartilesNamed(file, Q+Q_LAST_INTERVAL_INDEX, "EIN:LAST_INTERVAL");
-	_WriteQuartilesNamed(file, Q+Q_LAUNCHES_INDEX, "EIN:LAUNCHES");
-	_WriteQuartilesNamed(file, Q+Q_TOTAL_RUN_TIME_INDEX, "EIN:TOTAL_RUN_TIME");
+	printf("Calculating scores\n");
+	int count = subscriber->appStatsList.CountItems();
+	for(int i=0; i<count; i++)
+	{
+		AppStats* stats = (AppStats*)(subscriber->appStatsList.ItemAt(i));
+		_CalculateScore(subscriber, stats);
+	}
 }
 
 
 void
-einsteinium_engine::_WriteQuartilesNamed(BFile* file, double* Q, const char* name)
+einsteinium_engine::_CalculateScore(Subscriber *subscriber, AppStats *appStats)
 {
-	BString nameStr;
-	for(int i=0; i<5; i++)
-	{	nameStr.SetTo(name);
-		nameStr.Append("_Q");
-		nameStr << i;
-		file->WriteAttr(nameStr.String(), B_DOUBLE_TYPE, 0, Q+i, sizeof(double));
-	}
+	const double *Quart = subscriber->fQuartiles;
+	float launch_value = _GetQuartileValue(Quart+Q_LAUNCHES_INDEX, appStats->launch_count);
+	float first_launch_value = _GetQuartileValue(Quart+Q_FIRST_LAUNCH_INDEX, appStats->first_launch);
+	float last_launch_value = _GetQuartileValue(Quart+Q_LAST_LAUNCH_INDEX, appStats->last_launch);
+	float last_interval_value = _GetQuartileValue(Quart+Q_LAST_INTERVAL_INDEX, appStats->last_interval);
+	float total_run_time_value = _GetQuartileValue(Quart+Q_TOTAL_RUN_TIME_INDEX, appStats->total_run_time);
+
+	// If last interval is zero (only one launch) put quartile value at .5 so that this
+	// statistic does not adversly effect the score
+	if(appStats->last_interval == 0)
+		last_interval_value = .5;
+
+	int max_scale = 100000;
+	appStats->score = int(  max_scale*(launch_value * subscriber->launch_scale)
+				+ max_scale*(first_launch_value * subscriber->first_scale)
+				+ max_scale*(last_launch_value * subscriber->last_scale)
+				+ max_scale*((1 - last_interval_value) * subscriber->interval_scale)
+					// Need to reverse interval scale, because longer intervals decrease the score
+					// TODO or do I change the sorting method to sort descending??
+				+ max_scale*(total_run_time_value * subscriber->runtime_scale));
+	printf("Score for %s is %i\n", appStats->app_sig.String(), appStats->score);
 }
 
 
-/*bool einsteinium_engine::_ReadQuartiles(BFile *file, double* Q)
-{
-	_ReadQuartilesNamed(file, Q+Q_SCORE_INDEX, "EIN:SCORE");
-	_ReadQuartilesNamed(file, Q+Q_FIRST_LAUNCH_INDEX, "EIN:FIRST_LAUNCH");
-	_ReadQuartilesNamed(file, Q+Q_LAST_LAUNCH_INDEX, "EIN:LAST_LAUNCH");
-	_ReadQuartilesNamed(file, Q+Q_LAST_INTERVAL_INDEX, "EIN:LAST_INTERVAL");
-	_ReadQuartilesNamed(file, Q+Q_LAUNCHES_INDEX, "EIN:LAUNCHES");
-	_ReadQuartilesNamed(file, Q+Q_TOTAL_RUN_TIME_INDEX, "EIN:TOTAL_RUN_TIME");
-	return true;
-}
-bool einsteinium_engine::_ReadQuartilesNamed(BFile* statsFile, double* Q, const char* name)
-{
-	attr_info info;
-	BString nameStr;
-	for(int i=0; i<5; i++)
-	{
-		nameStr.SetTo(name);
-		nameStr.Append("_Q");
-		nameStr << i;
-		if(statsFile->GetAttrInfo(nameStr.String(), &info) != B_NO_ERROR) { return false; }
-		statsFile->ReadAttr(nameStr.String(), B_DOUBLE_TYPE, 0, Q+i, sizeof(double));
+// Calculate the quartile value of where d lies in the quartile range Q
+float
+einsteinium_engine::_GetQuartileValue(const double *Q, double d)
+{//	printf("EIN: quartiles\n");
+//	printf("Q4: %f, Q3: %f, Q2: %f, Q1: %f, Q0: %f\n", Q[4], Q[3], Q[2], Q[1], Q[0]);
+	int index, index_offset = 0;
+	if(d >= Q[0] && d<Q[1]) { index = 0; }
+	else if(d >= Q[1] && d<Q[2]) { index = 1; }
+	else if(d >= Q[2] && d<Q[3]) { index = 2; }
+	else if(d >= Q[3] && d<Q[4]) { index = 3; }
+	else if(d == Q[4]) { return 1; }
+	// For values that lie outside the current quartile range
+	else if(d < Q[0]) { index = 0; }
+	else if(d > Q[4])
+	{	index = 4;
+		index_offset = 1;
+		// since there is no Q[5], index offset will modify the calculation below to
+		// use Q[3] and Q[4] to find the quartile value range
 	}
-	return true;
-}*/
+	else { return .5; }
+
+	return (.25*index + .25*((d - Q[index])/(Q[index+1-index_offset] - Q[index-index_offset])));
+}
 
 
 template < class itemType >

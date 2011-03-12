@@ -10,7 +10,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "DR2",
-	long_info = "Einstseinium Engine DR2"
+	long_info = "Einsteinium Engine DR2"
 };
 
 

@@ -56,11 +56,20 @@
 #define PATH_HOME_BIN "/boot/home/config/bin"
 #define PATH_HOME_TRACKER_ADDONS "/boot/home/config/add-ons/Tracker"
 
+//Subscribe message names
+#define E_SUBSCRIPTION_MESSENGER "messenger"
+#define E_SUBSCRIPTION_COUNT "count"
+#define E_SUBSCRIPTION_LAUNCH_SCALE "launch_scale"
+#define E_SUBSCRIPTION_FIRST_SCALE "first_scale"
+#define E_SUBSCRIPTION_LAST_SCALE "last_scale"
+#define E_SUBSCRIPTION_INTERVAL_SCALE "interval_scale"
+#define E_SUBSCRIPTION_RUNTIME_SCALE "runtime_scale"
+
 //Defaults
 #define DEFAULTVALUE_LAUNCHES 5
 
 // Other text
-#define EE_SHELFVIEW_NAME "ee_shelfview"
+
 
 //Indexes
 enum scales_index
@@ -71,12 +80,12 @@ enum scales_index
 	RUNTIME_INDEX
 };
 enum quartile_indexes
-{	Q_SCORE_INDEX=0,
-	Q_FIRST_LAUNCH_INDEX=5,
-	Q_LAST_LAUNCH_INDEX=10,
-	Q_LAST_INTERVAL_INDEX=15,
-	Q_LAUNCHES_INDEX=20,
-	Q_TOTAL_RUN_TIME_INDEX=25
+{	Q_FIRST_LAUNCH_INDEX=0,
+	Q_LAST_LAUNCH_INDEX=5,
+	Q_LAST_INTERVAL_INDEX=10,
+	Q_LAUNCHES_INDEX=15,
+	Q_TOTAL_RUN_TIME_INDEX=20,
+	Q_ARRAY_SIZE=25
 };
 
 //Messages
@@ -90,11 +99,6 @@ enum engine_messages
 	E_UPDATE_QUARTILES='Eupq',
 	E_RESCAN_DATA_FILES,
 	E_UPDATE_SCORES,
-	E_UPDATE_SUBSCRIBERS,
-	E_SET_IGNORE_ATTR,
-	E_SHELFVIEW_OPENPREFS,
-	E_SHELFVIEW_OPEN,
-	E_UPDATE_SHELFVIEW_SETTINGS,
 	// Subscriber messages
 	E_SUBSCRIBER_UPDATE_RANKED_APPS,
 	E_SUBSCRIBE_RANKED_APPS,
@@ -102,7 +106,8 @@ enum engine_messages
 	E_SUBSCRIBE_CONFIRMED,
 	E_SUBSCRIBE_FAILED,
 	E_UNSUBSCRIBE_CONFIRMED,
-	E_UNSUBSCRIBE_FAILED
+	E_UNSUBSCRIBE_FAILED,
+	E_TEST_MODE_INIT
 };
 
 //Actions

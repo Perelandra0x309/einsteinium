@@ -4,7 +4,6 @@ Critical:
 -add MIME type to created databases
 -new AppAttrFile looks for an existing database
 -optimize for speed
--provide a -10 to 10 range for setting statistic weight in calculations (so at -10 more launches pushes app to lower rank, for example)
 
 Soon:
 -Enable a filtering system

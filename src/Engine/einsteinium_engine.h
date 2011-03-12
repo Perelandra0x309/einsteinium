@@ -1,5 +1,5 @@
 /* einsteinium_engine.h
- * Copyright 2010 Brian Hill
+ * Copyright 2011 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #ifndef EINSTEINIUM_ENGINE_H
@@ -11,7 +11,6 @@
 #include "AppStats.h"
 #include "AppAttrFile.h"
 #include "EESettingsFile.h"
-#include "EEShelfView.h"
 #include "engine_constants.h"
 #include "methods.h"
 
@@ -19,7 +18,17 @@
 struct Subscriber {
 	int16 count;
 	int32 uniqueID;
+	int8 launch_scale,
+		first_scale,
+		last_scale,
+		interval_scale,
+		runtime_scale;
 	BMessenger messenger;
+	BList appStatsList;
+	int appStatsSortOrder;
+	double fQuartiles[Q_ARRAY_SIZE];
+	bool currentAppIsExcluded;
+	uint currentAppPreviousRank;
 };
 
 class einsteinium_engine : public BApplication {
@@ -30,41 +39,32 @@ public:
 	virtual void	ReadyToRun();
 	virtual void	ArgvReceived(int32, char**);
 	virtual void	MessageReceived(BMessage*);
-	const double*	GetQuartilesPtr() const { return fQuartiles; }
-	const int*		GetScalesPtr() const { return fSettingsFile->GetScales(); }
 	const time_t	GetSession() { return fEngineSession; }
 private:
 	BPath			fSettingsDirPath;
 	EESettingsFile	*fSettingsFile;
 	bool			fWatchingRoster;//will be true when roster is being watched
-	BMessageRunner	*fQuartileRunner;
+//	BMessageRunner	*fQuartileRunner;
 	const time_t	fEngineSession;//current session number
-	double			fQuartiles[30];
 	BList			fSubscribersList;
-//	BQuery			fRankQuery;
-	int32			fShelfViewId;
 	// functions
 	void			_Unsubscribe(int32 uniqueID);
-	void			_SendListToSubscriber(BList *appStatsList, Subscriber *subscriber);
+	void			_SendListToSubscriber(Subscriber *subscriber);
 	void			_PopulateAppRankMessage(BList *appStatsList, BMessage *message, int count);
-	void			_ShowShelfView(bool showShelfView, int shelfViewCount);
-//	void			_DoRankQuery();
-	void			_ForEachAttrFile(int action, BList *appStatsList = NULL);
-	void			_RescanAllAttrFiles();
-	void			_RescanAttrFile(BEntry*);
-	void			_UpdateAllAttrScores();
-	void			_UpdateAttrScore(BEntry*);
-	BList			_CreateAppStatsList(int sortAction=SORT_BY_NONE);
-	void			_SortAppStatsList(BList &list, int sortAction);
+//	void			_ForEachAttrFile(int action, BList *appStatsList = NULL);
+//	void			_RescanAllAttrFiles();
+//	void			_RescanAttrFile(BEntry*);
+	bool			_DetermineExclusion(Subscriber *subscriber, const char* signature);
+	void			_CreateAppStatsList(Subscriber *subscriber, int sortAction=SORT_BY_NONE);
+	void			_SortAppStatsList(Subscriber *subscriber, int sortAction);
 	void			_EmptyAppStatsList(BList &list);
-	uint			_FindAppStatsRank(BList &appStatsList, const char* signature);
-	void			_UpdateQuartiles();
+	uint			_FindAppStatsRank(Subscriber *subscriber, const char* signature);
+	void			_UpdateQuartiles(Subscriber *subscriber);
 	template < class itemType >
 	void			_GetQuartiles(itemType (*)(AppStats*), BList&, double*);
-	void			_WriteQuartiles(BFile*, double*);
-	void			_WriteQuartilesNamed(BFile*, double*, const char*);
-//	bool			_ReadQuartiles(BFile*, double*);
-//	bool			_ReadQuartilesNamed(BFile*, double*, const char*);
+	void			_CalculateScores(Subscriber *subscriber);
+	void			_CalculateScore(Subscriber *subscriber, AppStats *appStats);
+	float			_GetQuartileValue(const double *Q, double d);
 };
 
 
