@@ -42,10 +42,11 @@ einsteinium_engine::einsteinium_engine()//Einsteinium Engine Constructor
 	}
 
 	//Initialize the settings file object and check to see if it instatiated correctly
+	// TODO do we even use the settings file here?
 	fSettingsFile = new EESettingsFile();
 	status_t result = fSettingsFile->CheckStatus();
 	if(result!=B_OK){
-		printf("Error creating Einsteinium Daemon settings file.  Cannot continue.\n");
+		printf("Error creating Einsteinium Engine settings file.  Cannot continue.\n");
 		be_app->PostMessage(B_QUIT_REQUESTED);
 			//Quit. Can we do anthything w/o settings?
 	}
@@ -274,8 +275,12 @@ einsteinium_engine::MessageReceived(BMessage *msg)
 				status_t result = B_ERROR;
 				if(msg->IsSourceWaiting())
 					result = msg->SendReply(E_SUBSCRIBE_FAILED);
+				else
+					printf("Source is not waiting\n");
 				if(result != B_OK && newSubscriber->messenger.IsValid())
 					newSubscriber->messenger.SendMessage(E_SUBSCRIBE_FAILED);
+				else
+					printf("Cannot send \'Subscribe Failed\' message.  Result=%i, valid messenger=%i\n", result, newSubscriber->messenger.IsValid());
 				delete newSubscriber;
 				break;
 			}

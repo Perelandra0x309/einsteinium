@@ -15,12 +15,13 @@
 #include <stdio.h>
 
 #include "EESettingsFile.h"
+#include "EngineSubscriber.h"
 #include "IconMenuItem.h"
 #include "launcher_constants.h"
 // TODO make seperate constants.h for subscribers
 #include "engine_constants.h"
 
-class _EXPORT ELShelfView : public BView {
+class _EXPORT ELShelfView : public BView, public EngineSubscriber {
 public:
 							ELShelfView();
 							ELShelfView(BMessage* data);
@@ -38,11 +39,13 @@ public:
 private:
 	BBitmap*				fIcon;
 	BPopUpMenu*				fMenu;
-	int16					fItemCount;
-	int32					fUniqueID;
+	int						fItemCount;
 	EESettingsFile			*fSettingsFile;
 	void					_BuildMenu(BMessage *message);
 	void					_Quit();
+	virtual void			_SubscribeFailed();
+	virtual void			_SubscribeConfirmed();
+	virtual void			_UpdateReceived(BMessage *message);
 };
 
 #endif	/* EL_SHELF_VIEW_H */

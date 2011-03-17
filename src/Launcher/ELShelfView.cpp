@@ -40,6 +40,7 @@ ELShelfView::ELShelfView()
 ELShelfView::ELShelfView(BMessage *message)
 	:
 	BView(message),
+	EngineSubscriber(),
 	fIcon(NULL),
 	fMenu(NULL),
 	fItemCount(0)
@@ -48,7 +49,6 @@ ELShelfView::ELShelfView(BMessage *message)
 	status_t result = message->FindMessage("fIconArchive", &iconArchive);
 	if(result == B_OK)
 		fIcon = new BBitmap(&iconArchive);
-//	message->FindInt16("count", &fItemCount);
 	// Apparently Haiku does not yet archive tool tips (Release 1 Alpha 2)
 	SetToolTip(EL_TOOLTIP_TEXT);
 }
@@ -74,8 +74,6 @@ ELShelfView::AttachedToWindow()
 
 	_BuildMenu(NULL);
 
-	fUniqueID = time(NULL);
-
 	// TODO make seperate Launcher settings file
 	//Initialize the settings file object and check to see if it instatiated correctly
 	fSettingsFile = new EESettingsFile();
@@ -90,34 +88,18 @@ ELShelfView::AttachedToWindow()
 	if (!be_roster->IsRunning(e_engine_sig)) {
 		// TODO- display warning?
 		_Quit();
+		return;
 	}
-	else
-	{
-		// TODO get rid of this messy conversion
-		bool dummyBool;
-		int dummyInt;
-		fSettingsFile->GetDeskbarSettings(dummyBool, dummyInt);
-		fItemCount = dummyInt;
 
-		const int *scales = fSettingsFile->GetScales();
+	// Subscribe to the Einsteinium Engine
+	// TODO get rid of dummyBool
+	bool dummyBool;
+	fSettingsFile->GetDeskbarSettings(dummyBool, fItemCount);
+	const int *scales = fSettingsFile->GetScales();
+	_SubscribeToEngine(fItemCount, scales[LAUNCH_INDEX], scales[FIRST_INDEX],
+						scales[LAST_INDEX], scales[INTERVAL_INDEX], scales[RUNTIME_INDEX]);
 
-		// Subscribe with the Einsteinium Engine to receive updates
-		BMessage subscribeMsg(E_SUBSCRIBE_RANKED_APPS);
-		subscribeMsg.AddInt32("uniqueID", fUniqueID);
-		subscribeMsg.AddInt16("count", fItemCount);
-		subscribeMsg.AddInt8(E_SUBSCRIPTION_LAUNCH_SCALE, scales[LAUNCH_INDEX]);
-		subscribeMsg.AddInt8(E_SUBSCRIPTION_FIRST_SCALE, scales[FIRST_INDEX]);
-		subscribeMsg.AddInt8(E_SUBSCRIPTION_LAST_SCALE, scales[LAST_INDEX]);
-		subscribeMsg.AddInt8(E_SUBSCRIPTION_INTERVAL_SCALE, scales[INTERVAL_INDEX]);
-		subscribeMsg.AddInt8(E_SUBSCRIPTION_RUNTIME_SCALE, scales[RUNTIME_INDEX]);
-		subscribeMsg.AddMessenger("messenger", BMessenger(this));
-		BMessenger EsMessenger(e_engine_sig);
-		EsMessenger.SendMessage(&subscribeMsg, this);
-		// TODO trying to get reply synchronously freezes
-	//	BMessage reply;
-	//	EsMessenger.SendMessage(&subscribeMsg, &reply);
-		Invalidate();
-	}
+	Invalidate();
 }
 
 
@@ -125,13 +107,7 @@ void
 ELShelfView::DetachedFromWindow()
 {
 	// Unsubscribe from the Einsteinium Engine
-	if (be_roster->IsRunning(e_engine_sig))
-	{
-		BMessage unsubscribeMsg(E_UNSUBSCRIBE_RANKED_APPS);
-		unsubscribeMsg.AddInt32("uniqueID", fUniqueID);
-		BMessenger EsMessenger(e_engine_sig);
-		EsMessenger.SendMessage(&unsubscribeMsg, this);
-	}
+	_UnsubscribeFromEngine();
 }
 
 
@@ -150,7 +126,6 @@ ELShelfView::Archive(BMessage *data, bool deep) const
 	BView::Archive(data, deep);
 	data->AddString("add_on", e_launcher_sig);
 //	data->AddString("class", "ELShelfView");
-//	data->AddInt16("count", fItemCount);
 	if(fIcon != NULL)
 	{
 		BMessage archive;
@@ -178,11 +153,6 @@ ELShelfView::MessageReceived(BMessage* msg)
 {
 	switch(msg->what)
 	{
-		case E_SUBSCRIBE_FAILED: {
-			BDeskbar deskbar;
-			deskbar.RemoveItem(EL_SHELFVIEW_NAME);
-			break;
-		}
 		case EL_SHELFVIEW_OPENPREFS: {
 			be_roster->Launch("application/x-vnd.Einsteinium_Preferences");
 			break;
@@ -191,10 +161,6 @@ ELShelfView::MessageReceived(BMessage* msg)
 			entry_ref ref;
 			if(msg->FindRef("refs", &ref) == B_OK)
 				be_roster->Launch(&ref);
-			break;
-		}
-		case E_SUBSCRIBER_UPDATE_RANKED_APPS: {
-			_BuildMenu(msg);
 			break;
 		}
 		case EL_SHELFVIEW_MENU_QUIT: {
@@ -279,3 +245,23 @@ ELShelfView::_Quit()
 	deskbar.RemoveItem(EL_SHELFVIEW_NAME);
 }
 
+
+void
+ELShelfView::_SubscribeFailed()
+{
+	_Quit();
+}
+
+
+void
+ELShelfView::_SubscribeConfirmed()
+{
+
+}
+
+
+void
+ELShelfView::_UpdateReceived(BMessage *message)
+{
+	_BuildMenu(message);
+}
