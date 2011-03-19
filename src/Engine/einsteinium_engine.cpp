@@ -250,7 +250,7 @@ einsteinium_engine::MessageReceived(BMessage *msg)
 			status_t result1 = msg->FindMessenger(E_SUBSCRIPTION_MESSENGER, &(newSubscriber->messenger));
 			status_t result2 = msg->FindInt16(E_SUBSCRIPTION_COUNT, &(newSubscriber->count));
 			// TODO create a unique ID and pass back to the subscriber
-			status_t result3 = msg->FindInt32("uniqueID", &(newSubscriber->uniqueID));
+			status_t result3 = msg->FindInt32(E_SUBSCRIPTION_UNIQUEID, &(newSubscriber->uniqueID));
 			// Get the settings for scale values (default to 0 for any not defined)
 			newSubscriber->launch_scale = 0;
 			msg->FindInt8(E_SUBSCRIPTION_LAUNCH_SCALE, &(newSubscriber->launch_scale));
@@ -296,7 +296,7 @@ einsteinium_engine::MessageReceived(BMessage *msg)
 		case E_UNSUBSCRIBE_RANKED_APPS: {
 		//	printf("Received unsubscribe message\n");
 			int32 uniqueID;
-			status_t result = msg->FindInt32("uniqueID", &uniqueID);
+			status_t result = msg->FindInt32(E_SUBSCRIPTION_UNIQUEID, &uniqueID);
 			if(result!=B_OK)
 			{
 				printf("Einsteinium Engine received invalid unsubscribe message.\n");
@@ -384,7 +384,7 @@ einsteinium_engine::MessageReceived(BMessage *msg)
 		{
 			printf("EE Test mode init request received\n");
 			BMessage subscribeMsg(E_SUBSCRIBE_RANKED_APPS);
-			subscribeMsg.AddInt32("uniqueID", 777);
+			subscribeMsg.AddInt32(E_SUBSCRIPTION_UNIQUEID, 777);
 			subscribeMsg.AddInt16(E_SUBSCRIPTION_COUNT, 20);
 			subscribeMsg.AddInt8(E_SUBSCRIPTION_LAST_SCALE, 1);
 			subscribeMsg.AddMessenger(E_SUBSCRIPTION_MESSENGER, BMessenger(this));

@@ -18,8 +18,7 @@
 #include "EngineSubscriber.h"
 #include "IconMenuItem.h"
 #include "launcher_constants.h"
-// TODO make seperate constants.h for subscribers
-#include "engine_constants.h"
+
 
 class _EXPORT ELShelfView : public BView, public EngineSubscriber {
 public:

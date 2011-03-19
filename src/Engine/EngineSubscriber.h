@@ -9,8 +9,31 @@
 #include <Looper.h>
 #include <Roster.h>
 #include <stdio.h>
+#include "string.h"
 
-#include "engine_constants.h"
+//Einsteinium_engine application signature
+#define einsteinium_engine_sig "application/x-vnd.Einsteinium_Engine"
+
+//Subscribe message names
+#define E_SUBSCRIPTION_MESSENGER "messenger"
+#define E_SUBSCRIPTION_UNIQUEID "uniqueID"
+#define E_SUBSCRIPTION_COUNT "count"
+#define E_SUBSCRIPTION_LAUNCH_SCALE "launch_scale"
+#define E_SUBSCRIPTION_FIRST_SCALE "first_scale"
+#define E_SUBSCRIPTION_LAST_SCALE "last_scale"
+#define E_SUBSCRIPTION_INTERVAL_SCALE "interval_scale"
+#define E_SUBSCRIPTION_RUNTIME_SCALE "runtime_scale"
+
+//Messages
+enum subscriber_messages
+{	E_SUBSCRIBER_UPDATE_RANKED_APPS,
+	E_SUBSCRIBE_RANKED_APPS,
+	E_UNSUBSCRIBE_RANKED_APPS,
+	E_SUBSCRIBE_CONFIRMED,
+	E_SUBSCRIBE_FAILED,
+	E_UNSUBSCRIBE_CONFIRMED,
+	E_UNSUBSCRIBE_FAILED
+};
 
 class EngineSubscriber;
 

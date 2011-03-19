@@ -12,6 +12,7 @@
 #include "AppAttrFile.h"
 #include "EESettingsFile.h"
 #include "engine_constants.h"
+#include "EngineSubscriber.h"
 #include "methods.h"
 
 

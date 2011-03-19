@@ -5,7 +5,6 @@
 #include "EngineSubscriber.h"
 
 
-
 SubscriberHandler::SubscriberHandler(EngineSubscriber *owner)
 	:
 	BHandler("ESM_Handler")
@@ -46,8 +45,8 @@ EngineSubscriber::_SubscribeToEngine(int itemCount, int numberOfLaunchesScale, i
 {
 	// Subscribe with the Einsteinium Engine to receive updates
 	BMessage subscribeMsg(E_SUBSCRIBE_RANKED_APPS);
-	subscribeMsg.AddInt32("uniqueID", fUniqueID);
-	subscribeMsg.AddInt16("count", itemCount);
+	subscribeMsg.AddInt32(E_SUBSCRIPTION_UNIQUEID, fUniqueID);
+	subscribeMsg.AddInt16(E_SUBSCRIPTION_COUNT, itemCount);
 	subscribeMsg.AddInt8(E_SUBSCRIPTION_LAUNCH_SCALE, numberOfLaunchesScale);
 	subscribeMsg.AddInt8(E_SUBSCRIPTION_FIRST_SCALE, firstLaunchScale);
 	subscribeMsg.AddInt8(E_SUBSCRIPTION_LAST_SCALE, latestLaunchScale);
@@ -57,11 +56,11 @@ EngineSubscriber::_SubscribeToEngine(int itemCount, int numberOfLaunchesScale, i
 	BMessenger messenger(fHandler, NULL, &mErr);
 	if(!messenger.IsValid())
 	{
-		printf("ESM: Messenger is not valid, error=%i\n", mErr);
+		printf("ESM: Messenger is not valid, error=%s\n", strerror(mErr));
 		return;
 	}
-	subscribeMsg.AddMessenger("messenger", messenger);
-	BMessenger EsMessenger(e_engine_sig);
+	subscribeMsg.AddMessenger(E_SUBSCRIPTION_MESSENGER, messenger);
+	BMessenger EsMessenger(einsteinium_engine_sig);
 	EsMessenger.SendMessage(&subscribeMsg, fHandler);
 	// TODO trying to get reply synchronously freezes
 	//	BMessage reply;
@@ -73,11 +72,11 @@ void
 EngineSubscriber::_UnsubscribeFromEngine()
 {
 	// Unsubscribe from the Einsteinium Engine
-	if (be_roster->IsRunning(e_engine_sig))
+	if (be_roster->IsRunning(einsteinium_engine_sig))
 	{
 		BMessage unsubscribeMsg(E_UNSUBSCRIBE_RANKED_APPS);
 		unsubscribeMsg.AddInt32("uniqueID", fUniqueID);
-		BMessenger EsMessenger(e_engine_sig);
+		BMessenger EsMessenger(einsteinium_engine_sig);
 		EsMessenger.SendMessage(&unsubscribeMsg, fHandler);
 	}
 }
