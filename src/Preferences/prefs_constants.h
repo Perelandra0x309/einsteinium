@@ -1,5 +1,5 @@
 /* prefs_constants.h
- * Copyright 2010 Brian Hill
+ * Copyright 2011 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #ifndef EP_CONSTANTS_H
@@ -12,7 +12,7 @@ static const char* app_sig = "application/x-vnd.Einsteinium_Preferences";
 static const rgb_color bg_color = {216,216,216,0};//grey background color
 
 //settings
-struct engine_prefs
+struct scale_settings
 {	int		launches_scale, first_launch_scale, last_launch_scale,
 			interval_scale, total_run_time_scale;
 
@@ -20,29 +20,31 @@ struct engine_prefs
 
 //Messages
 enum prefs_messages
-{	//Daemon messages
+{	//Daemon settings messages
 	ED_RELAPP_SELECTION_CHANGED=1,
 	ED_ADD_APPITEM,
 	ED_ADD_APPITEM_REF,
 	ED_REMOVE_APPITEM,
 	ED_AUTO_RELAUNCH_CHANGED,
 //	ED_PROMPT_RELAUNCH_CHANGED,
-	//Engine messages
-	EE_LAUNCHES_SL_CHANGED,
-	EE_FIRST_SL_CHANGED,
-	EE_LAST_SL_CHANGED,
-	EE_INTERVAL_SL_CHANGED,
-	EE_RUNTIME_SL_CHANGED,
-	EE_IGNORE_ATTR_CHANGED,
-	EE_APPATTR_SELECTION_CHANGED,
-	EE_LIST_INCLUSION_CHANGED,
-	EE_ADD_ATTR_FILE,
-	EE_ADD_ATTR_FILE_REF,
-	EE_REMOVE_ATTR_FILE,
-	EE_DESKBAR_CHANGED,
+	//Engine settings messages
+
+	//Launcher settings messages
+	EL_LAUNCHES_SL_CHANGED,
+	EL_FIRST_SL_CHANGED,
+	EL_LAST_SL_CHANGED,
+	EL_INTERVAL_SL_CHANGED,
+	EL_RUNTIME_SL_CHANGED,
+//	EE_IGNORE_ATTR_CHANGED,
+	EL_EXCLUSION_SELECTION_CHANGED,
+	EL_LIST_INCLUSION_CHANGED,
+	EL_ADD_EXCLUSION,
+	EL_ADD_EXCLUSION_REF,
+	EL_REMOVE_EXCLUSION,
+	EL_DESKBAR_CHANGED,
 	//app messages
 	PREFS_ITEM_CHANGED,
-	SAVE_RANKING,
+	EL_SAVE_RANKING,
 	E_RECALC_SCORES,
 	E_RECALC_QUARTS,
 	E_RESCAN_DATA,

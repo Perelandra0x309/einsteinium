@@ -1,11 +1,11 @@
-/* DeskbarSettingsView.cpp
- * Copyright 2010 Brian Hill
+/* LauncherDeskbarView.cpp
+ * Copyright 2011 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
-#include "DeskbarSettingsView.h"
+#include "LauncherDeskbarView.h"
 
 
-DeskbarSettingsView::DeskbarSettingsView(BRect size)
+LauncherDeskbarView::LauncherDeskbarView(BRect size)
 	:
 	BView(size, "Deskbar Settings", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
 {
@@ -13,11 +13,11 @@ DeskbarSettingsView::DeskbarSettingsView(BRect size)
 	BRect viewRect;
 	fDeskbarBox = new BBox("Deskbar");
 	fDeskbarBox->SetLabel("Deskbar Settings");
-	fShowDeskbarCB = new BCheckBox(viewRect, "Show Deskbar",
-						"Show a list of ranked applications in the Deskbar",
-						new BMessage(EE_DESKBAR_CHANGED));
+//	fShowDeskbarCB = new BCheckBox(viewRect, "Show Deskbar",
+//						"Show a list of ranked applications in the Deskbar",
+//						new BMessage(EL_DESKBAR_CHANGED));
 	fItemCountTC = new BTextControl("Show this many applications:", "",
-						new BMessage(EE_DESKBAR_CHANGED));
+						new BMessage(EL_DESKBAR_CHANGED));
 	//fItemCountTC->SetDivider(be_plain_font->StringWidth(fItemCountTC->Label()) + 4);
 	fItemCountTC->SetExplicitMaxSize(BSize(be_plain_font->StringWidth(fItemCountTC->Label())
 				+ be_plain_font->StringWidth("00000000"), B_SIZE_UNSET));
@@ -29,13 +29,14 @@ DeskbarSettingsView::DeskbarSettingsView(BRect size)
 		textView->AllowChar(i);
 	textView->AllowChar(B_BACKSPACE);
 
-	fDeskbarBox->AddChild(BGroupLayoutBuilder(B_VERTICAL, 5)
-		.Add(fShowDeskbarCB)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 5)
+	fDeskbarBox->AddChild(//BGroupLayoutBuilder(B_VERTICAL, 5)
+//		.Add(fShowDeskbarCB)
+//		.Add(
+			BGroupLayoutBuilder(B_HORIZONTAL, 5)
 			.Add(fItemCountTC)
 			.AddGlue()
-			.SetInsets(15, 0, 0, 0)
-		)
+//			.SetInsets(15, 0, 0, 0)
+//		)
 		.SetInsets(5, 5, 5, 5)
 	);
 
@@ -47,19 +48,19 @@ DeskbarSettingsView::DeskbarSettingsView(BRect size)
 }
 
 
-/*DeskbarSettingsView::~DeskbarSettingsView()
+/*LauncherDeskbarView::~LauncherDeskbarView()
 {
 }*/
 
-
+/*
 void
-DeskbarSettingsView::MessageReceived(BMessage* msg)
+LauncherDeskbarView::MessageReceived(BMessage* msg)
 {	switch(msg->what)
 	{
 		case EE_DESKBAR_CHANGED: {
 			bool showDeskbar = fShowDeskbarCB->Value();
 			int16 count = strtol(fItemCountTC->Text(), NULL, 0);
-			EESettingsFile settings;
+			LauncherSettingsFile settings;
 			settings.SaveDeskbarSettings(showDeskbar, count);
 
 			app_info info;
@@ -67,6 +68,7 @@ DeskbarSettingsView::MessageReceived(BMessage* msg)
 			if(result==B_OK)
 			{
 				// Send message to update the deskbar menu
+				// TODO remove?
 				BMessenger messenger(e_engine_sig);
 				BMessage msg(E_UPDATE_SHELFVIEW_SETTINGS);
 				msg.AddBool("show", showDeskbar);
@@ -78,15 +80,23 @@ DeskbarSettingsView::MessageReceived(BMessage* msg)
 			break;
 		}
 	}
-}
+}*/
 
 
 void
-DeskbarSettingsView::SetDeskbarValues(bool show, int count)
+LauncherDeskbarView::SetDeskbarCount(int count)
+{
+	BString number;
+	number << count;
+	fItemCountTC->SetText(number.String());
+}
+/*
+void
+LauncherDeskbarView::SetDeskbarValues(bool show, int count)
 {
 	fShowDeskbarCB->SetValue(show);
 	BString number;
 	number << count;
 	fItemCountTC->SetText(number.String());
 	fItemCountTC->SetEnabled(show);
-}
+}*/

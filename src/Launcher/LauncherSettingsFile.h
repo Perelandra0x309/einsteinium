@@ -1,9 +1,9 @@
-/* EESettingsFile.h
- * Copyright 2010 Brian Hill
+/* LauncherSettingsFile.h
+ * Copyright 2011 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
-#ifndef EE_SETTINGSFILE_H
-#define EE_SETTINGSFILE_H
+#ifndef EINSTEINIUM_LAUNCHER_SETTINGSFILE_H
+#define EINSTEINIUM_LAUNCHER_SETTINGSFILE_H
 
 #include <StorageKit.h>
 #include <Handler.h>
@@ -11,22 +11,24 @@
 #include <String.h>
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
-#include "engine_constants.h"
+#include "launcher_constants.h"
 
-class EESettingsFile : public BHandler
+class LauncherSettingsFile : public BHandler
 {
 public:
-							EESettingsFile();
-							~EESettingsFile();
+							LauncherSettingsFile(BHandler *messageHandler=NULL);
+							~LauncherSettingsFile();
 	virtual void			MessageReceived(BMessage*);//received BMessages
-	status_t				CheckStatus();
+	status_t				CheckStatus() { return fStatus; }
 	int*					GetScales();
 	void					SaveScales(int*);
 	const char*				GetLinkInclusionDefaultValue();
 	void					SaveLinkInclusionDefaultValue(const char*);
-	void					GetDeskbarSettings(bool &show, int &count);
-	void					SaveDeskbarSettings(bool show, int count);
-
+//	void					GetDeskbarSettings(bool &show, int &count);
+	int						GetDeskbarCount() { return fDeskbarMenuCount; }
+	void					SaveDeskbarCount(int count);
+	BMessage				GetExclusionsList() { return fExclusionsList; }
+	void					SaveExclusionsList(BMessage &exclusionsList);
 	int						scales[5];
 private:
 	BPath					fSettingsPath;
@@ -34,16 +36,20 @@ private:
 	BLooper					*fWatchingLooper;
 	bool					fWatchingSettingsNode;//true when settings file is being watched
 	status_t				fStatus;
+	BMessage				fExclusionsList;
+	BHandler				*fExternalMessageHandler;
 	// Engine settings that can change
 	int						fLaunchScale, fFirstScale, fLastScale, fIntervalScale, fRuntimeScale;
 	BString					fInclusionDefault;
-	bool					fShowDeskbarMenu;
+//	bool					fShowDeskbarMenu;
 	int						fDeskbarMenuCount;
 
 	void					_StartWatching();
 	void					_StopWatching();
 	int						_XmlGetIntProp(xmlNodePtr cur, char *name);
 	void					_ReadSettingsFromFile(BPath file);
+	void					_ParseExclusionSettings(xmlDocPtr doc, xmlNodePtr cur);
+//	void					_DeleteExclusionsList();
 	status_t				_WriteSettingsToFile();
 };
 

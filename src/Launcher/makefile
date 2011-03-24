@@ -1,7 +1,7 @@
 NAME := Einsteinium_Launcher
 TYPE := APP
-SRCS := ../Engine/EESettingsFile.cpp \
-	../Engine/EngineSubscriber.cpp \
+SRCS := ../Engine/EngineSubscriber.cpp \
+	LauncherSettingsFile.cpp \
 	ELShelfView.cpp \
 	LauncherApp.cpp \
 	main.cpp

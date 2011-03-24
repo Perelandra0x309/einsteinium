@@ -14,9 +14,9 @@
 #include <Roster.h>
 #include <stdio.h>
 
-#include "EESettingsFile.h"
 #include "EngineSubscriber.h"
 #include "IconMenuItem.h"
+#include "LauncherSettingsFile.h"
 #include "launcher_constants.h"
 
 
@@ -39,9 +39,10 @@ private:
 	BBitmap*				fIcon;
 	BPopUpMenu*				fMenu;
 	int						fItemCount;
-	EESettingsFile			*fSettingsFile;
+	LauncherSettingsFile	*fSettingsFile;
 	void					_BuildMenu(BMessage *message);
 	void					_Quit();
+	void					_Subscribe();
 	virtual void			_SubscribeFailed();
 	virtual void			_SubscribeConfirmed();
 	virtual void			_UpdateReceived(BMessage *message);

@@ -3,13 +3,13 @@ TYPE := APP
 SRCS := ../Daemon/AppRelaunchSettings.cpp \
 		../Daemon/EDSettingsFile.cpp \
 		../Engine/methods.cpp \
-		../Engine/EESettingsFile.cpp \
+		../Launcher/LauncherSettingsFile.cpp \
 		AppRefFilter.cpp \
-		AttrSettingsView.cpp \
 		BitmapListItem.cpp \
-		DeskbarSettingsView.cpp \
+		LauncherExclusionsView.cpp \
+		LauncherDeskbarView.cpp \
+		LauncherRankingsView.cpp \
 		EMaintenanceView.cpp \
-		RankingSettingsView.cpp \
 		RelaunchSettingsView.cpp \
 		SystemStatusBox.cpp \
 		prefsWindow.cpp \
@@ -38,7 +38,7 @@ SYSTEM_INCLUDE_PATHS := /boot/common/include/libxml2
 #       additional paths to look for local headers
 #       thes use the form: #include "header.h"
 #       source file directories are automatically included
-LOCAL_INCLUDE_PATHS := ../Daemon ../Engine ../Icons
+LOCAL_INCLUDE_PATHS := ../Daemon ../Engine ../Icons ../Launcher
 
 #       specify any preprocessor symbols to be defined.  The symbols will not
 #       have their values set automatically; you must supply the value (if any)

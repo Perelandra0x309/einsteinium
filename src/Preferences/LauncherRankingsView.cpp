@@ -1,8 +1,8 @@
-/* RankingSettingsView.cpp
- * Copyright 2010 Brian Hill
+/* LauncherRankingsView.cpp
+ * Copyright 2011 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
-#include "RankingSettingsView.h"
+#include "LauncherRankingsView.h"
 
 /*	Definitions and objects for the view to change settings for calculation
 	of app rank in the engine
@@ -11,14 +11,14 @@
 rgb_color kFillColor = {200,255,200,0};
 rgb_color kBarColor = {205,205,255,0};
 
-RankingSettingsView::RankingSettingsView(BRect size)
+LauncherRankingsView::LauncherRankingsView(BRect size)
 	:
 	BView(size, "Recent Apps Rank", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
 {
 	SetViewColor(bg_color);
 
 	fLaunchesSl = new BSlider("Launches", "Number of Launches",
-							new BMessage(EE_LAUNCHES_SL_CHANGED),
+							new BMessage(EL_LAUNCHES_SL_CHANGED),
 							-5, 5, B_HORIZONTAL, B_TRIANGLE_THUMB);
 	_InitSlider(fLaunchesSl);
 	BBox *launchesBox = new BBox("Launches Box");
@@ -26,7 +26,7 @@ RankingSettingsView::RankingSettingsView(BRect size)
 	launchesBox->SetLabel("Total number of launches:");
 	launchesBox->AddChild(fLaunchesSl);
 	fFirstSl = new BSlider("First Launch", "First Launch",
-							new BMessage(EE_FIRST_SL_CHANGED),
+							new BMessage(EL_FIRST_SL_CHANGED),
 							-5, 5, B_HORIZONTAL, B_TRIANGLE_THUMB);
 	_InitSlider(fFirstSl);
 	BBox *firstBox = new BBox("First Box");
@@ -34,7 +34,7 @@ RankingSettingsView::RankingSettingsView(BRect size)
 	firstBox->SetLabel("Date of very first launch:");
 	firstBox->AddChild(fFirstSl);
 	fLastSl = new BSlider("Last Launch", "Last Launch",
-							new BMessage(EE_LAST_SL_CHANGED),
+							new BMessage(EL_LAST_SL_CHANGED),
 							-5, 5, B_HORIZONTAL, B_TRIANGLE_THUMB);
 	_InitSlider(fLastSl);
 	BBox *lastBox = new BBox("Last Box");
@@ -42,7 +42,7 @@ RankingSettingsView::RankingSettingsView(BRect size)
 	lastBox->SetLabel("Date of most recent launch:");
 	lastBox->AddChild(fLastSl);
 	fIntervalSl = new BSlider("Interval", "Interval between last two launches",
-							new BMessage(EE_INTERVAL_SL_CHANGED),
+							new BMessage(EL_INTERVAL_SL_CHANGED),
 							-5, 5, B_HORIZONTAL, B_TRIANGLE_THUMB);
 	_InitSlider(fIntervalSl);
 	BBox *intervalBox = new BBox("Interval Box");
@@ -50,14 +50,14 @@ RankingSettingsView::RankingSettingsView(BRect size)
 	intervalBox->SetLabel("Time lapsed between the last two launches:");
 	intervalBox->AddChild(fIntervalSl);
 	fRuntimeSl = new BSlider("RunTime", "Total Running Time",
-							new BMessage(EE_RUNTIME_SL_CHANGED),
+							new BMessage(EL_RUNTIME_SL_CHANGED),
 							-5, 5, B_HORIZONTAL, B_TRIANGLE_THUMB);
 	_InitSlider(fRuntimeSl);
 	BBox *runtimeBox = new BBox("Runtime Box");
 	runtimeBox->SetBorder(B_PLAIN_BORDER);
 	runtimeBox->SetLabel("Total lifetime running time:");
 	runtimeBox->AddChild(fRuntimeSl);
-	fSetB = new BButton("Set Button", "Save and Recalculate Scores", new BMessage(SAVE_RANKING));
+	fSetB = new BButton("Set Button", "Save and Recalculate Scores", new BMessage(EL_SAVE_RANKING));
 	fSlidersBox = new BBox("Rank Sliders");
 	fSlidersBox->SetLabel("Rank Weights");
 	fSlidersBox->AddChild(BGroupLayoutBuilder(B_VERTICAL, 5)
@@ -83,30 +83,39 @@ RankingSettingsView::RankingSettingsView(BRect size)
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
 		.Add(fSlidersBox)
 	);
+	_SetSlidersChanged(false);
 }
 
 
-RankingSettingsView::~RankingSettingsView()
+LauncherRankingsView::~LauncherRankingsView()
 {	}
 
 
 void
-RankingSettingsView::MessageReceived(BMessage* msg)
+LauncherRankingsView::MessageReceived(BMessage* msg)
 {	switch(msg->what)
-	{	case EE_LAUNCHES_SL_CHANGED:
+	{	case EL_LAUNCHES_SL_CHANGED:
 		{	_SetSliderScaleLabel(fLaunchesSl, fLaunchesSl->Value());
+			_SetSlidersChanged(true);
 			break; }
-		case EE_FIRST_SL_CHANGED:
+		case EL_FIRST_SL_CHANGED:
 		{	_SetSliderScaleLabel(fFirstSl, fFirstSl->Value());
+			_SetSlidersChanged(true);
 			break; }
-		case EE_LAST_SL_CHANGED:
+		case EL_LAST_SL_CHANGED:
 		{	_SetSliderScaleLabel(fLastSl, fLastSl->Value());
+			_SetSlidersChanged(true);
 			break; }
-		case EE_INTERVAL_SL_CHANGED:
+		case EL_INTERVAL_SL_CHANGED:
 		{	_SetSliderScaleLabel(fIntervalSl, fIntervalSl->Value());
+			_SetSlidersChanged(true);
 			break; }
-		case EE_RUNTIME_SL_CHANGED:
+		case EL_RUNTIME_SL_CHANGED:
 		{	_SetSliderScaleLabel(fRuntimeSl, fRuntimeSl->Value());
+			_SetSlidersChanged(true);
+			break; }
+		case EL_SAVE_RANKING: {
+			_SetSlidersChanged(false);
 			break; }
 	}
 }
@@ -114,7 +123,7 @@ RankingSettingsView::MessageReceived(BMessage* msg)
 
 // Set the standard slider properties
 void
-RankingSettingsView::_InitSlider(BSlider *slider)
+LauncherRankingsView::_InitSlider(BSlider *slider)
 {
 	slider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	slider->SetHashMarkCount(11);
@@ -125,7 +134,7 @@ RankingSettingsView::_InitSlider(BSlider *slider)
 
 
 void
-RankingSettingsView::_SetSliderScaleLabel(BSlider* sldr, int n)
+LauncherRankingsView::_SetSliderScaleLabel(BSlider* sldr, int n)
 {
 	BString label;
 	if(sldr==fLaunchesSl)
@@ -203,7 +212,7 @@ RankingSettingsView::_SetSliderScaleLabel(BSlider* sldr, int n)
 
 
 void
-RankingSettingsView::_SetSliderScale(BSlider* sldr, int n)
+LauncherRankingsView::_SetSliderScale(BSlider* sldr, int n)
 {
 	sldr->SetValue(n);
 	_SetSliderScaleLabel(sldr, n);
@@ -211,18 +220,27 @@ RankingSettingsView::_SetSliderScale(BSlider* sldr, int n)
 
 
 void
-RankingSettingsView::SetSliderValues(engine_prefs& prefs)
+LauncherRankingsView::_SetSlidersChanged(bool changed)
+{
+	fSlidersChanged = changed;
+	fSetB->SetEnabled(changed);
+}
+
+
+void
+LauncherRankingsView::SetSliderValues(scale_settings& prefs)
 {
 	_SetSliderScale(fLaunchesSl, prefs.launches_scale);
 	_SetSliderScale(fFirstSl, prefs.first_launch_scale);
 	_SetSliderScale(fLastSl, prefs.last_launch_scale);
 	_SetSliderScale(fIntervalSl, prefs.interval_scale);
 	_SetSliderScale(fRuntimeSl, prefs.total_run_time_scale);
+	_SetSlidersChanged(false);
 }
 
 
 void
-RankingSettingsView::GetSliderValues(engine_prefs& prefs)
+LauncherRankingsView::GetSliderValues(scale_settings& prefs)
 {
 	prefs.launches_scale = fLaunchesSl->Value();
 	prefs.first_launch_scale = fFirstSl->Value();
@@ -233,7 +251,7 @@ RankingSettingsView::GetSliderValues(engine_prefs& prefs)
 
 
 BSize
-RankingSettingsView::GetMinSize()
+LauncherRankingsView::GetMinSize()
 {
 	BSize size(B_SIZE_UNSET, B_SIZE_UNSET);
 	size.width = MinSize().width + 10;

@@ -1,5 +1,5 @@
 /* engine_constants.h
- * Copyright 2010 Brian Hill
+ * Copyright 2011 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #ifndef EE_CONSTANTS_H
@@ -15,23 +15,6 @@
 #define e_settings_app_dir "Applications"
 //Engine settings file
 #define ee_settings_file "engine_settings"
-
-//XML Text
-#define EE_XMLTEXT_ROOT_NAME "einsteinium_engine"
-#define EE_XMLTEXT_CHILD_NAME_INCLUSION "list_inclusion"
-#define EE_XMLTEXT_PROPERTY_INCLUSION_DEFAULT "default"
-#define EE_XMLTEXT_VALUE_INCLUDE "include"
-#define EE_XMLTEXT_VALUE_PROMPT "prompt"
-#define EE_XMLTEXT_VALUE_EXCLUDE "exclude"
-#define EE_XMLTEXT_CHILD_NAME_RANK "rank_scales"
-#define EE_XMLTEXT_PROPERTY_LAUNCHES "launches"
-#define EE_XMLTEXT_PROPERTY_FIRSTLAUNCH "first_launch"
-#define EE_XMLTEXT_PROPERTY_LASTLAUNCH "last_launch"
-#define EE_XMLTEXT_PROPERTY_INTERVAL "interval"
-#define EE_XMLTEXT_PROPERTY_RUNTIME "run_time"
-#define EE_XMLTEXT_CHILD_NAME_DESKBAR "deskbar"
-#define EE_XMLTEXT_PROPERTY_SHOW "show"
-#define EE_XMLTEXT_PROPERTY_COUNT "count"
 
 //Attribute names
 #define ATTR_SESSION_NAME "EIN:SESSION"
@@ -56,19 +39,7 @@
 #define PATH_HOME_BIN "/boot/home/config/bin"
 #define PATH_HOME_TRACKER_ADDONS "/boot/home/config/add-ons/Tracker"
 
-//Defaults
-#define DEFAULTVALUE_LAUNCHES 1
-// TODO add more defaults
-
-
-//Indexes
-enum scales_index
-{	LAUNCH_INDEX=0,
-	FIRST_INDEX,
-	LAST_INDEX,
-	INTERVAL_INDEX,
-	RUNTIME_INDEX
-};
+//Quartile array indexes
 enum quartile_indexes
 {	Q_FIRST_LAUNCH_INDEX=0,
 	Q_LAST_LAUNCH_INDEX=5,

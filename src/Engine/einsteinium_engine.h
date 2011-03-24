@@ -10,7 +10,6 @@
 #include <Deskbar.h>
 #include "AppStats.h"
 #include "AppAttrFile.h"
-#include "EESettingsFile.h"
 #include "engine_constants.h"
 #include "EngineSubscriber.h"
 #include "methods.h"
@@ -43,7 +42,6 @@ public:
 	const time_t	GetSession() { return fEngineSession; }
 private:
 	BPath			fSettingsDirPath;
-	EESettingsFile	*fSettingsFile;
 	bool			fWatchingRoster;//will be true when roster is being watched
 //	BMessageRunner	*fQuartileRunner;
 	const time_t	fEngineSession;//current session number

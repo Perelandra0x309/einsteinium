@@ -74,9 +74,8 @@ ELShelfView::AttachedToWindow()
 
 	_BuildMenu(NULL);
 
-	// TODO make seperate Launcher settings file
 	//Initialize the settings file object and check to see if it instatiated correctly
-	fSettingsFile = new EESettingsFile();
+	fSettingsFile = new LauncherSettingsFile(this);
 	status_t result = fSettingsFile->CheckStatus();
 	if(result!=B_OK){
 		printf("Error creating Einsteinium Launcher settings file.  Cannot continue.\n");
@@ -85,19 +84,14 @@ ELShelfView::AttachedToWindow()
 		return;
 	}
 
-	if (!be_roster->IsRunning(e_engine_sig)) {
+	if (!be_roster->IsRunning(einsteinium_engine_sig)) {
 		// TODO- display warning?
 		_Quit();
 		return;
 	}
 
 	// Subscribe to the Einsteinium Engine
-	// TODO get rid of dummyBool
-	bool dummyBool;
-	fSettingsFile->GetDeskbarSettings(dummyBool, fItemCount);
-	const int *scales = fSettingsFile->GetScales();
-	_SubscribeToEngine(fItemCount, scales[LAUNCH_INDEX], scales[FIRST_INDEX],
-						scales[LAST_INDEX], scales[INTERVAL_INDEX], scales[RUNTIME_INDEX]);
+	_Subscribe();
 
 	Invalidate();
 }
@@ -168,6 +162,10 @@ ELShelfView::MessageReceived(BMessage* msg)
 			_Quit();
 			break;
 		}
+		// Settings file was updated by an external application
+		case EL_SETTINGS_FILE_CHANGED_EXTERNALLY: {
+			_Subscribe();
+			break; }
 		default:
 			BView::MessageReceived(msg);
 	}
@@ -243,6 +241,17 @@ ELShelfView::_Quit()
 {
 	BDeskbar deskbar;
 	deskbar.RemoveItem(EL_SHELFVIEW_NAME);
+}
+
+
+void
+ELShelfView::_Subscribe()
+{
+	// Subscribe to the Einsteinium Engine.  If already subscribed, this will update the settings
+	fItemCount = fSettingsFile->GetDeskbarCount();
+	const int *scales = fSettingsFile->GetScales();
+	_SubscribeToEngine(fItemCount, scales[LAUNCH_INDEX], scales[FIRST_INDEX],
+						scales[LAST_INDEX], scales[INTERVAL_INDEX], scales[RUNTIME_INDEX]);
 }
 
 

@@ -1,18 +1,21 @@
-/*prefsWindow.cpp
-	Create the main window, restore and save settings
-*/
+/* prefsWindow.cpp
+ * Copyright 2011 Brian Hill
+ * All rights reserved. Distributed under the terms of the BSD License.
+ */
 #include "prefsWindow.h"
 
 prefsWindow::prefsWindow(BRect size)
 	:
-	BWindow(size, "Einsteinium Preferences", B_TITLED_WINDOW, B_NOT_ZOOMABLE)
+	BWindow(size, "Einsteinium Preferences", B_TITLED_WINDOW, B_NOT_ZOOMABLE),
+	fLauncherSettings(NULL)
 {
 	//Defaults
-	fEnginePrefs.launches_scale = 5;
-	fEnginePrefs.first_launch_scale = 5;
-	fEnginePrefs.last_launch_scale = 5;
-	fEnginePrefs.interval_scale = 5;
-	fEnginePrefs.total_run_time_scale = 5;
+	// TODO use defaults
+	fScales.launches_scale = 1;
+	fScales.first_launch_scale = 1;
+	fScales.last_launch_scale = 1;
+	fScales.interval_scale = 1;
+	fScales.total_run_time_scale = 1;
 
 	Lock();
 	BRect viewRect(Bounds());
@@ -26,19 +29,24 @@ prefsWindow::prefsWindow(BRect size)
 	//Daemon settings
 	fDaemonBLI = new BitmapListItem(e_daemon_sig, "Daemon Settings");
 	fPrefsListView->AddItem(fDaemonBLI);
-	fAppLaunchSI = new BStringItem("    App Relaunch");
-	fPrefsListView->AddItem(fAppLaunchSI);
+	fDAppLaunchSI = new BStringItem("    App Relaunch");
+	fPrefsListView->AddItem(fDAppLaunchSI);
 	//Engine settings
 	fEngineBLI = new BitmapListItem(e_engine_sig, "Engine Settings");
 	fPrefsListView->AddItem(fEngineBLI);
-	fAttrSI = new BStringItem("    List Inclusion");
-	fPrefsListView->AddItem(fAttrSI);
-	fRankSI = new BStringItem("    App Rankings");
-	fPrefsListView->AddItem(fRankSI);
-	fDeskbarSI = new BStringItem("    Deskbar Menu");
-	fPrefsListView->AddItem(fDeskbarSI);
-	fMaintSI = new BStringItem("    Maintenance");
-	fPrefsListView->AddItem(fMaintSI);
+	fEMaintSI = new BStringItem("    Maintenance");
+	fPrefsListView->AddItem(fEMaintSI);
+	//Launcher settings
+	fLauncherBLI = new BitmapListItem(e_launcher_sig, "Launcher Settings");
+	fPrefsListView->AddItem(fLauncherBLI);
+	fLDeskbarSI = new BStringItem("    Deskbar Menu");
+	fPrefsListView->AddItem(fLDeskbarSI);
+	fLRankSI = new BStringItem("    App Rankings");
+	fPrefsListView->AddItem(fLRankSI);
+	fLExclusionsSI = new BStringItem("    App Exclusions");
+// TODO impliment exclusions
+//	fPrefsListView->AddItem(fLExclusionsSI);
+
 
 	BFont font;
 	fPrefsListView->GetFont(&font);
@@ -65,18 +73,18 @@ prefsWindow::prefsWindow(BRect size)
 	fAppLaunchView = new RelaunchSettingsView(viewRect);
 	fMainView->AddChild(fAppLaunchView);
 	fAppLaunchView->Hide();
-	//Recent Apps ranking prefs view
-	fRankingView = new RankingSettingsView(viewRect);
-	fMainView->AddChild(fRankingView);
-	fRankingView->Hide();
-	//Attribute settings
-	fAttrView = new AttrSettingsView(viewRect);
-	fMainView->AddChild(fAttrView);
-	fAttrView->Hide();
+	//Launcher ranking settings
+	fLRankingsView = new LauncherRankingsView(viewRect);
+	fMainView->AddChild(fLRankingsView);
+	fLRankingsView->Hide();
+	//Launcher exclusions settings
+	fLExclusionsView = new LauncherExclusionsView(viewRect);
+	fMainView->AddChild(fLExclusionsView);
+	fLExclusionsView->Hide();
 	//Deskbar Settings View
-	fDeskbarView = new DeskbarSettingsView(viewRect);
-	fMainView->AddChild(fDeskbarView);
-	fDeskbarView->Hide();
+	fLDeskbarView = new LauncherDeskbarView(viewRect);
+	fMainView->AddChild(fLDeskbarView);
+	fLDeskbarView->Hide();
 	//Engine Maintenance View
 	fMaintenanceView = new EMaintenanceView(viewRect);
 	fMainView->AddChild(fMaintenanceView);
@@ -90,10 +98,10 @@ prefsWindow::prefsWindow(BRect size)
 	BSize minSize = fAppLaunchView->GetMinSize();
 	minHeight = minSize.height;
 	minWidth = minSize.width;
-	minSize = fRankingView->GetMinSize();
+	minSize = fLRankingsView->GetMinSize();
 	minHeight = max_c(minHeight, minSize.height);
 	minWidth = max_c(minWidth, minSize.width);
-	minSize = fAttrView->GetMinSize();
+	minSize = fLExclusionsView->GetMinSize();
 	minHeight = max_c(minHeight, minSize.height);
 	minWidth = max_c(minWidth, minSize.width);
 	float finalMinWidth = fPrefsListView->Frame().right + minWidth + 10;
@@ -102,21 +110,30 @@ prefsWindow::prefsWindow(BRect size)
 	ResizeTo(finalMinWidth, finalMinHeight);
 
 	//Settings
-	_ReadSettings();
+	fLauncherSettings = new LauncherSettingsFile(this);
+	_ReadAllSettings();
+
+	//File Panel
+	fAppFilter = new AppRefFilter();
+	fAppsPanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL, B_FILE_NODE, false, NULL, fAppFilter);
+
 	Unlock();
 	Show();
 }
 
 
-/*prefsWindow::~prefsWindow()
+prefsWindow::~prefsWindow()
 {
-}*/
+	delete fLauncherSettings;
+	delete fAppsPanel;
+	delete fAppFilter;
+}
 
 
 bool
 prefsWindow::QuitRequested()
 {
-	_StoreSettings();
+//	_StoreSettings();
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return(true);
 }
@@ -143,16 +160,16 @@ prefsWindow::MessageReceived(BMessage* msg)
 			else {
 				//Item selected
 				BStringItem *item = (BStringItem*)fPrefsListView->ItemAt(index);
-				if(item == fAppLaunchSI)
+				if(item == fDAppLaunchSI)
 					fCurrentView = fAppLaunchView;
-				else if(item == fRankSI)
-					fCurrentView = fRankingView;
-				else if(item == fAttrSI)
-					fCurrentView = fAttrView;
-				else if(item == fDeskbarSI)
-					fCurrentView = fDeskbarView;
-				else if(item == fMaintSI)
+				else if(item == fEMaintSI)
 					fCurrentView = fMaintenanceView;
+				else if(item == fLRankSI)
+					fCurrentView = fLRankingsView;
+				else if(item == fLExclusionsSI)
+					fCurrentView = fLExclusionsView;
+				else if(item == fLDeskbarSI)
+					fCurrentView = fLDeskbarView;
 				else
 					// If one of the BitmapListItems was selected, selected next ListItem
 					fPrefsListView->Select(index+1);
@@ -161,6 +178,7 @@ prefsWindow::MessageReceived(BMessage* msg)
 			fCurrentView->Show();
 			Unlock();
 			break; }
+		// TODO revisit these
 		case E_RECALC_SCORES: {
 			BMessenger messenger(e_engine_sig);
 			BMessage msg(E_UPDATE_SCORES);
@@ -176,84 +194,73 @@ prefsWindow::MessageReceived(BMessage* msg)
 			BMessage msg(E_RESCAN_DATA_FILES);
 			messenger.SendMessage(&msg);
 			break; }
+		// Deskbar settings changed
+		case EL_DESKBAR_CHANGED: {
+			_WriteLauncherDeskbarSettings();
+			break;
+		}
 		// Save rank slider settings and recalculate scores
-		case SAVE_RANKING: {
-			_WriteEngineSettings();
+		case EL_SAVE_RANKING: {
+			_WriteLauncherScaleSettings();
+			fLRankingsView->MessageReceived(msg);
 			// TODO detect if engine is running first
 			BMessenger messenger(e_engine_sig);
+			// TODO change to be specific for the launcher
 			BMessage msg(E_UPDATE_SCORES);
-			messenger.SendMessage(&msg);
+//			messenger.SendMessage(&msg);
+			break; }
+		// Save exclusion settings
+		case EL_LIST_INCLUSION_CHANGED: {
+			_WriteLauncherListInclusionSetting();
+			break; }
+		// Add exclusion to list
+		case EL_ADD_EXCLUSION: {
+			BMessage addmsg(EL_ADD_EXCLUSION_REF);
+			fAppsPanel->SetMessage(&addmsg);
+			fAppsPanel->SetTarget(this);
+			fAppsPanel->Show();
+			break; }
+		case EL_ADD_EXCLUSION_REF: {
+			bool success = fLExclusionsView->AddExclusion(msg);
+			if(success)
+				_WriteLauncherExclusions();
+			break; }
+		case EL_REMOVE_EXCLUSION: {
+			bool success = fLExclusionsView->RemoveSelectedExclusion();
+			if(success)
+				_WriteLauncherExclusions();
+			break; }
+		case EL_EXCLUSION_SELECTION_CHANGED: {
+			fLExclusionsView->UpdateSelectedItem();
+			break; }
+		// Settings file was updated by an external application
+		case EL_SETTINGS_FILE_CHANGED_EXTERNALLY: {
+			_ReadLauncherSettings();
 			break; }
 		default: {
 			fAppLaunchView->MessageReceived(msg);
-			fRankingView->MessageReceived(msg);
-			fAttrView->MessageReceived(msg);
-			fDeskbarView->MessageReceived(msg);
+			fLRankingsView->MessageReceived(msg);
+//			fLDeskbarView->MessageReceived(msg);
+			BWindow::MessageReceived(msg);
 			break; }
 	}
 }
 
-
+/*
 void
 prefsWindow::_StoreSettings()
 {
-	_WriteEngineSettings();
 //	_WriteDaemonSettings();
-}
+}*/
 
 
 void
-prefsWindow::_ReadSettings()
+prefsWindow::_ReadAllSettings()
 {
 	Lock();
-	_ReadEngineSettings();
 //	_ReadDaemonSettings();
-	// TODO watch settings files for updates
-	// TODO create one instance of settings files to share among views?
+	_ReadLauncherSettings();
 	Unlock();
-}
-
-
-void
-prefsWindow::_ReadEngineSettings()
-{
-	EESettingsFile *eeSettings = new EESettingsFile();
-	int *scales = eeSettings->GetScales();
-	fEnginePrefs.launches_scale = scales[LAUNCH_INDEX];
-	fEnginePrefs.first_launch_scale = scales[FIRST_INDEX];
-	fEnginePrefs.last_launch_scale = scales[LAST_INDEX];
-	fEnginePrefs.interval_scale = scales[INTERVAL_INDEX];
-	fEnginePrefs.total_run_time_scale = scales[RUNTIME_INDEX];
-	fRankingView->SetSliderValues(fEnginePrefs);
-
-	// Read setting for action when new application is detected
-	fAttrView->SetLinkInclusionDefault(eeSettings->GetLinkInclusionDefaultValue());
-
-	// Deskbar settings
-	bool show;
-	int count;
-	eeSettings->GetDeskbarSettings(show, count);
-	fDeskbarView->SetDeskbarValues(show, count);
-
-	delete eeSettings;
-}
-
-
-void
-prefsWindow::_WriteEngineSettings()
-{
-	// Rank scale settings
-	fRankingView->GetSliderValues(fEnginePrefs);
-	EESettingsFile *eeSettings = new EESettingsFile();
-	int scales[5];
-	scales[LAUNCH_INDEX] = fEnginePrefs.launches_scale;
-	scales[FIRST_INDEX] = fEnginePrefs.first_launch_scale;
-	scales[LAST_INDEX] = fEnginePrefs.last_launch_scale;
-	scales[INTERVAL_INDEX] = fEnginePrefs.interval_scale;
-	scales[RUNTIME_INDEX] = fEnginePrefs.total_run_time_scale;
-	eeSettings->SaveScales(scales);
-
-	delete eeSettings;
 }
 
 
@@ -276,4 +283,66 @@ prefsWindow::_WriteEngineSettings()
 	archive.Write(xml_text.String(), xml_text.Length());
 	archive.Unset();*/
 //}
+
+void
+prefsWindow::_ReadLauncherSettings()
+{
+	int *scales = fLauncherSettings->GetScales();
+	fScales.launches_scale = scales[LAUNCH_INDEX];
+	fScales.first_launch_scale = scales[FIRST_INDEX];
+	fScales.last_launch_scale = scales[LAST_INDEX];
+	fScales.interval_scale = scales[INTERVAL_INDEX];
+	fScales.total_run_time_scale = scales[RUNTIME_INDEX];
+	fLRankingsView->SetSliderValues(fScales);
+
+	// Read setting for action when new application is detected
+	fLExclusionsView->SetLinkInclusionDefault(fLauncherSettings->GetLinkInclusionDefaultValue());
+
+	// Read excluded apps
+	BMessage exclusionsList = fLauncherSettings->GetExclusionsList();
+	if(exclusionsList.what == EL_MESSAGE_WHAT_EXCLUDED_APPS)
+		fLExclusionsView->PopulateExclusionsList(exclusionsList);
+
+	// Deskbar settings
+	fLDeskbarView->SetDeskbarCount(fLauncherSettings->GetDeskbarCount());
+}
+
+
+
+void
+prefsWindow::_WriteLauncherDeskbarSettings()
+{
+	fLauncherSettings->SaveDeskbarCount(fLDeskbarView->GetDeskbarCount());
+}
+
+void
+prefsWindow::_WriteLauncherScaleSettings()
+{
+	// Rank scale settings
+	fLRankingsView->GetSliderValues(fScales);
+	int scales[5];
+	scales[LAUNCH_INDEX] = fScales.launches_scale;
+	scales[FIRST_INDEX] = fScales.first_launch_scale;
+	scales[LAST_INDEX] = fScales.last_launch_scale;
+	scales[INTERVAL_INDEX] = fScales.interval_scale;
+	scales[RUNTIME_INDEX] = fScales.total_run_time_scale;
+	fLauncherSettings->SaveScales(scales);
+}
+
+
+void
+prefsWindow::_WriteLauncherListInclusionSetting()
+{
+	BString inclusionValue;
+	fLExclusionsView->GetLinkInclusionDefault(inclusionValue);
+	fLauncherSettings->SaveLinkInclusionDefaultValue(inclusionValue.String());
+}
+
+void
+prefsWindow::_WriteLauncherExclusions()
+{
+	BMessage exclusionsList(EL_MESSAGE_WHAT_EXCLUDED_APPS);
+	fLExclusionsView->GetExclusionsList(exclusionsList);
+	fLauncherSettings->SaveExclusionsList(exclusionsList);
+}
 

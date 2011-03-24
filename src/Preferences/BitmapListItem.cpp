@@ -1,5 +1,5 @@
 /* BitmapListItem.cpp
- * Copyright 2010 Brian Hill
+ * Copyright 2011 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "BitmapListItem.h"
@@ -8,7 +8,8 @@
 BitmapListItem::BitmapListItem(const uint8 *iconBits, BRect iconRect,
 					const color_space colorSpace, const char *text)
 	:
-	BStringItem(text)
+	BStringItem(text),
+	fIcon(NULL)
 {
 	fIcon = new BBitmap(iconRect, colorSpace);
 	fIcon->SetBits(iconBits, fIcon->BitsLength(), 0, colorSpace);
@@ -18,7 +19,8 @@ BitmapListItem::BitmapListItem(const uint8 *iconBits, BRect iconRect,
 
 BitmapListItem::BitmapListItem(const char *signature, const char *text)
 	:
-	BStringItem(text)
+	BStringItem(text),
+	fIcon(NULL)
 {
 	BEntry appEntry = GetEntryFromSig(signature);
 	if(appEntry.Exists())
@@ -30,7 +32,6 @@ BitmapListItem::BitmapListItem(const char *signature, const char *text)
 	}
 	else
 	{
-		fIcon = NULL;
 		fIconSize = 0;
 	}
 }

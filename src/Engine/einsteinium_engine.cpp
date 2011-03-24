@@ -41,16 +41,6 @@ einsteinium_engine::einsteinium_engine()//Einsteinium Engine Constructor
 		}
 	}
 
-	//Initialize the settings file object and check to see if it instatiated correctly
-	// TODO do we even use the settings file here?
-	fSettingsFile = new EESettingsFile();
-	status_t result = fSettingsFile->CheckStatus();
-	if(result!=B_OK){
-		printf("Error creating Einsteinium Engine settings file.  Cannot continue.\n");
-		be_app->PostMessage(B_QUIT_REQUESTED);
-			//Quit. Can we do anthything w/o settings?
-	}
-
 	// TODO Register the signature of the preferences application
 }
 
@@ -82,8 +72,6 @@ einsteinium_engine::QuitRequested()
 		DeleteList(sub->appStatsList, stats);
 	}
 	DeleteList(fSubscribersList, sub);
-
-	delete fSettingsFile;
 
 	printf("Einsteinium engine quitting.\n");
 	return BApplication::QuitRequested();
