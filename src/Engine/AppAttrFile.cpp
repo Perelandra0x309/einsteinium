@@ -1,5 +1,5 @@
 /* AppAttrFile.cpp
- * Copyright 2010 Brian Hill
+ * Copyright 2011 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "AppAttrFile.h"
@@ -16,7 +16,6 @@ AppAttrFile::AppAttrFile(const char *appSig, const BEntry *appEntry)
 	fNewSession(false),
 	fAppStats(),
 	fAppEntry(*appEntry),
-//	fIgnoreInLists(false),
 	fEngineCurrentSession(0)
 {
 	BPath appPath(appEntry), appAttrPath;
@@ -51,35 +50,10 @@ AppAttrFile::AppAttrFile(const char *appSig, const BEntry *appEntry)
 		fAppStats.app_filename.SetTo(appPath.Leaf());
 		fAppStats.app_path.SetTo(appPath.Path());
 
-		// Automatically ignore binary commands, preferences, tracker addons and system servers
-/*		if(fAppStats.app_path.FindFirst(PATH_SYSTEM_BIN) == 0 ||
-			fAppStats.app_path.FindFirst(PATH_SYSTEM_SERVERS) == 0 ||
-			fAppStats.app_path.FindFirst(PATH_SYSTEM_PREFERENCES) == 0 ||
-			fAppStats.app_path.FindFirst(PATH_SYSTEM_TRACKER_ADDONS) == 0 ||
-			fAppStats.app_path.FindFirst(PATH_COMMON_BIN) == 0 ||
-			fAppStats.app_path.FindFirst(PATH_COMMON_TRACKER_ADDONS) == 0 ||
-			fAppStats.app_path.FindFirst(PATH_HOME_BIN) == 0 ||
-			fAppStats.app_path.FindFirst(PATH_HOME_TRACKER_ADDONS) == 0 )
-		{
-			fIgnoreInLists = true;
-		}
-		else
-			// Ask if executable should be included in ranked lists
-		{
-			BString text("Einsteinium detected a new application, \"");
-			text.Append(appPath.Leaf());
-			text.Append("\".  Would you like this app to be included in ranking lists?");
-			BMessage *msg = new BMessage(E_SET_IGNORE_ATTR);
-			msg->AddString("app_signature", appSig);
-			(new BAlert("",text.String(), "Ignore", "Include"))->Go(new BInvoker(msg, be_app_messenger));
-				// BInvoker takes ownership of the message so don't delete it
-		}*/
-
 		fNewSession = true;
 		_WriteAttrValues();
 	}
 	// TODO if file exists, verify signature matches to catch applications with identical names
-
 
 	_InitData(newFile);
 }
@@ -93,7 +67,6 @@ AppAttrFile::AppAttrFile(const BEntry *attrEntry)
 	fAppStats(),
 	fAppEntry(),
 	fAppAttrEntry(*attrEntry),
-//	fIgnoreInLists(false),
 	fEngineCurrentSession(0)
 {
 	_InitData(false);
@@ -146,7 +119,6 @@ AppAttrFile::UpdateAppLaunched()
 			//update the time interval between the last two launches
 	fAppStats.last_launch = now;
 
-//	CalculateScore();
 	_WriteAttrValues();
 }
 
@@ -164,73 +136,8 @@ AppAttrFile::UpdateAppQuit()
 	if( (!fNewSession) && (fAppStats.last_launch!=0) )
 		fAppStats.total_run_time += (now - fAppStats.last_launch);
 
-//	CalculateScore();
 	_WriteAttrValues();
 }
-
-/*
-void
-AppAttrFile::CalculateScore()
-{
-	const int *scales = ((einsteinium_engine*)be_app)->GetScalesPtr();
-	int launch_scale=scales[0],
-		first_scale=scales[1],
-		last_scale=scales[2],
-		interval_scale=scales[3],
-		runtime_scale=scales[4];
-
-	const double *Quart = ((einsteinium_engine*)be_app)->GetQuartilesPtr();
-	float launch_val(0), first_launch_val(0), last_launch_val(0), last_interval_val(0),
-			total_run_time_val(0);
-	if( Quart!=NULL )
-	{	launch_val = _GetQuartileVal(Quart+Q_LAUNCHES_INDEX, fAppStats.launch_count);
-		first_launch_val = _GetQuartileVal(Quart+Q_FIRST_LAUNCH_INDEX, fAppStats.first_launch);
-		last_launch_val = _GetQuartileVal(Quart+Q_LAST_LAUNCH_INDEX, fAppStats.last_launch);
-		last_interval_val = _GetQuartileVal(Quart+Q_LAST_INTERVAL_INDEX, fAppStats.last_interval);
-		total_run_time_val = _GetQuartileVal(Quart+Q_TOTAL_RUN_TIME_INDEX, fAppStats.total_run_time);
-
-		int max_scale = 100000;
-		// If last interval is zero (only one launch) put quartile value at .5 so that this
-		// statistic does not adversly effect the score
-		if(fAppStats.last_interval == 0)
-			last_interval_val = .5;
-
-		fAppStats.score = int(  max_scale*(launch_val * launch_scale)
-					+ max_scale*(first_launch_val * first_scale)
-					+ max_scale*(last_launch_val * last_scale)
-					+ max_scale*((1 - last_interval_val) * interval_scale)
-						// Need to reverse interval scale, because longer intervals decrease the score
-						// TODO or do I change the sorting method to sort descending??
-					+ max_scale*(total_run_time_val * runtime_scale));
-
-	}
-	_WriteAttrValues();
-}*/
-
-/*
-// Calculate the quartile value of where d lies in the quartile range Q
-float
-AppAttrFile::_GetQuartileVal(const double *Q, double d)
-{//	printf("EIN: quartiles\n");
-//	printf("Q4: %f, Q3: %f, Q2: %f, Q1: %f, Q0: %f\n", Q[4], Q[3], Q[2], Q[1], Q[0]);
-	int index, index_offset = 0;
-	if(d >= Q[0] && d<Q[1]) { index = 0; }
-	else if(d >= Q[1] && d<Q[2]) { index = 1; }
-	else if(d >= Q[2] && d<Q[3]) { index = 2; }
-	else if(d >= Q[3] && d<Q[4]) { index = 3; }
-	else if(d == Q[4]) { return 1; }
-	// For values that lie outside the current quartile range
-	else if(d < Q[0]) { index = 0; }
-	else if(d > Q[4])
-	{	index = 4;
-		index_offset = 1;
-		// since there is no Q[5], index offset will modify the calculation below to
-		// use Q[3] and Q[4] to find the quartile value range
-	}
-	else { return .5; }
-
-	return (.25*index + .25*((d - Q[index])/(Q[index+1-index_offset] - Q[index-index_offset])));
-}*/
 
 
 void
@@ -238,17 +145,8 @@ AppAttrFile::RescanData()
 {
 	BPath appDataPath(&fAppDataEntry);
 	Edb_Rescan_Data(appDataPath.Path(), &fAppStats);
-//	CalculateScore();
 	_WriteAttrValues();
 }
-
-
-/*void
-AppAttrFile::SetIgnore(bool ignore)
-{
-	fIgnoreInLists = ignore;
-	WriteAttr(ATTR_IGNORE_NAME, B_BOOL_TYPE, 0, &fIgnoreInLists, sizeof(fIgnoreInLists));
-}*/
 
 
 void
@@ -287,14 +185,8 @@ AppAttrFile::_ReadAttrValues()
 	//Number of launches
 	if(GetAttrInfo(ATTR_LAUNCHES_NAME, &info) == B_NO_ERROR)
 	{	ReadAttr(ATTR_LAUNCHES_NAME, B_INT32_TYPE, 0, &fAppStats.launch_count, sizeof(uint32)); }
-	//Score
-//	if(GetAttrInfo(ATTR_SCORE_NAME, &info) == B_NO_ERROR)
-//	{	ReadAttr(ATTR_SCORE_NAME, B_INT32_TYPE, 0, &fAppStats.score, sizeof(int)); }
 	//Checksum
 	//Class (app_sig, mimeype)
-	//Ignore (default, not app specific)
-//	if(GetAttrInfo(ATTR_IGNORE_NAME, &info) == B_NO_ERROR)
-//	{	ReadAttr(ATTR_IGNORE_NAME, B_BOOL_TYPE, 0, &fIgnoreInLists, sizeof(fIgnoreInLists)); }
 	//Owner?? this might need to be app specific
 	//Date last activated
 	if(GetAttrInfo(ATTR_LAST_LAUNCH_NAME, &info) == B_NO_ERROR)
@@ -343,12 +235,8 @@ AppAttrFile::_WriteAttrValues()
 	//Number of launches
 	WriteAttr(ATTR_LAUNCHES_NAME, B_INT32_TYPE, 0, &fAppStats.launch_count,
 		sizeof(fAppStats.launch_count));
-	//Score
-//	WriteAttr(ATTR_SCORE_NAME, B_INT32_TYPE, 0, &fAppStats.score, sizeof(fAppStats.score));
 	//Checksum
 	//Class (app_sig, mimeype)
-	//Ignore (default, not app specific)
-//s	WriteAttr(ATTR_IGNORE_NAME, B_BOOL_TYPE, 0, &fIgnoreInLists, sizeof(fIgnoreInLists));
 	//Owner?? this might need to be app specific
 	//Date last activated
 	WriteAttr(ATTR_LAST_LAUNCH_NAME, B_INT32_TYPE, 0, &fAppStats.last_launch,

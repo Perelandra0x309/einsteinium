@@ -52,14 +52,12 @@ enum quartile_indexes
 //Messages
 enum engine_messages
 {	E_PRINT_RANKING_APPS='Epra',
+	E_PRINT_RECENT_APPS='Eprc',
 	E_REPLY_RANKING_APPS='Erra',
 	E_RANKING_APPS_REPLY='Erar',
-	E_PRINT_RECENT_APPS='Eprc',
-	E_REPLY_RECENT_APPS='Errc',
-	E_RECENT_APPS_REPLY='Ercr',
 	E_UPDATE_QUARTILES='Eupq',
 	E_RESCAN_DATA_FILES,
-	E_UPDATE_SCORES,
+//	E_UPDATE_SCORES,
 	E_TEST_MODE_INIT
 };
 
