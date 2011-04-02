@@ -224,6 +224,7 @@ LauncherRankingsView::_SetSlidersChanged(bool changed)
 {
 	fSlidersChanged = changed;
 	fSetB->SetEnabled(changed);
+	// TODO disable save button if all values of sliders are 0
 }
 
 

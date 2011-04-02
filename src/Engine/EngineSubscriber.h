@@ -55,6 +55,8 @@ protected:
 	void					_SubscribeToEngine(int itemCount, int numberOfLaunchesScale, int firstLaunchScale,
 							int latestLaunchScale, int lastIntervalScale, int totalRuntimeScale);
 	void					_UnsubscribeFromEngine();
+	bool					_IsEngineRunning();
+	status_t				_LaunchEngine();
 
 	// pure virtual functions- these need to be implemented by your class
 	virtual void			_SubscribeFailed() = 0;

@@ -6,8 +6,7 @@
 
 LauncherApp::LauncherApp()
 	:
-	BApplication(e_launcher_sig),
-	fShelfViewId(0)
+	BApplication(e_launcher_sig)
 {
 
 }
@@ -16,7 +15,6 @@ LauncherApp::LauncherApp()
 void
 LauncherApp::ReadyToRun()
 {
-	// TODO check if there is anlready an instance in the deskbar
 	// Add the shelf view
 	_ShowShelfView(true);
 
@@ -30,16 +28,11 @@ void
 LauncherApp::_ShowShelfView(bool showShelfView)
 {
 	BDeskbar deskbar;
-	if(fShelfViewId)// shelf view is currently showing
+	// Don't add another ELShelfView to the Deskbar if one is already attached
+	if(showShelfView && !deskbar.HasItem(EL_SHELFVIEW_NAME))
 	{
-		deskbar.RemoveItem(fShelfViewId);
-		fShelfViewId = 0;
-	}
-	if(showShelfView)
-	{
-		// TODO detect if there is already an instance running in the deskbar
 		BView *shelfView = new ELShelfView();
-		deskbar.AddItem(shelfView, &fShelfViewId);
+		deskbar.AddItem(shelfView);
 		delete shelfView;
 	}
 }

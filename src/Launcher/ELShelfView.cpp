@@ -11,7 +11,10 @@ ELShelfView::ELShelfView()
 		B_WILL_DRAW/* | B_PULSE_NEEDED*/),
 	fIcon(NULL),
 	fMenu(NULL),
-	fItemCount(0)
+	fItemCount(0),
+	fCheckEngineRunner(NULL),
+	fEngineAlert(NULL),
+	fEngineAlertIsShowing(false)
 {
 	app_info info;
 	be_app->GetAppInfo(&info);
@@ -43,7 +46,10 @@ ELShelfView::ELShelfView(BMessage *message)
 	EngineSubscriber(),
 	fIcon(NULL),
 	fMenu(NULL),
-	fItemCount(0)
+	fItemCount(0),
+	fCheckEngineRunner(NULL),
+	fEngineAlert(NULL),
+	fEngineAlertIsShowing(false)
 {
 	BMessage iconArchive;
 	status_t result = message->FindMessage("fIconArchive", &iconArchive);
@@ -84,14 +90,22 @@ ELShelfView::AttachedToWindow()
 		return;
 	}
 
-	if (!be_roster->IsRunning(einsteinium_engine_sig)) {
-		// TODO- display warning?
-		_Quit();
-		return;
-	}
+	// Display warning if the Engine is not running
+	bool engineIsRunning = _CheckEngineStatus(true);
 
 	// Subscribe to the Einsteinium Engine
-	_Subscribe();
+	if(engineIsRunning)
+		_Subscribe();
+
+	// Setup the message runner to periodically check the engine running status every 120 seconds
+	fCheckEngineRunner = new BMessageRunner(this, new BMessage(EL_CHECK_ENGINE_STATUS), 120*1e6);
+	status_t status = fCheckEngineRunner->InitCheck();
+	if(status != B_OK)
+	{
+		printf("ELSV: Error creating Check Engine Message Runner: %s\n", strerror(status));
+		delete fCheckEngineRunner;
+		fCheckEngineRunner = NULL;
+	}
 
 	Invalidate();
 }
@@ -100,6 +114,17 @@ ELShelfView::AttachedToWindow()
 void
 ELShelfView::DetachedFromWindow()
 {
+	// Stop the message runner
+	delete fCheckEngineRunner;
+	fCheckEngineRunner = NULL;
+
+	// If the Engine warning alert is showing, close it
+	if(fEngineAlert)
+	{
+		fEngineAlert->PostMessage(B_QUIT_REQUESTED);
+		fEngineAlert = NULL;
+	}
+
 	// Unsubscribe from the Einsteinium Engine
 	_UnsubscribeFromEngine();
 }
@@ -147,6 +172,22 @@ ELShelfView::MessageReceived(BMessage* msg)
 {
 	switch(msg->what)
 	{
+		case EL_CHECK_ENGINE_STATUS: {
+			_CheckEngineStatus(true);
+			break;
+		}
+		case EL_START_ENGINE_ALERT: {
+			int32 selection;
+			msg->FindInt32("which", &selection);
+			if(selection)
+			{
+				_LaunchEngine();
+				_Subscribe();
+			}
+			fEngineAlert = NULL;
+			fEngineAlertIsShowing = false;
+			break;
+		}
 		case EL_SHELFVIEW_OPENPREFS: {
 			be_roster->Launch("application/x-vnd.Einsteinium_Preferences");
 			break;
@@ -158,7 +199,6 @@ ELShelfView::MessageReceived(BMessage* msg)
 			break;
 		}
 		case EL_SHELFVIEW_MENU_QUIT: {
-			// TODO confirm quit
 			_Quit();
 			break;
 		}
@@ -170,14 +210,6 @@ ELShelfView::MessageReceived(BMessage* msg)
 			BView::MessageReceived(msg);
 	}
 }
-
-
-/*
-void
-ELShelfView::Pulse()
-{
-	// TODO: Check if einsteinium engine is still running
-}*/
 
 
 void
@@ -193,10 +225,7 @@ ELShelfView::MouseDown(BPoint pos)
 void
 ELShelfView::_BuildMenu(BMessage *message)
 {
-	if(fMenu)
-		delete fMenu;
-		// TODO does this delete all children as well?
-
+	delete fMenu;
 	fMenu = new BPopUpMenu(B_EMPTY_STRING, false, false);
 	fMenu->SetFont(be_plain_font);
 
@@ -233,6 +262,27 @@ ELShelfView::_BuildMenu(BMessage *message)
 		if (item && (msg = item->Message()) != NULL)
 			item->SetTarget(this);
 	}
+}
+
+
+bool
+ELShelfView::_CheckEngineStatus(bool showWarning = false)
+{
+	bool engineIsRunning = _IsEngineRunning();
+
+	// Show the warning if the engine is not running, the applications wants the warning shown,
+	// and the warning is not already showing
+	if (!engineIsRunning && showWarning && !fEngineAlertIsShowing) {
+		fEngineAlert = new BAlert("StartEngine",
+			"The Einsteinium Launcher has detected that the Engine is not running.  Would you like to start the Engine?",
+			"No", "Yes", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		// Set the feel to FLOATING so that the alert does not block use of the Deskbar while showing
+		fEngineAlert->SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
+		BMessage *runMessage = new BMessage(EL_START_ENGINE_ALERT);
+		fEngineAlert->Go(new BInvoker(runMessage, this));
+		fEngineAlertIsShowing = true;
+	}
+	return engineIsRunning;
 }
 
 

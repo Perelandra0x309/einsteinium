@@ -75,11 +75,27 @@ EngineSubscriber::_UnsubscribeFromEngine()
 	if (be_roster->IsRunning(einsteinium_engine_sig))
 	{
 		BMessage unsubscribeMsg(E_UNSUBSCRIBE_RANKED_APPS);
-		unsubscribeMsg.AddInt32("uniqueID", fUniqueID);
+		unsubscribeMsg.AddInt32(E_SUBSCRIPTION_UNIQUEID, fUniqueID);
 		BMessenger EsMessenger(einsteinium_engine_sig);
 		EsMessenger.SendMessage(&unsubscribeMsg, fHandler);
 	}
 }
+
+
+bool
+EngineSubscriber::_IsEngineRunning()
+{
+	return be_roster->IsRunning(einsteinium_engine_sig);
+}
+
+
+status_t
+EngineSubscriber::_LaunchEngine()
+{
+	return be_roster->Launch(einsteinium_engine_sig);
+}
+
+// TODO _QuitEngine()
 
 
 void
@@ -102,7 +118,6 @@ EngineSubscriber::_ProcessEngineMessage(BMessage *message)
 			_UpdateReceived(message);
 			break;
 		}
-		// TODO Add a message for when the engine quits
 	}
 }
 

@@ -15,7 +15,6 @@ public:
 					LauncherApp();
 	virtual void	ReadyToRun();
 private:
-	int32			fShelfViewId;
 	void			_ShowShelfView(bool showShelfView);
 };
 
