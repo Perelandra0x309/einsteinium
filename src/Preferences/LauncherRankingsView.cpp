@@ -13,7 +13,7 @@ rgb_color kBarColor = {205,205,255,0};
 
 LauncherRankingsView::LauncherRankingsView(BRect size)
 	:
-	BView(size, "Recent Apps Rank", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
+	BView(size, "Recent Apps Rank", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS)
 {
 	SetViewColor(bg_color);
 
@@ -59,7 +59,7 @@ LauncherRankingsView::LauncherRankingsView(BRect size)
 	runtimeBox->AddChild(fRuntimeSl);
 	fSetB = new BButton("Set Button", "Save and Recalculate Scores", new BMessage(EL_SAVE_RANKING));
 	fSlidersBox = new BBox("Rank Sliders");
-	fSlidersBox->SetLabel("Rank Weights");
+	fSlidersBox->SetLabel("Application Ranking Weights");
 	fSlidersBox->AddChild(BGroupLayoutBuilder(B_VERTICAL, 5)
 		.AddGlue()
 		.Add(launchesBox)
@@ -86,9 +86,9 @@ LauncherRankingsView::LauncherRankingsView(BRect size)
 	_SetSlidersChanged(false);
 }
 
-
+/*
 LauncherRankingsView::~LauncherRankingsView()
-{	}
+{	}*/
 
 
 void
@@ -117,7 +117,24 @@ LauncherRankingsView::MessageReceived(BMessage* msg)
 		case EL_SAVE_RANKING: {
 			_SetSlidersChanged(false);
 			break; }
+		default: {
+			BView::MessageReceived(msg);
+			break; }
 	}
+}
+
+
+void
+LauncherRankingsView::FrameResized(float width, float height)
+{
+	fLaunchesSl->Invalidate();
+	fFirstSl->Invalidate();
+	fLastSl->Invalidate();
+	fIntervalSl->Invalidate();
+	fRuntimeSl->Invalidate();
+	fSetB->Invalidate();
+	fSlidersBox->Invalidate();
+	BView::FrameResized(width, height);
 }
 
 
@@ -224,7 +241,13 @@ LauncherRankingsView::_SetSlidersChanged(bool changed)
 {
 	fSlidersChanged = changed;
 	fSetB->SetEnabled(changed);
-	// TODO disable save button if all values of sliders are 0
+	if(changed)
+	{
+		// Disable the button if all slider values are 0
+		if( fLaunchesSl->Value()==0 && fFirstSl->Value()==0 && fLastSl->Value()==0
+			&& fIntervalSl->Value()==0 && fRuntimeSl->Value()==0 )
+			fSetB->SetEnabled(false);
+	}
 }
 
 

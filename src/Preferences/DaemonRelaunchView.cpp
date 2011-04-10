@@ -1,16 +1,17 @@
-/* RealunchSettingsView.cpp
- * Copyright 2010 Brian Hill
+/* DaemonRelaunchView.cpp
+ * Copyright 2011 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
-#include "RelaunchSettingsView.h"
+#include "DaemonRelaunchView.h"
 
 /*	Definitions and objects for the view containing settings for relaunching
 	apps with the daemon
 */
 
-RelaunchSettingsView::RelaunchSettingsView(BRect size)
+DaemonRelaunchView::DaemonRelaunchView(BRect size)
 	:
-	BView(size, "Auto-Relaunch", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
+	BView(size, "Auto-Relaunch", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS),
+	fSelectedItem(NULL)
 {
 	SetViewColor(bg_color);
 	BRect viewRect;
@@ -23,7 +24,7 @@ RelaunchSettingsView::RelaunchSettingsView(BRect size)
 	fRemoveAppB->SetEnabled(false);
 	fRelaunchBox = new BBox("Application Relaunch Behavior");
 	fRelaunchBox->SetLabel("Application Relaunch Settings");
-
+	// TODO Can the radio button labels be color coded to match the list view?
 	fAutoRelaunchRB = new BRadioButton("Auto Relaunch",
 						"Automatically relaunch this application when it quits",
 						new BMessage(ED_AUTO_RELAUNCH_CHANGED));
@@ -73,7 +74,7 @@ RelaunchSettingsView::RelaunchSettingsView(BRect size)
 }
 
 
-RelaunchSettingsView::~RelaunchSettingsView()
+DaemonRelaunchView::~DaemonRelaunchView()
 {	//Remove List Items
 	RelaunchAppItem *Item;
 	int32 count;
@@ -88,7 +89,7 @@ RelaunchSettingsView::~RelaunchSettingsView()
 
 
 void
-RelaunchSettingsView::MessageReceived(BMessage* msg)
+DaemonRelaunchView::MessageReceived(BMessage* msg)
 {	switch(msg->what)
 	{	case ED_RELAPP_SELECTION_CHANGED: {
 			Window()->Lock();
@@ -153,13 +154,27 @@ RelaunchSettingsView::MessageReceived(BMessage* msg)
 									fSelectedItem->fSettings->relaunchAction);
 			}
 			break; }
-		default: { break; }
+		default: {
+			BView::MessageReceived(msg);
+			break; }
 	}
 	return;
 }
 
 
-/*void RelaunchSettingsView::WriteSettings()
+void
+DaemonRelaunchView::FrameResized(float width, float height)
+{
+	fAppsLView->Invalidate();
+	fAppsSView->Invalidate();
+	fAddAppB->Invalidate();
+	fRemoveAppB->Invalidate();
+	fRelaunchBox->Invalidate();
+	BView::FrameResized(width, height);
+}
+
+
+/*void DaemonRelaunchView::WriteSettings()
 {
 	// if no changed were made no need to update settings file
 	if(!settingsChanged) return;
@@ -189,7 +204,7 @@ RelaunchSettingsView::MessageReceived(BMessage* msg)
 
 
 void
-RelaunchSettingsView::ReadSettings()
+DaemonRelaunchView::ReadSettings()
 {
 	// Add default settings item
 	fDefaultSettings->relaunchAction = fDaemonSettings->GetDefaultRelaunchAction();
@@ -210,7 +225,7 @@ RelaunchSettingsView::ReadSettings()
 
 
 BSize
-RelaunchSettingsView::GetMinSize()
+DaemonRelaunchView::GetMinSize()
 {
 	BSize size(B_SIZE_UNSET, B_SIZE_UNSET);
 	size.width = fPromptRelaunchRB->MinSize().width + 20;
@@ -221,7 +236,7 @@ RelaunchSettingsView::GetMinSize()
 
 
 void
-RelaunchSettingsView::_SaveSelectedItemSettings()//save user configureable settings
+DaemonRelaunchView::_SaveSelectedItemSettings()//save user configureable settings
 {
 	if(fSelectedItem != NULL)
 	{
@@ -247,7 +262,7 @@ RelaunchSettingsView::_SaveSelectedItemSettings()//save user configureable setti
 
 
 void
-RelaunchSettingsView::_ClearItemSettings()
+DaemonRelaunchView::_ClearItemSettings()
 {
 	fAutoRelaunchRB->SetValue(false);
 	fPromptRelaunchRB->SetValue(false);
@@ -256,7 +271,7 @@ RelaunchSettingsView::_ClearItemSettings()
 
 
 void
-RelaunchSettingsView::_UpdateSelectedItem()
+DaemonRelaunchView::_UpdateSelectedItem()
 {
 	int32 index = fAppsLView->CurrentSelection();
 	if(index < 0)
@@ -268,7 +283,7 @@ RelaunchSettingsView::_UpdateSelectedItem()
 
 
 void
-RelaunchSettingsView::_RecallItemSettings()
+DaemonRelaunchView::_RecallItemSettings()
 {
 	//Enable or disable objects
 	if(fSelectedItem == NULL)//no selected item

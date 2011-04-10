@@ -10,92 +10,111 @@ prefsWindow::prefsWindow(BRect size)
 	fLauncherSettings(NULL)
 {
 	//Defaults
-	// TODO use defaults
-	fScales.launches_scale = 1;
-	fScales.first_launch_scale = 1;
-	fScales.last_launch_scale = 1;
-	fScales.interval_scale = 1;
-	fScales.total_run_time_scale = 1;
+	fScales.launches_scale = DEFAULT_VALUE_LAUNCH_SCALE;
+	fScales.first_launch_scale = DEFAULT_VALUE_FIRST_SCALE;
+	fScales.last_launch_scale = DEFAULT_VALUE_LAST_SCALE;
+	fScales.interval_scale = DEFAULT_VALUE_INTERVAL_SCALE;
+	fScales.total_run_time_scale = DEFAULT_VALUE_RUNTIME_SCALE;
 
 	Lock();
 	BRect viewRect(Bounds());
 	fMainView = new BView(viewRect, "Background View", B_FOLLOW_ALL_SIDES, B_WILL_DRAW);
 	fMainView->SetViewColor(bg_color);
 	AddChild(fMainView);
+
+
 	//Prefs list view
 	viewRect.Set(BORDER_SIZE, BORDER_SIZE, BORDER_SIZE + 100, Bounds().bottom - BORDER_SIZE);
 	fPrefsListView = new BListView(viewRect, "Preferences", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
 	fPrefsListView->SetSelectionMessage(new BMessage(PREFS_ITEM_CHANGED));
 	//Daemon settings
-	fDaemonBLI = new BitmapListItem(e_daemon_sig, "Daemon Settings");
-	fPrefsListView->AddItem(fDaemonBLI);
+	fDaemonBLI = new BitmapListItem(e_daemon_sig, "Daemon");
 	fDAppLaunchSI = new BStringItem("    App Relaunch");
-	fPrefsListView->AddItem(fDAppLaunchSI);
 	//Engine settings
-	fEngineBLI = new BitmapListItem(e_engine_sig, "Engine Settings");
-	fPrefsListView->AddItem(fEngineBLI);
+	fEngineBLI = new BitmapListItem(e_engine_sig, "Engine");
 	fEMaintSI = new BStringItem("    Maintenance");
-	fPrefsListView->AddItem(fEMaintSI);
 	//Launcher settings
-	fLauncherBLI = new BitmapListItem(e_launcher_sig, "Launcher Settings");
-	fPrefsListView->AddItem(fLauncherBLI);
+	fLauncherBLI = new BitmapListItem(e_launcher_sig, "Launcher");
 	fLDeskbarSI = new BStringItem("    Deskbar Menu");
-	fPrefsListView->AddItem(fLDeskbarSI);
 	fLRankSI = new BStringItem("    App Rankings");
-	fPrefsListView->AddItem(fLRankSI);
 	fLExclusionsSI = new BStringItem("    App Exclusions");
-// TODO impliment exclusions
-//	fPrefsListView->AddItem(fLExclusionsSI);
 
-
+	//Resize the list view
 	BFont font;
 	fPrefsListView->GetFont(&font);
-	fPrefsListView->ResizeTo(fDaemonBLI->GetWidth(&font) + 10, fPrefsListView->Frame().Height());
-	BScrollView *prefsScrollView = new BScrollView("List Scrollview", fPrefsListView,
+	fPrefsListView->ResizeTo(font.StringWidth(fLDeskbarSI->Text()) + 10, fPrefsListView->Frame().Height());
+	fPrefsScrollView = new BScrollView("List Scrollview", fPrefsListView,
 		B_FOLLOW_TOP_BOTTOM);
-	fMainView->AddChild(prefsScrollView);
-
-
-	//Empty settings view
-	viewRect.Set(prefsScrollView->Frame().right + BORDER_SIZE, BORDER_SIZE,
+	fMainView->AddChild(fPrefsScrollView);
+	viewRect.Set(fPrefsScrollView->Frame().right + BORDER_SIZE, BORDER_SIZE,
 					Bounds().right - BORDER_SIZE, Bounds().bottom - BORDER_SIZE);
+
+	//Main about view
+	BRect aboutViewRect(0,0,viewRect.Width(), viewRect.Height());
 	fEmptySettingsView = new BView(viewRect, "Empty SettingsView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW);
 	fEmptySettingsView->SetViewColor(bg_color);
-	BBox *box = new BBox(BRect(0,0,fEmptySettingsView->Bounds().right,
-				fEmptySettingsView->Bounds().bottom), "Empty Box", B_FOLLOW_ALL_SIDES);
-	box->SetLabel("About Einsteinium Prefs");
-	// TODO add about text
-	fEmptySettingsView->AddChild(box);
+//	fAboutBox = new BBox("Empty Box");
+	fAboutBox = new BBox(aboutViewRect, "About", B_FOLLOW_LEFT_RIGHT);
+	fAboutBox->SetLabel("About Einsteinium Preferences");
+//	fAboutTextView = new BTextView("About text");
+	aboutViewRect.InsetBy(10, 5);
+	aboutViewRect.top += 15;
+	BRect textRect(0,0,aboutViewRect.Width(), aboutViewRect.Height());
+	fAboutTextView = new BTextView(aboutViewRect, "About text", textRect, B_FOLLOW_ALL);
+	fAboutTextView->SetText("Einsteinium provides smarter monitoring of applications and"
+		" system services for Haiku.  Currently the two major functions implimented are"
+		" automatically restarting applications and system services that quit or crash,"
+		" and gathering statistics on application usage to provide customizable ranked"
+		" lists of applications.\n\n"
+		"This preferences application is used to set options for the Einsteinium Engine,"
+		" Daemon and Launcher.  See each application's main section to get more details.");
+	fAboutTextView->MakeSelectable(false);
+	fAboutTextView->MakeEditable(false);
+	fAboutTextView->SetViewColor(fMainView->ViewColor());
+	fCopyrightStringView = new BStringView("Copyright", "Einsteinium Copyright 2011 by Brian Hill");
+	fCopyrightStringView->ResizeToPreferred();
+/*	fAboutBox->AddChild(BGroupLayoutBuilder(B_HORIZONTAL, 5)
+		.Add(fAboutTextView)
+		.SetInsets(5, 5, 5, 5)
+	);
+	fEmptySettingsView->SetLayout(new BGroupLayout(B_HORIZONTAL));
+	fEmptySettingsView->AddChild(BGroupLayoutBuilder(B_VERTICAL, 10).Add(fAboutBox).AddGlue());*/
+	fAboutBox->AddChild(fAboutTextView);
+	fAboutBox->AddChild(fCopyrightStringView);
+	fEmptySettingsView->AddChild(fAboutBox);
 	fMainView->AddChild(fEmptySettingsView);
 	fEmptySettingsView->Hide();
 
-	//Relaunch Apps View
-	fAppLaunchView = new RelaunchSettingsView(viewRect);
-	fMainView->AddChild(fAppLaunchView);
-	fAppLaunchView->Hide();
-	//Launcher ranking settings
+	//Settings views
+	fDStatusView = new DaemonStatusView(viewRect);
+	fDRelaunchView = new DaemonRelaunchView(viewRect);
+	fEStatusView = new EngineStatusView(viewRect);
+	fMaintenanceView = new EngineMaintenanceView(viewRect);
+	fLAboutView = new LauncherAboutView(viewRect);
+	fLDeskbarView = new LauncherDeskbarView(viewRect);
 	fLRankingsView = new LauncherRankingsView(viewRect);
-	fMainView->AddChild(fLRankingsView);
-	fLRankingsView->Hide();
-	//Launcher exclusions settings
 	fLExclusionsView = new LauncherExclusionsView(viewRect);
+
+	//Add all the ListItems and settings views to the window
+	_AddSettingsView(fDaemonBLI, fDStatusView);
+	_AddSettingsView(fDAppLaunchSI, fDRelaunchView);
+	_AddSettingsView(fEngineBLI, fEStatusView);
+	_AddSettingsView(fEMaintSI, fMaintenanceView);
+	_AddSettingsView(fLauncherBLI, fLAboutView);
+	_AddSettingsView(fLDeskbarSI, fLDeskbarView);
+	_AddSettingsView(fLRankSI, fLRankingsView);
+	// TODO impliment exclusions
+//	_AddSettingsView(fLExclusionsSI, fLExclusionsView);
 	fMainView->AddChild(fLExclusionsView);
 	fLExclusionsView->Hide();
-	//Deskbar Settings View
-	fLDeskbarView = new LauncherDeskbarView(viewRect);
-	fMainView->AddChild(fLDeskbarView);
-	fLDeskbarView->Hide();
-	//Engine Maintenance View
-	fMaintenanceView = new EMaintenanceView(viewRect);
-	fMainView->AddChild(fMaintenanceView);
-	fMaintenanceView->Hide();
 
 	fCurrentView = fEmptySettingsView;
+	FrameResized(0,0);
 	fCurrentView->Show();
 
 	// resize main window and set min size based on the min sizes of each view
 	float minHeight=0, minWidth=0;
-	BSize minSize = fAppLaunchView->GetMinSize();
+	BSize minSize = fDRelaunchView->GetMinSize();
 	minHeight = minSize.height;
 	minWidth = minSize.width;
 	minSize = fLRankingsView->GetMinSize();
@@ -124,6 +143,7 @@ prefsWindow::prefsWindow(BRect size)
 
 prefsWindow::~prefsWindow()
 {
+	fSettingsViews.MakeEmpty();
 	delete fLauncherSettings;
 	delete fAppsPanel;
 	delete fAppFilter;
@@ -142,52 +162,37 @@ prefsWindow::QuitRequested()
 void
 prefsWindow::FrameResized(float width, float height)
 {
-	fMaintenanceView->ResizeStatusBox();
+	BRect textRect = fAboutTextView->Bounds();
+	fAboutTextView->SetTextRect(textRect);
+	textRect.bottom = fAboutTextView->TextHeight(0, fAboutTextView->TextLength());
+	fAboutTextView->SetTextRect(textRect);
+	fAboutTextView->ResizeTo(fAboutTextView->Bounds().Width(), textRect.Height());
+	fCopyrightStringView->MoveTo((textRect.Width() - fCopyrightStringView->Frame().Width())/2.0,
+									fAboutTextView->Frame().bottom + 30);
+	fAboutBox->ResizeTo(fAboutBox->Frame().Width(), fCopyrightStringView->Frame().bottom + 25);
+	fPrefsListView->Invalidate();
+	fPrefsScrollView->Invalidate();
+	fEmptySettingsView->Invalidate();
+	fAboutBox->Invalidate();
+	fCopyrightStringView->Invalidate();
+	BWindow::FrameResized(width, height);
 }
 
 
 void
-prefsWindow::MessageReceived(BMessage* msg)
+prefsWindow::MessageReceived(BMessage *msg)
 {	switch(msg->what)
 	{	case PREFS_ITEM_CHANGED: {
 			Lock();
 			fCurrentView->Hide();
+			// Show view for selected item, or the fEmptySettingsView if nothing is selected
 			int32 index = fPrefsListView->CurrentSelection();
-
 			if(index < 0)
-				//No selection
 				fCurrentView = fEmptySettingsView;
-			else {
-				//Item selected
-				BStringItem *item = (BStringItem*)fPrefsListView->ItemAt(index);
-				if(item == fDAppLaunchSI)
-					fCurrentView = fAppLaunchView;
-				else if(item == fEMaintSI)
-					fCurrentView = fMaintenanceView;
-				else if(item == fLRankSI)
-					fCurrentView = fLRankingsView;
-				else if(item == fLExclusionsSI)
-					fCurrentView = fLExclusionsView;
-				else if(item == fLDeskbarSI)
-					fCurrentView = fLDeskbarView;
-				else
-					// If one of the BitmapListItems was selected, selected next ListItem
-					fPrefsListView->Select(index+1);
-			}
-
+			else
+				fCurrentView = (BView*)fSettingsViews.ItemAt(index);
 			fCurrentView->Show();
 			Unlock();
-			break; }
-		// TODO revisit these
-		case E_RECALC_SCORES: {
-			BMessenger messenger(e_engine_sig);
-			BMessage msg(E_UPDATE_SCORES);
-			messenger.SendMessage(&msg);
-			break; }
-		case E_RECALC_QUARTS: {
-			BMessenger messenger(e_engine_sig);
-			BMessage msg(E_UPDATE_QUARTILES);
-			messenger.SendMessage(&msg);
 			break; }
 		case E_RESCAN_DATA: {
 			BMessenger messenger(e_engine_sig);
@@ -203,11 +208,6 @@ prefsWindow::MessageReceived(BMessage* msg)
 		case EL_SAVE_RANKING: {
 			_WriteLauncherScaleSettings();
 			fLRankingsView->MessageReceived(msg);
-			// TODO detect if engine is running first
-			BMessenger messenger(e_engine_sig);
-			// TODO change to be specific for the launcher
-			BMessage msg(E_UPDATE_SCORES);
-//			messenger.SendMessage(&msg);
 			break; }
 		// Save exclusion settings
 		case EL_LIST_INCLUSION_CHANGED: {
@@ -237,13 +237,40 @@ prefsWindow::MessageReceived(BMessage* msg)
 		case EL_SETTINGS_FILE_CHANGED_EXTERNALLY: {
 			_ReadLauncherSettings();
 			break; }
-		default: {
-			fAppLaunchView->MessageReceived(msg);
+		case EL_GOTO_LAUNCHER_SETTINGS: {
+			fPrefsListView->Select(fPrefsListView->IndexOf(fLauncherBLI));
+			break; }
+		case ED_RELAPP_SELECTION_CHANGED:
+		case ED_ADD_APPITEM:
+		case ED_ADD_APPITEM_REF:
+		case ED_REMOVE_APPITEM:
+		case ED_AUTO_RELAUNCH_CHANGED: {
+			fDRelaunchView->MessageReceived(msg);
+			break; }
+		case EL_LAUNCHES_SL_CHANGED:
+		case EL_FIRST_SL_CHANGED:
+		case EL_LAST_SL_CHANGED:
+		case EL_INTERVAL_SL_CHANGED:
+		case EL_RUNTIME_SL_CHANGED: {
 			fLRankingsView->MessageReceived(msg);
-//			fLDeskbarView->MessageReceived(msg);
+			break; }
+		default: {
 			BWindow::MessageReceived(msg);
 			break; }
 	}
+}
+
+
+void
+prefsWindow::_AddSettingsView(BListItem *item, BView *view)
+{
+	// Add list item
+	fPrefsListView->AddItem(item);
+
+	// Add view
+	fMainView->AddChild(view);
+	view->Hide();
+	fSettingsViews.AddItem(view);
 }
 
 /*

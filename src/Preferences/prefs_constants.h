@@ -8,7 +8,7 @@
 /*	constant definitions and message commands */
 
 #define BORDER_SIZE 5
-static const char* app_sig = "application/x-vnd.Einsteinium_Preferences";
+#define e_preferences_sig "application/x-vnd.Einsteinium_Preferences"
 static const rgb_color bg_color = {216,216,216,0};//grey background color
 
 //settings
@@ -21,7 +21,7 @@ struct scale_settings
 //Messages
 enum prefs_messages
 {	//Daemon settings messages
-	ED_RELAPP_SELECTION_CHANGED=1,
+	ED_RELAPP_SELECTION_CHANGED='Ersc',
 	ED_ADD_APPITEM,
 	ED_ADD_APPITEM_REF,
 	ED_REMOVE_APPITEM,

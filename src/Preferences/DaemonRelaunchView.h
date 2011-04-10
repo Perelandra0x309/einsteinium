@@ -1,9 +1,9 @@
-/* RelaunchSettingsView
- * Copyright 2010 Brian Hill
+/* DaemonRelaunchView
+ * Copyright 2011 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
-#ifndef EP_RELAUNCH_VIEW
-#define EP_RELAUNCH_VIEW
+#ifndef EP_D_RELAUNCH_VIEW
+#define EP_D_RELAUNCH_VIEW
 
 #include <InterfaceKit.h>
 #include <StorageKit.h>
@@ -19,11 +19,12 @@
 
 class RelaunchAppItem;
 
-class RelaunchSettingsView : public BView {
+class DaemonRelaunchView : public BView {
 public:
-					RelaunchSettingsView(BRect);
-					~RelaunchSettingsView();
+					DaemonRelaunchView(BRect);
+					~DaemonRelaunchView();
 	virtual void	MessageReceived(BMessage*);
+	virtual void	FrameResized(float width, float height);
 //	void			WriteSettings();
 	void			ReadSettings();
 	BSize			GetMinSize();
@@ -55,7 +56,7 @@ private:
 	AppRelaunchSettings *fSettings;
 //	void			Update(BView *owner, const BFont *font);
 //	virtual bool	InitiateDrag(BPoint point, int32 index, bool wasSelected);
-	friend class RelaunchSettingsView;
+	friend class DaemonRelaunchView;
 };
 
 int SortRelaunchAppItems(const void*, const void*);

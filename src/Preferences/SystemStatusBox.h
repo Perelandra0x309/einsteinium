@@ -1,5 +1,5 @@
 /* SystemStatusBox.h
- * Copyright 2010 Brian Hill
+ * Copyright 2011 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #ifndef EP_SYSTEMSTATUS_BOX
@@ -28,7 +28,7 @@ enum {
 
 class SystemStatusBox : public BBox {
 public:
-							SystemStatusBox(BEntry entry, const char * sig);
+							SystemStatusBox(const char *label, BEntry entry, const char * sig);
 //							~SystemStatusBox();
 			void			AttachedToWindow();
 			void			ResizeStatusText();

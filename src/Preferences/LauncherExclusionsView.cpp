@@ -76,6 +76,7 @@ LauncherExclusionsView::MessageReceived(BMessage* msg)
 	{
 
 	}
+	BView::MessageReceived(msg);
 }*/
 
 
@@ -258,7 +259,6 @@ ExcludeItem::ExcludeItem(const char *sig, const char *name)
 	BListItem(),
 	fAppSig(sig),
 	fAppName(name)
-	// TODO appName may not be path.Leaf()
 {	}
 
 

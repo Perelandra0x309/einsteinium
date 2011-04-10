@@ -1,11 +1,11 @@
 /* SystemStatusBox.cpp
- * Copyright 2010 Brian Hill
+ * Copyright 2011 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "SystemStatusBox.h"
 
 
-SystemStatusBox::SystemStatusBox(BEntry entry, const char * sig)
+SystemStatusBox::SystemStatusBox(const char *label, BEntry entry, const char * sig)
 	:
 	BBox(sig),
 	fCurrentState(STATE_NONE)
@@ -13,8 +13,7 @@ SystemStatusBox::SystemStatusBox(BEntry entry, const char * sig)
 	BPath path;
 	entry.GetPath(&path);
 	fName.SetTo(path.Leaf());
-	SetLabel(fName.String());
-	SetBorder(B_PLAIN_BORDER);
+	SetLabel(label);
 	SetResizingMode(B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
 	fSignature.SetTo(sig);
 	fStatusSV = new BStringView("Status String", "Status: ");

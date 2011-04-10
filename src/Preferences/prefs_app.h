@@ -1,5 +1,5 @@
 /* prefs_app.h
- * Copyright 2010 Brian Hill
+ * Copyright 2011 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #ifndef EINSTEINIUM_PREFERENCES_APP_H
@@ -12,6 +12,7 @@ class prefs_app : public BApplication {
 public:
 					prefs_app();
 					~prefs_app();
+	virtual void	MessageReceived(BMessage*);
 private:
 	prefsWindow		*fMainWindow;
 };

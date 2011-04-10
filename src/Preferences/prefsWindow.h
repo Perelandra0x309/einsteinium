@@ -7,11 +7,15 @@
 
 #include <InterfaceKit.h>
 #include "BitmapListItem.h"
-#include "EMaintenanceView.h"
+#include "DaemonRelaunchView.h"
+#include "DaemonStatusView.h"
+#include "EngineMaintenanceView.h"
+#include "EngineStatusView.h"
+#include "LauncherAboutView.h"
 #include "LauncherDeskbarView.h"
 #include "LauncherExclusionsView.h"
 #include "LauncherRankingsView.h"
-#include "RelaunchSettingsView.h"
+#include "LauncherSettingsFile.h"
 #include "daemon_constants.h"
 #include "engine_constants.h"
 #include "launcher_constants.h"
@@ -28,17 +32,26 @@ public:
 private:
 	scale_settings			fScales;
 	BView					*fMainView, *fEmptySettingsView, *fCurrentView;
+	BBox					*fAboutBox;
+	BTextView				*fAboutTextView;
+	BStringView				*fCopyrightStringView;
 	BListView				*fPrefsListView;
+	BScrollView				*fPrefsScrollView;
 	BitmapListItem			*fDaemonBLI, *fEngineBLI, *fLauncherBLI;
 	BStringItem				*fDAppLaunchSI, *fLRankSI, *fLExclusionsSI, *fLDeskbarSI, *fEMaintSI;
-	RelaunchSettingsView	*fAppLaunchView;
+	BList					fSettingsViews;
+	DaemonRelaunchView		*fDRelaunchView;
+	DaemonStatusView		*fDStatusView;
+	LauncherAboutView		*fLAboutView;
 	LauncherRankingsView	*fLRankingsView;
 	LauncherExclusionsView	*fLExclusionsView;
 	LauncherDeskbarView		*fLDeskbarView;
-	EMaintenanceView		*fMaintenanceView;
+	EngineMaintenanceView	*fMaintenanceView;
+	EngineStatusView		*fEStatusView;
 	LauncherSettingsFile	*fLauncherSettings;
 	AppRefFilter			*fAppFilter;
 	BFilePanel				*fAppsPanel;
+	void					_AddSettingsView(BListItem*, BView*);
 //	void					_StoreSettings();
 	void					_ReadAllSettings();
 //	void					_ReadDaemonSettings();

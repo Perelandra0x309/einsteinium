@@ -17,8 +17,9 @@
 class LauncherRankingsView : public BView {
 public:
 					LauncherRankingsView(BRect);
-					~LauncherRankingsView();
+//					~LauncherRankingsView();
 	virtual void	MessageReceived(BMessage*);
+	virtual void	FrameResized(float width, float height);
 	void			SetSliderValues(scale_settings& prefs);
 	void			GetSliderValues(scale_settings& prefs);
 	BSize			GetMinSize();

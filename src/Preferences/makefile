@@ -6,11 +6,14 @@ SRCS := ../Daemon/AppRelaunchSettings.cpp \
 		../Launcher/LauncherSettingsFile.cpp \
 		AppRefFilter.cpp \
 		BitmapListItem.cpp \
+		LauncherAboutView.cpp \
 		LauncherExclusionsView.cpp \
 		LauncherDeskbarView.cpp \
 		LauncherRankingsView.cpp \
-		EMaintenanceView.cpp \
-		RelaunchSettingsView.cpp \
+		EngineMaintenanceView.cpp \
+		EngineStatusView.cpp \
+		DaemonRelaunchView.cpp \
+		DaemonStatusView.cpp \
 		SystemStatusBox.cpp \
 		prefsWindow.cpp \
 		prefs_app.cpp \
