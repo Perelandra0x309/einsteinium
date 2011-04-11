@@ -35,7 +35,7 @@
 
 // Other text
 #define EL_SHELFVIEW_NAME "el_shelfview"
-#define EL_TOOLTIP_TEXT "Einsteinium  \nRanked\nApplications"
+#define EL_TOOLTIP_TEXT "Einsteinium  \nLauncher"
 #define EL_EXCLUDE_SIGNATURE "sig"
 #define EL_EXCLUDE_NAME "name"
 
@@ -45,8 +45,6 @@
 #define DEFAULT_VALUE_LAST_SCALE 0
 #define DEFAULT_VALUE_INTERVAL_SCALE 0
 #define DEFAULT_VALUE_RUNTIME_SCALE 0
-
-// TODO add more defaults
 
 //Indexes
 enum scales_index
@@ -60,12 +58,14 @@ enum scales_index
 //Enumerations for messages
 enum launcher_messages
 {	EL_SHELFVIEW_OPENPREFS='Esop',
-	EL_SHELFVIEW_OPEN,
+	EL_SHELFVIEW_LAUNCH_REF,
 	EL_SHELFVIEW_MENU_QUIT,
 	EL_MESSAGE_WHAT_EXCLUDED_APPS,
 	EL_SETTINGS_FILE_CHANGED_EXTERNALLY,
 	EL_START_ENGINE_ALERT,
-	EL_CHECK_ENGINE_STATUS
+	EL_CHECK_ENGINE_STATUS,
+	EL_GOTO_LAUNCHER_SETTINGS,
+	EL_START_ENGINE
 };
 
 #endif

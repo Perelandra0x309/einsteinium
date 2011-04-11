@@ -7,14 +7,13 @@
 
 ELShelfView::ELShelfView()
 	:
-	BView(BRect(0, 0, 15, 15), EL_SHELFVIEW_NAME, B_FOLLOW_NONE,
-		B_WILL_DRAW/* | B_PULSE_NEEDED*/),
+	BView(BRect(0, 0, 15, 15), EL_SHELFVIEW_NAME, B_FOLLOW_NONE, B_WILL_DRAW),
 	fIcon(NULL),
 	fMenu(NULL),
 	fItemCount(0),
-	fCheckEngineRunner(NULL),
 	fEngineAlert(NULL),
-	fEngineAlertIsShowing(false)
+	fEngineAlertIsShowing(false),
+	fWatchingRoster(false)
 {
 	app_info info;
 	be_app->GetAppInfo(&info);
@@ -47,9 +46,9 @@ ELShelfView::ELShelfView(BMessage *message)
 	fIcon(NULL),
 	fMenu(NULL),
 	fItemCount(0),
-	fCheckEngineRunner(NULL),
 	fEngineAlert(NULL),
-	fEngineAlertIsShowing(false)
+	fEngineAlertIsShowing(false),
+	fWatchingRoster(false)
 {
 	BMessage iconArchive;
 	status_t result = message->FindMessage("fIconArchive", &iconArchive);
@@ -97,15 +96,18 @@ ELShelfView::AttachedToWindow()
 	if(engineIsRunning)
 		_Subscribe();
 
-	// Setup the message runner to periodically check the engine running status every 120 seconds
-	fCheckEngineRunner = new BMessageRunner(this, new BMessage(EL_CHECK_ENGINE_STATUS), 120*1e6);
-	status_t status = fCheckEngineRunner->InitCheck();
-	if(status != B_OK)
-	{
-		printf("ELSV: Error creating Check Engine Message Runner: %s\n", strerror(status));
-		delete fCheckEngineRunner;
-		fCheckEngineRunner = NULL;
-	}
+	//Start watching for launches and quits of the Einsteinium Engine
+	result = be_roster->StartWatching(BMessenger(this),
+							B_REQUEST_QUIT | B_REQUEST_LAUNCHED);
+	if(result  != B_OK)
+		//roster failed to be watched.  Show warning, but we can continue.
+		(new BAlert("Watching Warning", "Warning: This app was not able to succeesfully start "
+					"watching the roster for aplication quit and launch messages.  "
+					"The status of the Einsteinium Engine may not be up to date at any time.",
+					"OK"))->Go();
+	else
+		//watching was sucessful
+		fWatchingRoster = true;
 
 	Invalidate();
 }
@@ -114,16 +116,15 @@ ELShelfView::AttachedToWindow()
 void
 ELShelfView::DetachedFromWindow()
 {
-	// Stop the message runner
-	delete fCheckEngineRunner;
-	fCheckEngineRunner = NULL;
+	//Need to stop watching for application launches and quits
+	if(fWatchingRoster)
+	{
+		be_roster->StopWatching(BMessenger(this));
+		fWatchingRoster = false;
+	}
 
 	// If the Engine warning alert is showing, close it
-	if(fEngineAlert)
-	{
-		fEngineAlert->PostMessage(B_QUIT_REQUESTED);
-		fEngineAlert = NULL;
-	}
+	_CloseEngineAlert();
 
 	// Unsubscribe from the Einsteinium Engine
 	_UnsubscribeFromEngine();
@@ -172,6 +173,32 @@ ELShelfView::MessageReceived(BMessage* msg)
 {
 	switch(msg->what)
 	{
+		case B_SOME_APP_QUIT: {
+			// Look for the einsteinium engine signature
+			const char* sig;
+			if (msg->FindString("be:signature", &sig) != B_OK) break;
+			if(strcmp(sig, einsteinium_engine_sig) == 0)
+			{
+				// Build an empty menu with an item that can be chosen to start the Engine
+				_BuildMenu(NULL);
+				// Display an alert that the engine is not running
+				_CheckEngineStatus(true);
+			}
+			break;
+		}
+		case B_SOME_APP_LAUNCHED: {
+			// Look for the einsteinium engine signature
+			const char* sig;
+			if (msg->FindString("be:signature", &sig) != B_OK) break;
+			if(strcmp(sig, einsteinium_engine_sig) == 0)
+			{
+				// Renew subscription
+				_Subscribe();
+				// Close the alert if it is displayed
+				_CloseEngineAlert();
+			}
+			break;
+		}
 		case EL_CHECK_ENGINE_STATUS: {
 			_CheckEngineStatus(true);
 			break;
@@ -179,20 +206,23 @@ ELShelfView::MessageReceived(BMessage* msg)
 		case EL_START_ENGINE_ALERT: {
 			int32 selection;
 			msg->FindInt32("which", &selection);
+			// If the Yes button was selected, launch the Engine
 			if(selection)
-			{
 				_LaunchEngine();
-				_Subscribe();
-			}
 			fEngineAlert = NULL;
 			fEngineAlertIsShowing = false;
 			break;
 		}
-		case EL_SHELFVIEW_OPENPREFS: {
-			be_roster->Launch("application/x-vnd.Einsteinium_Preferences");
+		case EL_START_ENGINE: {
+			_LaunchEngine();
 			break;
 		}
-		case EL_SHELFVIEW_OPEN: {
+		case EL_SHELFVIEW_OPENPREFS: {
+			BMessage goToMessage(EL_GOTO_LAUNCHER_SETTINGS);
+			be_roster->Launch("application/x-vnd.Einsteinium_Preferences", &goToMessage);
+			break;
+		}
+		case EL_SHELFVIEW_LAUNCH_REF: {
 			entry_ref ref;
 			if(msg->FindRef("refs", &ref) == B_OK)
 				be_roster->Launch(&ref);
@@ -230,9 +260,9 @@ ELShelfView::_BuildMenu(BMessage *message)
 	fMenu->SetFont(be_plain_font);
 
 	// Add any refs found
+	int32 countFound = 0;
 	if(message)
 	{
-		int32 countFound;
 		type_code typeFound;
 		message->GetInfo("refs", &typeFound, &countFound);
 	//	printf("Found %i refs\n", countFound);
@@ -243,14 +273,49 @@ ELShelfView::_BuildMenu(BMessage *message)
 	//		printf("Found ref %s\n", newref.name);
 			BNode refNode(&newref);
 			BNodeInfo refNodeInfo(&refNode);
-			BMessage *newMsg = new BMessage(EL_SHELFVIEW_OPEN);
+			BMessage *newMsg = new BMessage(EL_SHELFVIEW_LAUNCH_REF);
 			newMsg->AddRef("refs", &newref);
 			fMenu->AddItem(new IconMenuItem(newref.name, newMsg, &refNodeInfo, B_MINI_ICON));
+		}
+	}
+	// No applications to display- create a helpful message
+	bool showStartEngineItem = false;
+	if(message==NULL || countFound==0)
+	{
+		// The engine is not running
+		if(!_IsEngineRunning())
+		{
+			BMenuItem *menuItem1 = new BMenuItem("Warning:", NULL);
+			BMenuItem *menuItem2 = new BMenuItem("Einsteinium Engine is not running.", NULL);
+			BMenuItem *menuItem3 = new BMenuItem("Please start the Engine to populate", NULL);
+			BMenuItem *menuItem4 = new BMenuItem("this menu.", NULL);
+			menuItem1->SetEnabled(false);
+			menuItem2->SetEnabled(false);
+			menuItem3->SetEnabled(false);
+			menuItem4->SetEnabled(false);
+			fMenu->AddItem(menuItem1);
+			fMenu->AddItem(menuItem2);
+			fMenu->AddItem(menuItem3);
+			fMenu->AddItem(menuItem4);
+			showStartEngineItem = true;
+		}
+		// The engine is running but there were no applications in the subscription message
+		else
+		{
+			BMenuItem *menuItem1 = new BMenuItem("There are no applications to list.", NULL);
+			menuItem1->SetEnabled(false);
+			fMenu->AddItem(menuItem1);
 		}
 	}
 
 	// Preferences and close menu items
 	fMenu->AddSeparatorItem();
+	if(showStartEngineItem)
+	{
+		BMenuItem *menuItemStart = new BMenuItem("Start the Einsteinium Engine",
+											new BMessage(EL_START_ENGINE));
+		fMenu->AddItem(menuItemStart);
+	}
 	fMenu->AddItem(new BMenuItem("Preferences"B_UTF8_ELLIPSIS,
 		new BMessage(EL_SHELFVIEW_OPENPREFS)));
 	fMenu->AddItem(new BMenuItem("Close Launch Menu", new BMessage(EL_SHELFVIEW_MENU_QUIT)));
@@ -287,6 +352,19 @@ ELShelfView::_CheckEngineStatus(bool showWarning = false)
 
 
 void
+ELShelfView::_CloseEngineAlert()
+{
+	// If the Engine warning alert is showing, close it
+	if(fEngineAlert)
+	{
+		fEngineAlert->PostMessage(B_QUIT_REQUESTED);
+		fEngineAlert = NULL;
+		fEngineAlertIsShowing = false;
+	}
+}
+
+
+void
 ELShelfView::_Quit()
 {
 	BDeskbar deskbar;
@@ -308,19 +386,26 @@ ELShelfView::_Subscribe()
 void
 ELShelfView::_SubscribeFailed()
 {
-	_Quit();
+	// Show error message
+	BAlert *subscriptioneAlert = new BAlert("Subscription",
+			"The Einsteinium Launcher sent an invalid subscription to the Engine.  Please check your Launcher settings.",
+			"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+	// Set the feel to FLOATING so that the alert does not block use of the Deskbar while showing
+	subscriptioneAlert->SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
+	subscriptioneAlert->Go(NULL);
 }
 
 
 void
 ELShelfView::_SubscribeConfirmed()
 {
-
+	// Don't need to do anything- just wait for an updated subscription message
 }
 
 
 void
 ELShelfView::_UpdateReceived(BMessage *message)
 {
+	// Rebuild the application launch menu with the list received from the Engine
 	_BuildMenu(message);
 }

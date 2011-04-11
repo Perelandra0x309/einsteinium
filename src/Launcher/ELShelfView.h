@@ -40,11 +40,11 @@ private:
 	BPopUpMenu*				fMenu;
 	int						fItemCount;
 	LauncherSettingsFile	*fSettingsFile;
-	BMessageRunner			*fCheckEngineRunner;
 	BAlert					*fEngineAlert;
-	bool					fEngineAlertIsShowing;
+	bool					fEngineAlertIsShowing, fWatchingRoster;
 	void					_BuildMenu(BMessage *message);
 	bool					_CheckEngineStatus(bool showWarning = false);
+	void					_CloseEngineAlert();
 	void					_Quit();
 	void					_Subscribe();
 	// virtual functions inherited from the EngineSubscriber class
