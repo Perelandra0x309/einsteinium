@@ -104,9 +104,9 @@ prefsWindow::prefsWindow(BRect size)
 	_AddSettingsView(fLDeskbarSI, fLDeskbarView);
 	_AddSettingsView(fLRankSI, fLRankingsView);
 	// TODO impliment exclusions
-//	_AddSettingsView(fLExclusionsSI, fLExclusionsView);
-	fMainView->AddChild(fLExclusionsView);
-	fLExclusionsView->Hide();
+	_AddSettingsView(fLExclusionsSI, fLExclusionsView);
+//	fMainView->AddChild(fLExclusionsView);
+//	fLExclusionsView->Hide();
 
 	fCurrentView = fEmptySettingsView;
 	FrameResized(0,0);
@@ -210,9 +210,9 @@ prefsWindow::MessageReceived(BMessage *msg)
 			fLRankingsView->MessageReceived(msg);
 			break; }
 		// Save exclusion settings
-		case EL_LIST_INCLUSION_CHANGED: {
+/*		case EL_LIST_INCLUSION_CHANGED: {
 			_WriteLauncherListInclusionSetting();
-			break; }
+			break; }*/
 		// Add exclusion to list
 		case EL_ADD_EXCLUSION: {
 			BMessage addmsg(EL_ADD_EXCLUSION_REF);
@@ -323,7 +323,7 @@ prefsWindow::_ReadLauncherSettings()
 	fLRankingsView->SetSliderValues(fScales);
 
 	// Read setting for action when new application is detected
-	fLExclusionsView->SetLinkInclusionDefault(fLauncherSettings->GetLinkInclusionDefaultValue());
+//	fLExclusionsView->SetLinkInclusionDefault(fLauncherSettings->GetLinkInclusionDefaultValue());
 
 	// Read excluded apps
 	BMessage exclusionsList = fLauncherSettings->GetExclusionsList();
@@ -356,14 +356,14 @@ prefsWindow::_WriteLauncherScaleSettings()
 	fLauncherSettings->SaveScales(scales);
 }
 
-
+/*
 void
 prefsWindow::_WriteLauncherListInclusionSetting()
 {
 	BString inclusionValue;
 	fLExclusionsView->GetLinkInclusionDefault(inclusionValue);
 	fLauncherSettings->SaveLinkInclusionDefaultValue(inclusionValue.String());
-}
+}*/
 
 void
 prefsWindow::_WriteLauncherExclusions()

@@ -36,7 +36,7 @@
 // Other text
 #define EL_SHELFVIEW_NAME "el_shelfview"
 #define EL_TOOLTIP_TEXT "Einsteinium  \nLauncher"
-#define EL_EXCLUDE_SIGNATURE "sig"
+#define EL_EXCLUDE_SIGNATURE E_SUBSCRIPTION_EXCLUSIONS
 #define EL_EXCLUDE_NAME "name"
 
 //Defaults

@@ -58,7 +58,7 @@ private:
 //	void					_WriteDaemonSettings();
 	void					_ReadLauncherSettings();
 	void					_WriteLauncherScaleSettings();
-	void					_WriteLauncherListInclusionSetting();
+//	void					_WriteLauncherListInclusionSetting();
 	void					_WriteLauncherDeskbarSettings();
 	void					_WriteLauncherExclusions();
 };

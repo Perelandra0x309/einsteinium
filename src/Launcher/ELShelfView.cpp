@@ -85,7 +85,7 @@ ELShelfView::AttachedToWindow()
 	if(result!=B_OK){
 		printf("Error creating Einsteinium Launcher settings file.  Cannot continue.\n");
 		_Quit();
-			//Quit. Can we do anthything w/o settings?
+			// TODO Can we do anything w/o settings?
 		return;
 	}
 
@@ -95,6 +95,7 @@ ELShelfView::AttachedToWindow()
 	// Subscribe to the Einsteinium Engine
 	if(engineIsRunning)
 		_Subscribe();
+	// TODO automatically start engine if not running
 
 	//Start watching for launches and quits of the Einsteinium Engine
 	result = be_roster->StartWatching(BMessenger(this),
@@ -378,8 +379,9 @@ ELShelfView::_Subscribe()
 	// Subscribe to the Einsteinium Engine.  If already subscribed, this will update the settings
 	fItemCount = fSettingsFile->GetDeskbarCount();
 	const int *scales = fSettingsFile->GetScales();
-	_SubscribeToEngine(fItemCount, scales[LAUNCH_INDEX], scales[FIRST_INDEX],
-						scales[LAST_INDEX], scales[INTERVAL_INDEX], scales[RUNTIME_INDEX]);
+	BMessage exclusionsList = fSettingsFile->GetExclusionsList();
+	_SubscribeToEngine(fItemCount, scales[LAUNCH_INDEX], scales[FIRST_INDEX], scales[LAST_INDEX],
+						scales[INTERVAL_INDEX], scales[RUNTIME_INDEX], &exclusionsList);
 }
 
 

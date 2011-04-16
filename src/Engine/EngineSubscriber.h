@@ -8,6 +8,7 @@
 #include <Handler.h>
 #include <Looper.h>
 #include <Roster.h>
+#include <String.h>
 #include <stdio.h>
 #include "string.h"
 
@@ -23,6 +24,7 @@
 #define E_SUBSCRIPTION_LAST_SCALE "last_scale"
 #define E_SUBSCRIPTION_INTERVAL_SCALE "interval_scale"
 #define E_SUBSCRIPTION_RUNTIME_SCALE "runtime_scale"
+#define E_SUBSCRIPTION_EXCLUSIONS "app_exclusions"
 
 //Messages
 enum subscriber_messages
@@ -52,11 +54,13 @@ public:
 							~EngineSubscriber();
 
 protected:
-	void					_SubscribeToEngine(int itemCount, int numberOfLaunchesScale, int firstLaunchScale,
-							int latestLaunchScale, int lastIntervalScale, int totalRuntimeScale);
+	void					_SubscribeToEngine(int itemCount, int numberOfLaunchesScale,
+								int firstLaunchScale, int latestLaunchScale, int lastIntervalScale,
+								int totalRuntimeScale, BMessage *excludeList = NULL);
 	void					_UnsubscribeFromEngine();
 	bool					_IsEngineRunning();
 	status_t				_LaunchEngine();
+	status_t				_QuitEngine();
 
 	// pure virtual functions- these need to be implemented by your class
 	virtual void			_SubscribeFailed() = 0;

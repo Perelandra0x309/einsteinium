@@ -108,6 +108,7 @@ DaemonStatusView::MessageReceived(BMessage* msg)
 				BMessenger messenger(fStatusBox);
 				messenger.SendMessage(msg);
 			}
+			break;
 		}
 		default: {
 			BView::MessageReceived(msg);

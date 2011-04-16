@@ -41,7 +41,8 @@ EngineSubscriber::~EngineSubscriber()
 
 void
 EngineSubscriber::_SubscribeToEngine(int itemCount, int numberOfLaunchesScale, int firstLaunchScale,
-							int latestLaunchScale, int lastIntervalScale, int totalRuntimeScale)
+							int latestLaunchScale, int lastIntervalScale, int totalRuntimeScale,
+							BMessage *excludeList = NULL)
 {
 	// Subscribe with the Einsteinium Engine to receive updates
 	BMessage subscribeMsg(E_SUBSCRIBE_RANKED_APPS);
@@ -52,6 +53,21 @@ EngineSubscriber::_SubscribeToEngine(int itemCount, int numberOfLaunchesScale, i
 	subscribeMsg.AddInt8(E_SUBSCRIPTION_LAST_SCALE, latestLaunchScale);
 	subscribeMsg.AddInt8(E_SUBSCRIPTION_INTERVAL_SCALE, lastIntervalScale);
 	subscribeMsg.AddInt8(E_SUBSCRIPTION_RUNTIME_SCALE, totalRuntimeScale);
+	if(excludeList)
+	{
+		type_code typeFound;
+		int32 countFound;
+		status_t exStatus = excludeList->GetInfo(E_SUBSCRIPTION_EXCLUSIONS, &typeFound, &countFound);
+		BString appSig;
+		if(exStatus==B_OK)
+		{
+			for(int i=0; i<countFound; i++)
+			{
+				excludeList->FindString(E_SUBSCRIPTION_EXCLUSIONS, i, &appSig);
+				subscribeMsg.AddString(E_SUBSCRIPTION_EXCLUSIONS, appSig);
+			}
+		}
+	}
 	status_t mErr;
 	BMessenger messenger(fHandler, NULL, &mErr);
 	if(!messenger.IsValid())
@@ -95,7 +111,17 @@ EngineSubscriber::_LaunchEngine()
 	return be_roster->Launch(einsteinium_engine_sig);
 }
 
-// TODO _QuitEngine()
+
+status_t
+EngineSubscriber::_QuitEngine()
+{
+	status_t rc = B_ERROR;
+	BMessenger appMessenger(einsteinium_engine_sig, -1, &rc);
+	if(!appMessenger.IsValid())
+		return rc;
+	rc = appMessenger.SendMessage(B_QUIT_REQUESTED);
+	return rc;
+}
 
 
 void

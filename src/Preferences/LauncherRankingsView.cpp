@@ -17,6 +17,7 @@ LauncherRankingsView::LauncherRankingsView(BRect size)
 {
 	SetViewColor(bg_color);
 
+	// TODO tooltips
 	fLaunchesSl = new BSlider("Launches", "Number of Launches",
 							new BMessage(EL_LAUNCHES_SL_CHANGED),
 							-5, 5, B_HORIZONTAL, B_TRIANGLE_THUMB);

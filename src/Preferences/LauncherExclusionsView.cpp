@@ -7,13 +7,13 @@
 
 LauncherExclusionsView::LauncherExclusionsView(BRect size)
 	:
-	BView(size, "Recent Apps Rank", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
+	BView(size, "Recent Apps Rank", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS)
 {
 	SetViewColor(bg_color);
 	BRect viewRect;
 
 	// Default Settings
-	fDefaultSettingsBox = new BBox("Default Settings BBox");
+/*	fDefaultSettingsBox = new BBox("Default Settings BBox");
 	fDefaultSettingsBox->SetLabel("When a new application is detected:");
 	// TODO how to implement this?
 	fPromptRB = new BRadioButton("New App Prompt",
@@ -30,7 +30,7 @@ LauncherExclusionsView::LauncherExclusionsView(BRect size)
 		.Add(fPromptRB)
 		.Add(fIgnoreRB)
 		.SetInsets(5, 5, 5, 5)
-	);
+	);*/
 
 	// Buttons
 	fAddB = new BButton("Add", "Add" B_UTF8_ELLIPSIS, new BMessage(EL_ADD_EXCLUSION));
@@ -47,7 +47,7 @@ LauncherExclusionsView::LauncherExclusionsView(BRect size)
 
 	// Inidividual app settings
 	fSettingsBox = new BBox("Application Attribute Settings");
-	fSettingsBox->SetLabel("Exclude These Applications:");
+	fSettingsBox->SetLabel("Exclude These Apps From The Launcher");
 	fSettingsBox->AddChild(BGridLayoutBuilder(5, 5)
 		.Add(fAttrSView, 0, 0, 1, 3)
 		.Add(fAddB, 1, 0)
@@ -57,7 +57,7 @@ LauncherExclusionsView::LauncherExclusionsView(BRect size)
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
-		.Add(fDefaultSettingsBox)
+//		.Add(fDefaultSettingsBox)
 		.Add(fSettingsBox)
 	);
 
@@ -80,6 +80,18 @@ LauncherExclusionsView::MessageReceived(BMessage* msg)
 }*/
 
 
+void
+LauncherExclusionsView::FrameResized(float width, float height)
+{
+	fSettingsBox->Invalidate();
+	fAddB->Invalidate();
+	fRemoveB->Invalidate();
+	fExclusionLView->Invalidate();
+	fAttrSView->Invalidate();
+	BView::FrameResized(width, height);
+}
+
+
 bool
 LauncherExclusionsView::AddExclusion(BMessage* refMsg)
 {
@@ -91,11 +103,11 @@ LauncherExclusionsView::AddExclusion(BMessage* refMsg)
 	BNode node(&srcEntry);
 	char *buf = new char[B_ATTR_NAME_LENGTH];
 	ssize_t size = node.ReadAttr("BEOS:APP_SIG",0,0,buf,B_ATTR_NAME_LENGTH);
+	BPath path;
+	BEntry entry(&srcRef);
+	entry.GetPath(&path);
 	if( size > 0 )
 	{
-		BPath path;
-		BEntry entry(&srcRef);
-		entry.GetPath(&path);
 		ExcludeItem *item = new ExcludeItem(buf, path.Leaf());
 		fExclusionLView->AddItem(item);
 		fExclusionLView->SortItems(SortExcludeItems);
@@ -104,7 +116,11 @@ LauncherExclusionsView::AddExclusion(BMessage* refMsg)
 		addedApp = true;
 	}
 	else
-		(new BAlert("","Excecutable does not have an application signature","OK"))->Go(NULL);
+	{
+		BString text(path.Leaf());
+		text.Append(" does not have an application signature");
+		(new BAlert("",text,"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go(NULL);
+	}
 	delete[] buf;
 	Window()->Unlock();
 	return addedApp;
@@ -126,7 +142,7 @@ LauncherExclusionsView::RemoveSelectedExclusion()
 	return true;
 }
 
-
+/*
 void
 LauncherExclusionsView::SetLinkInclusionDefault(const char* value)
 {
@@ -154,7 +170,7 @@ LauncherExclusionsView::GetLinkInclusionDefault(BString &value)
 	else if(fIgnoreRB->Value())
 	value.SetTo(EL_XMLTEXT_VALUE_EXCLUDE);
 }
-
+*/
 
 void
 LauncherExclusionsView::PopulateExclusionsList(BMessage &exclusionsList)
@@ -184,9 +200,10 @@ BSize
 LauncherExclusionsView::GetMinSize()
 {
 	BSize size(B_SIZE_UNSET, B_SIZE_UNSET);
-	size.width = fIgnoreRB->MinSize().width + 20;
+/*	size.width = fIgnoreRB->MinSize().width + 20;
 	size.height = (4 * fIgnoreRB->MinSize().height)
-					+ (2 * fAddB->MinSize().height) + 90;
+					+ (2 * fAddB->MinSize().height) + 90;*/
+
 	return size;
 }
 

@@ -56,22 +56,16 @@ einsteinium_engine::QuitRequested()
 	if(fWatchingRoster)
 	{	be_roster->StopWatching(be_app_messenger); }
 
-	//disable timer
-//	if(fQuartileRunner != NULL)
-//		delete fQuartileRunner;
-
 	// TODO wait for all messages to clear the message queue?
 
 	// Delete subscribers list items
 	Subscriber *sub;
-	AppStats *stats;
 	int subscribersCount = fSubscribersList.CountItems();
 	for(int i=0; i<subscribersCount; i++)
 	{
-		sub = (Subscriber*)fSubscribersList.ItemAt(i);
-		DeleteList(sub->appStatsList, stats);
+		sub = (Subscriber*)fSubscribersList.ItemAt(0);
+		_DeleteSubscriber(sub);
 	}
-	DeleteList(fSubscribersList, sub);
 
 	printf("Einsteinium engine quitting.\n");
 	return BApplication::QuitRequested();
@@ -184,7 +178,7 @@ einsteinium_engine::MessageReceived(BMessage *msg)
 				for(int i=0; i<subscribersCount; i++)
 				{
 					Subscriber *currentSub = (Subscriber*)fSubscribersList.ItemAt(i);
-					currentSub->currentAppIsExcluded = _DetermineExclusion(currentSub, sig);
+					currentSub->currentAppIsExcluded = _AppIsExcluded(currentSub, sig);
 					if(!currentSub->currentAppIsExcluded)
 					{
 						// Only if the list is not already sorted by score do we need to sort
@@ -301,83 +295,43 @@ einsteinium_engine::MessageReceived(BMessage *msg)
 					printf("Cannot send \'Subscribe Failed\' message.  Result=%i, valid messenger=%i\n", result, messenger.IsValid());
 				break;
 			}
-
+			// Get excluded apps
+			type_code typeFound;
+			int32 countFound;
+			status_t exStatus = msg->GetInfo(E_SUBSCRIPTION_EXCLUSIONS, &typeFound, &countFound);
+			BList exList;
+			BString *appSig;
+			if(exStatus==B_OK)
+			{
+				for(int i=0; i<countFound; i++)
+				{
+					appSig = new BString();
+					msg->FindString(E_SUBSCRIPTION_EXCLUSIONS, i, appSig);
+					exList.AddItem(appSig);
+				}
+			}
 			// Determine if subscriber exists to update it or if we create a new one
 			Subscriber *subscriber = _FindSubscriber(uniqueID);
 			if(subscriber==NULL)
 			{
 				subscriber = new Subscriber();
 				subscriber->uniqueID = uniqueID;
-				subscriber->messenger = messenger;
-				subscriber->count = count;
-				subscriber->launch_scale = launchScale;
-				subscriber->first_scale = firstScale;
-				subscriber->last_scale = lastScale;
-				subscriber->interval_scale = intervalScale;
-				subscriber->runtime_scale = runtimeScale;
-				_CreateAppStatsList(subscriber, SORT_BY_SCORE);
 				fSubscribersList.AddItem(subscriber);
 			}
 			else
-			{
-				subscriber->messenger = messenger;
-				subscriber->count = count;
-				subscriber->launch_scale = launchScale;
-				subscriber->first_scale = firstScale;
-				subscriber->last_scale = lastScale;
-				subscriber->interval_scale = intervalScale;
-				subscriber->runtime_scale = runtimeScale;
-				_CalculateScores(subscriber);
-				_SortAppStatsList(subscriber, SORT_BY_SCORE);
-			}
-
+				DeleteList(subscriber->appExclusionList, appSig);
+			subscriber->messenger = messenger;
+			subscriber->count = count;
+			subscriber->launch_scale = launchScale;
+			subscriber->first_scale = firstScale;
+			subscriber->last_scale = lastScale;
+			subscriber->interval_scale = intervalScale;
+			subscriber->runtime_scale = runtimeScale;
+			subscriber->appExclusionList = exList;
+			// Send subscription confirmed and updated apps list messages
 			subscriber->messenger.SendMessage(E_SUBSCRIBE_CONFIRMED);
+			_CreateAppStatsList(subscriber, SORT_BY_SCORE);
 			_SendListToSubscriber(subscriber);
-
-/*			Subscriber* newSubscriber = new Subscriber();
-			status_t result1 = msg->FindMessenger(E_SUBSCRIPTION_MESSENGER, &(newSubscriber->messenger));
-			status_t result2 = msg->FindInt16(E_SUBSCRIPTION_COUNT, &(newSubscriber->count));
-			status_t result3 = msg->FindInt32(E_SUBSCRIPTION_UNIQUEID, &(newSubscriber->uniqueID));
-			// Get the settings for scale values (default to 0 for any not defined)
-			newSubscriber->launch_scale = 0;
-			msg->FindInt8(E_SUBSCRIPTION_LAUNCH_SCALE, &(newSubscriber->launch_scale));
-			newSubscriber->first_scale = 0;
-			msg->FindInt8(E_SUBSCRIPTION_FIRST_SCALE, &(newSubscriber->first_scale));
-			newSubscriber->last_scale = 0;
-			msg->FindInt8(E_SUBSCRIPTION_LAST_SCALE, &(newSubscriber->last_scale));
-			newSubscriber->interval_scale = 0;
-			msg->FindInt8(E_SUBSCRIPTION_INTERVAL_SCALE, &(newSubscriber->interval_scale));
-			newSubscriber->runtime_scale = 0;
-			msg->FindInt8(E_SUBSCRIPTION_RUNTIME_SCALE, &(newSubscriber->runtime_scale));
-			// There must be at least one scale defined to a non zero value
-			bool noScalesDefined = ( newSubscriber->launch_scale == 0
-									&& newSubscriber->first_scale == 0
-									&& newSubscriber->last_scale == 0
-									&& newSubscriber->interval_scale == 0
-									&& newSubscriber->runtime_scale == 0 );
-			if(result1 != B_OK || result2 != B_OK || result3 != B_OK || noScalesDefined)
-			{
-				printf("Einsteinium Engine received invalid subscribe message.\n");
-				// Attempt to deliver a reply
-				status_t result = B_ERROR;
-				if(msg->IsSourceWaiting())
-					result = msg->SendReply(E_SUBSCRIBE_FAILED);
-				else
-					printf("Source is not waiting\n");
-				if(result != B_OK && newSubscriber->messenger.IsValid())
-					newSubscriber->messenger.SendMessage(E_SUBSCRIBE_FAILED);
-				else
-					printf("Cannot send \'Subscribe Failed\' message.  Result=%i, valid messenger=%i\n", result, newSubscriber->messenger.IsValid());
-				delete newSubscriber;
-				break;
-			}
-			_Unsubscribe(newSubscriber->uniqueID);
-				// if there already is a subscriber listed with the unique ID remove it
-			fSubscribersList.AddItem(newSubscriber);
-		//	printf("Sending subscribe confirmed reply\n");
-			newSubscriber->messenger.SendMessage(E_SUBSCRIBE_CONFIRMED);
-			_CreateAppStatsList(newSubscriber, SORT_BY_SCORE);
-			_SendListToSubscriber(newSubscriber);*/
 			break;
 		}
 		case E_UNSUBSCRIBE_RANKED_APPS: {
@@ -529,24 +483,7 @@ void
 einsteinium_engine::_Unsubscribe(int32 uniqueID)
 {
 	Subscriber *subscriber = _FindSubscriber(uniqueID);
-	if(subscriber)
-	{
-		fSubscribersList.RemoveItem(subscriber);
-		_EmptyAppStatsList(subscriber->appStatsList);
-		delete subscriber;
-	}
-/*	int subscribersCount = fSubscribersList.CountItems();
-	for(int j=0; j<subscribersCount; j++)
-	{
-		Subscriber *currentSub = (Subscriber*)fSubscribersList.ItemAt(j);
-		if( uniqueID==currentSub->uniqueID )
-		{
-			fSubscribersList.RemoveItem(currentSub);
-			_EmptyAppStatsList(currentSub->appStatsList);
-			delete currentSub;
-			j = subscribersCount;
-		}
-	}*/
+	_DeleteSubscriber(subscriber);
 }
 
 
@@ -563,6 +500,20 @@ einsteinium_engine::_FindSubscriber(int32 uniqueID)
 		}
 	}
 	return NULL;
+}
+
+
+void
+einsteinium_engine::_DeleteSubscriber(Subscriber *subscriber)
+{
+	if(subscriber)
+	{
+		fSubscribersList.RemoveItem(subscriber);
+		_EmptyAppStatsList(subscriber->appStatsList);
+		BString* item;
+		DeleteList(subscriber->appExclusionList, item);
+		delete subscriber;
+	}
 }
 
 
@@ -670,8 +621,16 @@ einsteinium_engine::_RescanAttrFile(BEntry* entry)
 
 
 bool
-einsteinium_engine::_DetermineExclusion(Subscriber *subscriber, const char *signature)
+einsteinium_engine::_AppIsExcluded(Subscriber *subscriber, const char *signature)
 {
+	int count = subscriber->appExclusionList.CountItems();
+	BString *appSig;
+	for(int i=0; i<count; i++)
+	{
+		appSig = (BString*)subscriber->appExclusionList.ItemAt(i);
+		if(appSig->Compare(signature)==0)
+			return true;
+	}
 	return false;
 }
 
@@ -699,14 +658,14 @@ einsteinium_engine::_CreateAppStatsList(Subscriber *subscriber, int sortAction=S
 			strcmp(nodeType, e_app_attr_filetype) != 0) { continue; }
 		attrNode.Unset();
 		AppAttrFile attrFile(&attrEntry);
-		// check ignore value- skip if ignore flag is true
-//		if(attrFile.GetIgnore() == false)
-//		{
+		// check exclusion
+		if(!_AppIsExcluded(subscriber, attrFile.GetSig()))
+		{
 			AppStats *appStatsData = attrFile.CloneAppStats();
 			subscriber->appStatsList.AddItem(appStatsData);
 			attrEntry.GetPath(&appAttrDirPath);//create path from entry
 			printf("Adding app %s to list\n", appAttrDirPath.Path());//debug info
-//		}
+		}
 	}
 
 	_UpdateQuartiles(subscriber);

@@ -25,6 +25,7 @@ struct Subscriber {
 		runtime_scale;
 	BMessenger messenger;
 	BList appStatsList;
+	BList appExclusionList;
 	int appStatsSortOrder;
 	int recalcQuartilesCount;
 	int countSinceQuartilesUpdated;
@@ -50,13 +51,14 @@ private:
 	BList			fSubscribersList;
 	// functions
 	Subscriber*		_FindSubscriber(int32 uniqueID);
+	void			_DeleteSubscriber(Subscriber *subscriber);
 	void			_Unsubscribe(int32 uniqueID);
 	void			_SendListToSubscriber(Subscriber *subscriber, uint32 msgWhat = E_SUBSCRIBER_UPDATE_RANKED_APPS);
 	void			_PopulateAppRankMessage(BList *appStatsList, BMessage *message, int count);
 //	void			_ForEachAttrFile(int action, BList *appStatsList = NULL);
 	void			_RescanAllAttrFiles();
 	void			_RescanAttrFile(BEntry*);
-	bool			_DetermineExclusion(Subscriber *subscriber, const char* signature);
+	bool			_AppIsExcluded(Subscriber *subscriber, const char* signature);
 	void			_CreateAppStatsList(Subscriber *subscriber, int sortAction=SORT_BY_NONE);
 	void			_SortAppStatsList(Subscriber *subscriber, int sortAction);
 	void			_EmptyAppStatsList(BList &list);

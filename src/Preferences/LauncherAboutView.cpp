@@ -19,6 +19,7 @@ LauncherAboutView::LauncherAboutView(BRect size)
 	viewRect.top += 15;
 	BRect textRect(0,0,viewRect.Width(), viewRect.Height());
 	fAboutTextView = new BTextView(viewRect, "About text", textRect, B_FOLLOW_ALL);
+	// TODO add text about exclusions
 	fAboutTextView->SetText("The Einsteinium Launcher is a menu of"
 		" applications that resides in the deskbar.  This menu uses the Einsteinium Engine"
 		" to retrieve a list of ranked applications which are ordered by criteria set in"

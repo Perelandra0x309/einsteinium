@@ -16,6 +16,7 @@
 #include "AppRefFilter.h"
 #include "launcher_constants.h"
 #include "prefs_constants.h"
+#include "EngineSubscriber.h"
 
 
 class ExcludeItem;
@@ -25,18 +26,19 @@ public:
 					LauncherExclusionsView(BRect);
 					~LauncherExclusionsView();
 //	virtual void	MessageReceived(BMessage*);
+	virtual void	FrameResized(float width, float height);
 	bool			AddExclusion(BMessage* refMsg);
 	bool			RemoveSelectedExclusion();
 	void			UpdateSelectedItem();
-	void			SetLinkInclusionDefault(const char*);
-	void			GetLinkInclusionDefault(BString &value);
+//	void			SetLinkInclusionDefault(const char*);
+//	void			GetLinkInclusionDefault(BString &value);
 	void			PopulateExclusionsList(BMessage &exclusionsList);
 	void			GetExclusionsList(BMessage &list);
 	BSize			GetMinSize();
 private:
-	BBox			*fDefaultSettingsBox, *fSettingsBox;
+	BBox			/**fDefaultSettingsBox, */*fSettingsBox;
 	BButton			*fAddB, *fRemoveB;
-	BRadioButton	*fPromptRB, *fIncludeRB, *fIgnoreRB;
+//	BRadioButton	*fPromptRB, *fIncludeRB, *fIgnoreRB;
 	BListView		*fExclusionLView;
 	BScrollView		*fAttrSView;
 	ExcludeItem		*fSelectedItem;

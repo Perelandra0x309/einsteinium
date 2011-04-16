@@ -12,6 +12,7 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 #include "launcher_constants.h"
+#include "EngineSubscriber.h"
 
 class LauncherSettingsFile : public BHandler
 {
