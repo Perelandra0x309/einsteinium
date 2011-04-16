@@ -58,7 +58,9 @@ LauncherRankingsView::LauncherRankingsView(BRect size)
 	runtimeBox->SetBorder(B_PLAIN_BORDER);
 	runtimeBox->SetLabel("Total lifetime running time:");
 	runtimeBox->AddChild(fRuntimeSl);
-	fSetB = new BButton("Set Button", "Save and Recalculate Scores", new BMessage(EL_SAVE_RANKING));
+	fSetB = new BButton("Set Button", "Save and Recalculate Ranks", new BMessage(EL_SAVE_RANKING));
+	fSetB->SetToolTip("Click this button once the sliders are at their proper values.\n"
+							"The Launcher menu will be updated with these new settings.");
 	fSlidersBox = new BBox("Rank Sliders");
 	fSlidersBox->SetLabel("Application Ranking Weights");
 	fSlidersBox->AddChild(BGroupLayoutBuilder(B_VERTICAL, 5)
@@ -154,17 +156,32 @@ LauncherRankingsView::_InitSlider(BSlider *slider)
 void
 LauncherRankingsView::_SetSliderScaleLabel(BSlider* sldr, int n)
 {
-	BString label;
+	BString label, tooltip("This slider will set how much the application's final rank is determined by\n");
 	if(sldr==fLaunchesSl)
+	{
 		label.SetTo("More launches will ");
+		tooltip.Append("the total number of times the application has been launched.");
+	}
 	else if(sldr==fFirstSl)
+	{
 		label.SetTo("More recent dates will ");
+		tooltip.Append("the very first date and time the application was launched.");
+	}
 	else if(sldr==fLastSl)
+	{
 		label.SetTo("More recent dates will ");
+		tooltip.Append("the most recent date and time the application was launched.");
+	}
 	else if(sldr==fIntervalSl)
+	{
 		label.SetTo("Shorter interval will ");
+		tooltip.Append("the length of time between the application's two most recent launches.");
+	}
 	else if(sldr==fRuntimeSl)
+	{
 		label.SetTo("Higher runtime total will ");
+		tooltip.Append("the total cumulative running time of the application since its first launch.");
+	}
 	else
 		return;
 	switch(n)
@@ -226,6 +243,7 @@ LauncherRankingsView::_SetSliderScaleLabel(BSlider* sldr, int n)
 		}
 	}
 	sldr->SetLabel(label.String());
+	sldr->SetToolTip(tooltip);
 }
 
 

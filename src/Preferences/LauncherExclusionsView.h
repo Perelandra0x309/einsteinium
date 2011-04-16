@@ -40,7 +40,7 @@ private:
 	BButton			*fAddB, *fRemoveB;
 //	BRadioButton	*fPromptRB, *fIncludeRB, *fIgnoreRB;
 	BListView		*fExclusionLView;
-	BScrollView		*fAttrSView;
+	BScrollView		*fExclusionSView;
 	ExcludeItem		*fSelectedItem;
 	void			_RebuildExclusionsList(BMessage &exclusionsList);
 	void			_EmptyExclusionsList();

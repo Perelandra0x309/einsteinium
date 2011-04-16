@@ -24,7 +24,7 @@ LauncherAboutView::LauncherAboutView(BRect size)
 		" applications that resides in the deskbar.  This menu uses the Einsteinium Engine"
 		" to retrieve a list of ranked applications which are ordered by criteria set in"
 		" this preferences application.  Each application in the Launcher menu list can be"
-		" run by clicking on that menu item.\n\n"
+		" started by clicking on that menu item.");/*\n\n"
 		"Deskbar Menu:\n"
 		"Under the \"Deskbar Menu\" settings, change the \"Show this many applications:\" value"
 		" to set how many applications are listed in the deskbar menu.\n\n"
@@ -35,7 +35,7 @@ LauncherAboutView::LauncherAboutView(BRect size)
 		" a list of the applications run the most number of times, move the slider under"
 		" \"Total number of launches:\" to the right and set all other sliders so they say"
 		" \"...will have no effect\".  Then click the \"Save and Recalculate Scores\" button"
-		" and the Launcher menu will be updated with your new criteria.");
+		" and the Launcher menu will be updated with your new criteria.");*/
 	fAboutTextView->MakeSelectable(false);
 	fAboutTextView->MakeEditable(false);
 

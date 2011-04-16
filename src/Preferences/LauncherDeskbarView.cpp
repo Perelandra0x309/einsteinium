@@ -18,6 +18,8 @@ LauncherDeskbarView::LauncherDeskbarView(BRect size)
 	fItemCountTC = new BTextControl("Show this many applications:", "",
 						new BMessage(EL_DESKBAR_CHANGED));
 //	fItemCountTC->SetDivider(be_plain_font->StringWidth(fItemCountTC->Label()) + 4);
+	fItemCountTC->SetToolTip("Change this value to be the number of applications\n"
+							"you want to have listed in the Launcher deskbar menu.");
 	fItemCountTC->SetExplicitMaxSize(BSize(be_plain_font->StringWidth(fItemCountTC->Label())
 				+ be_plain_font->StringWidth("00000000"), B_SIZE_UNSET));
 	long i;
@@ -32,7 +34,8 @@ LauncherDeskbarView::LauncherDeskbarView(BRect size)
 	fEngineLaunchCB = new BCheckBox("LaunchValue",
 		"Automatically start the Engine when the Launcher starts.",
 		new BMessage(EL_ENGINELAUNCH_CHANGED));
-
+	fEngineLaunchCB->SetToolTip("If this option is checked, when the Launcher starts\n"
+								"it will also automatically start the Engine.");
 
 	fDeskbarBox->AddChild(BGroupLayoutBuilder(B_VERTICAL, 5)
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 5)

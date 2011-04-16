@@ -27,10 +27,7 @@ EngineStatusView::EngineStatusView(BRect size)
 		"  For example, a list of the most recently run apps (the typical Recent Applications"
 		" list), a list of apps with the longest total running time, a list of apps with the"
 		" highest number of launches, and more are possible using the statictics gathered by"
-		" the Einsteinium Engine.\n\n"
-		"Maintenance:\n"
-		"If you are having trouble with applications not ranking properly you can try running"
-		" a rescan of the database in the Maintenance section.");
+		" the Einsteinium Engine.");
 	fAboutTextView->MakeSelectable(false);
 	fAboutTextView->MakeEditable(false);
 /*	fAboutBox->AddChild(BGroupLayoutBuilder(B_HORIZONTAL, 5)

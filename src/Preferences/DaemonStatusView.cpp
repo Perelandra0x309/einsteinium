@@ -25,13 +25,7 @@ DaemonStatusView::DaemonStatusView(BRect size)
 		" all the apps which are running.  The daemon can automatically restart an app which"
 		" quits or crashes, provide a prompt to ask whether the app should be restarted, or"
 		" allow the app to quit without restarting it.  The Einsteinium Daemon determines the"
-		" appropriate action to take for each app by the settings you specify.\n\n"
-		"App Relaunch:\n"
-		"Use the \"App Relaunch\" section to specify what actions you want the daemon to"
-		" take.  The \"Default setting\" item specifies the action to take for any apps"
-		" that are not in the list.  Add specific apps to the list to override the default"
-		" action for that specific app.  Each specific app will be color coded based on the"
-		" action specified, so you can quickly view all your app settings.");
+		" appropriate action to take for each app by the settings you specify.");
 	fAboutTextView->MakeSelectable(false);
 	fAboutTextView->MakeEditable(false);
 /*	fAboutBox->AddChild(BGroupLayoutBuilder(B_HORIZONTAL, 5)

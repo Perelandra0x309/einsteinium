@@ -40,6 +40,12 @@ DaemonRelaunchView::DaemonRelaunchView(BRect size)
 	fAppsLView->SetSelectionMessage(new BMessage(ED_RELAPP_SELECTION_CHANGED));
 	fAppsSView = new BScrollView("Apps List Scroll View", fAppsLView, B_FOLLOW_ALL_SIDES, 0,
 								false, true);
+	fAppsSView->SetToolTip("Use this list to specify what actions you want the Einsteinium Daemon to take\n"
+							"when an application quits.  The \"Default setting\" item specifies the action\n"
+							"to take for any apps that are not in this list.  Add specific apps to this list\n"
+							"to override the default action for that specific app.  Each app in this list will\n"
+							"be color coded based on the action specified, so you can quickly view all your\n"
+							"app settings.");
 
 	fRelaunchBox->AddChild(BGridLayoutBuilder(5, 5)
 		.Add(fAppsSView, 0, 0, 1, 3)

@@ -31,6 +31,8 @@ LauncherExclusionsView::LauncherExclusionsView(BRect size)
 		.Add(fIgnoreRB)
 		.SetInsets(5, 5, 5, 5)
 	);*/
+	// TODO Make a double pane view to easily move applications into the excluded list.
+	// Subscribe to the engine to get a current list of applications.
 
 	// Buttons
 	fAddB = new BButton("Add", "Add" B_UTF8_ELLIPSIS, new BMessage(EL_ADD_EXCLUSION));
@@ -42,14 +44,17 @@ LauncherExclusionsView::LauncherExclusionsView(BRect size)
 	fExclusionLView = new BListView(viewRect, "Attr List View", B_SINGLE_SELECTION_LIST,
 								B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS);
 	fExclusionLView->SetSelectionMessage(new BMessage(EL_EXCLUSION_SELECTION_CHANGED));
-	fAttrSView = new BScrollView("Attr List Scroll View", fExclusionLView, B_FOLLOW_ALL_SIDES, 0,
+	fExclusionSView = new BScrollView("Attr List Scroll View", fExclusionLView, B_FOLLOW_ALL_SIDES, 0,
 								false, true);
+	fExclusionSView->SetToolTip("Applications in this list will be completely excluded from\n"
+								"the Launcher deskbar menu.  Adding or removing applications\n"
+								"from this list will instantly update the Launcher.");
 
 	// Inidividual app settings
 	fSettingsBox = new BBox("Application Attribute Settings");
 	fSettingsBox->SetLabel("Exclude These Apps From The Launcher");
 	fSettingsBox->AddChild(BGridLayoutBuilder(5, 5)
-		.Add(fAttrSView, 0, 0, 1, 3)
+		.Add(fExclusionSView, 0, 0, 1, 3)
 		.Add(fAddB, 1, 0)
 		.Add(fRemoveB, 1, 1)
 		.SetInsets(5, 5, 5, 5)
@@ -87,7 +92,7 @@ LauncherExclusionsView::FrameResized(float width, float height)
 	fAddB->Invalidate();
 	fRemoveB->Invalidate();
 	fExclusionLView->Invalidate();
-	fAttrSView->Invalidate();
+	fExclusionSView->Invalidate();
 	BView::FrameResized(width, height);
 }
 

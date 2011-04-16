@@ -22,8 +22,9 @@ EngineMaintenanceView::EngineMaintenanceView(BRect size)
 	viewRect.top += 15;
 	BRect textRect(0,0,viewRect.Width(), viewRect.Height());
 	fDataTV = new BTextView(viewRect, "Rescan Data Description", textRect, B_FOLLOW_ALL);
-	fDataTV->SetText("Press the \"Rescan Data\" button below to have the Engine rescan the database to recreate "
-		"application statistics.  The Engine must be running to perform this task.");
+	fDataTV->SetText("If you are having trouble with applications not ranking properly you can"
+		" press the \"Rescan Data\" button below to have the Engine rescan the database and recreate"
+		" application statistics.  The Engine must be running to perform this task.");
 	fDataTV->MakeSelectable(false);
 	fDataTV->MakeEditable(false);
 
