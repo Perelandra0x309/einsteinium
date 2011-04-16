@@ -34,7 +34,7 @@ public:
 //	void			GetLinkInclusionDefault(BString &value);
 	void			PopulateExclusionsList(BMessage &exclusionsList);
 	void			GetExclusionsList(BMessage &list);
-	BSize			GetMinSize();
+//	BSize			GetMinSize();
 private:
 	BBox			/**fDefaultSettingsBox, */*fSettingsBox;
 	BButton			*fAddB, *fRemoveB;

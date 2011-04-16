@@ -23,13 +23,14 @@ public:
 	status_t				CheckStatus() { return fStatus; }
 	int*					GetScales();
 	void					SaveScales(int*);
-	const char*				GetLinkInclusionDefaultValue();
-	void					SaveLinkInclusionDefaultValue(const char*);
-//	void					GetDeskbarSettings(bool &show, int &count);
+//	const char*				GetLinkInclusionDefaultValue();
+//	void					SaveLinkInclusionDefaultValue(const char*);
 	int						GetDeskbarCount() { return fDeskbarMenuCount; }
 	void					SaveDeskbarCount(int count);
 	BMessage				GetExclusionsList() { return fExclusionsList; }
 	void					SaveExclusionsList(BMessage &exclusionsList);
+	bool					GetEngineAutoLaunch() { return fLaunchEngineOnStart; }
+	void					SaveEngineAutoLaunch(bool autoLaunch);
 	int						scales[5];
 private:
 	BPath					fSettingsPath;
@@ -41,16 +42,15 @@ private:
 	BHandler				*fExternalMessageHandler;
 	// Engine settings that can change
 	int						fLaunchScale, fFirstScale, fLastScale, fIntervalScale, fRuntimeScale;
-	BString					fInclusionDefault;
-//	bool					fShowDeskbarMenu;
+//	BString					fInclusionDefault;
 	int						fDeskbarMenuCount;
+	bool					fLaunchEngineOnStart;
 
 	void					_StartWatching();
 	void					_StopWatching();
 	int						_XmlGetIntProp(xmlNodePtr cur, char *name);
 	void					_ReadSettingsFromFile(BPath file);
 	void					_ParseExclusionSettings(xmlDocPtr doc, xmlNodePtr cur);
-//	void					_DeleteExclusionsList();
 	status_t				_WriteSettingsToFile();
 };
 

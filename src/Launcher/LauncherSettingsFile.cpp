@@ -15,10 +15,10 @@ LauncherSettingsFile::LauncherSettingsFile(BHandler *messageHandler=NULL)
 	fLastScale(DEFAULT_VALUE_LAST_SCALE),
 	fIntervalScale(DEFAULT_VALUE_INTERVAL_SCALE),
 	fRuntimeScale(DEFAULT_VALUE_RUNTIME_SCALE),
-	fInclusionDefault(EL_XMLTEXT_VALUE_PROMPT),
-//	fShowDeskbarMenu(true),
+//	fInclusionDefault(EL_XMLTEXT_VALUE_PROMPT),
 	fDeskbarMenuCount(20),
-	fExclusionsList(EL_MESSAGE_WHAT_EXCLUDED_APPS)
+	fExclusionsList(EL_MESSAGE_WHAT_EXCLUDED_APPS),
+	fLaunchEngineOnStart(DEFAULT_LAUNCH_ENGINE_ON_START)
 {
 	// find path for settings directory
 	find_directory(B_USER_SETTINGS_DIRECTORY, &fSettingsPath);
@@ -122,7 +122,7 @@ LauncherSettingsFile::_ReadSettingsFromFile(BPath file)
 	cur = cur->xmlChildrenNode;
 	while (cur != NULL) {
 		// default list inclusion setting
-		if (!xmlStrcmp(cur->name, (const xmlChar *) EL_XMLTEXT_CHILD_NAME_INCLUSION))
+/*		if (!xmlStrcmp(cur->name, (const xmlChar *) EL_XMLTEXT_CHILD_NAME_INCLUSION))
 		{
 			xmlChar *value = xmlGetProp(cur,
 							(const xmlChar *) EL_XMLTEXT_PROPERTY_INCLUSION_DEFAULT);
@@ -133,6 +133,12 @@ LauncherSettingsFile::_ReadSettingsFromFile(BPath file)
 			{
 				fInclusionDefault.SetTo((char *)value);
 			}
+		}*/
+		// engine auto launch
+		if (!xmlStrcmp(cur->name, (const xmlChar *) EL_XMLTEXT_CHILD_NAME_ENGINE))
+		{
+			xmlChar *value = xmlGetProp(cur, (const xmlChar *) EL_XMLTEXT_PROPERTY_AUTOLAUNCH);
+			fLaunchEngineOnStart = strcmp("true", (char *)value)==0;
 		}
 		// scale settings
 		if (!xmlStrcmp(cur->name, (const xmlChar *) EL_XMLTEXT_CHILD_NAME_RANK))
@@ -216,11 +222,12 @@ LauncherSettingsFile::_WriteSettingsToFile()
 	intervalChar << fIntervalScale;
 	runtimeChar << fRuntimeScale;
 
-/*	BString showDeskbar;
-	if(fShowDeskbarMenu)
-		showDeskbar.SetTo("true");
+	BString autoLaunchValue;
+	if(fLaunchEngineOnStart)
+		autoLaunchValue.SetTo("true");
 	else
-		showDeskbar.SetTo("false");*/
+		autoLaunchValue.SetTo("false");
+
 	BString countChar;
 	countChar << fDeskbarMenuCount;
 
@@ -231,9 +238,14 @@ LauncherSettingsFile::_WriteSettingsToFile()
 	dtd = xmlCreateIntSubset(doc, BAD_CAST EL_XMLTEXT_ROOT_NAME, NULL, BAD_CAST "tree.dtd");
 
 	// write default link inclusion value
-	child1node = xmlNewChild(root_node, NULL, BAD_CAST EL_XMLTEXT_CHILD_NAME_INCLUSION, NULL);
+/*	child1node = xmlNewChild(root_node, NULL, BAD_CAST EL_XMLTEXT_CHILD_NAME_INCLUSION, NULL);
 	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_INCLUSION_DEFAULT,
 				BAD_CAST fInclusionDefault.String() );
+	*/
+	// Automatically launch the Engine when Launcher starts
+	child1node = xmlNewChild(root_node, NULL, BAD_CAST EL_XMLTEXT_CHILD_NAME_ENGINE, NULL);
+	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_AUTOLAUNCH,
+				BAD_CAST autoLaunchValue.String() );
 
 	// write scale values
 	child1node = xmlNewChild(root_node, NULL, BAD_CAST EL_XMLTEXT_CHILD_NAME_RANK, NULL);
@@ -284,18 +296,6 @@ LauncherSettingsFile::_WriteSettingsToFile()
 	return B_OK;
 }
 
-/*
-void
-LauncherSettingsFile::_DeleteExclusionsList()
-{
-	BString *item;
-	do
-	{	item = static_cast<BString *>(fExclusionsList.RemoveItem(int32(0)));
-		delete item;
-	}while(item);
-	fExclusionsList.MakeEmpty();
-}*/
-
 
 void
 LauncherSettingsFile::MessageReceived(BMessage *msg)
@@ -330,13 +330,6 @@ LauncherSettingsFile::MessageReceived(BMessage *msg)
 	}
 }
 
-/*
-status_t
-LauncherSettingsFile::CheckStatus()
-{
-	return fStatus;
-}*/
-
 
 int*
 LauncherSettingsFile::GetScales()
@@ -361,7 +354,7 @@ LauncherSettingsFile::SaveScales(int *scales)
 	_WriteSettingsToFile();
 }
 
-
+/*
 const char*
 LauncherSettingsFile::GetLinkInclusionDefaultValue()
 {
@@ -380,25 +373,15 @@ LauncherSettingsFile::SaveLinkInclusionDefaultValue(const char *value)
 		fInclusionDefault.SetTo(value);
 		_WriteSettingsToFile();
 	}
-}
-
-
-/*
-int
-LauncherSettingsFile::GetDeskbarSettings()
-{
-//	show = fShowDeskbarMenu;
-	count = fDeskbarMenuCount;
 }*/
 
-/*
+
 void
-LauncherSettingsFile::SaveDeskbarSettings(bool show, int count)
+LauncherSettingsFile::SaveEngineAutoLaunch(bool autoLaunch)
 {
-	fShowDeskbarMenu = show;
-	fDeskbarMenuCount = count;
+	fLaunchEngineOnStart = autoLaunch;
 	_WriteSettingsToFile();
-}*/
+}
 
 
 void

@@ -195,17 +195,17 @@ LauncherExclusionsView::GetExclusionsList(BMessage &list)
 	}
 }
 
-
+/*
 BSize
 LauncherExclusionsView::GetMinSize()
 {
 	BSize size(B_SIZE_UNSET, B_SIZE_UNSET);
-/*	size.width = fIgnoreRB->MinSize().width + 20;
+	size.width = fIgnoreRB->MinSize().width + 20;
 	size.height = (4 * fIgnoreRB->MinSize().height)
-					+ (2 * fAddB->MinSize().height) + 90;*/
+					+ (2 * fAddB->MinSize().height) + 90;
 
 	return size;
-}
+}*/
 
 
 void

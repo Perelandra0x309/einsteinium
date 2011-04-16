@@ -11,6 +11,7 @@ ELShelfView::ELShelfView()
 	fIcon(NULL),
 	fMenu(NULL),
 	fItemCount(0),
+	fSettingsFile(NULL),
 	fEngineAlert(NULL),
 	fEngineAlertIsShowing(false),
 	fWatchingRoster(false)
@@ -46,6 +47,7 @@ ELShelfView::ELShelfView(BMessage *message)
 	fIcon(NULL),
 	fMenu(NULL),
 	fItemCount(0),
+	fSettingsFile(NULL),
 	fEngineAlert(NULL),
 	fEngineAlertIsShowing(false),
 	fWatchingRoster(false)
@@ -63,7 +65,7 @@ ELShelfView::~ELShelfView()
 {
 	delete fIcon;
 	delete fMenu;
-	delete fSettingsFile;
+//	delete fSettingsFile;
 }
 
 
@@ -90,12 +92,15 @@ ELShelfView::AttachedToWindow()
 	}
 
 	// Display warning if the Engine is not running
-	bool engineIsRunning = _CheckEngineStatus(true);
+	bool engineAutoLaunch = fSettingsFile->GetEngineAutoLaunch();
+	bool engineIsRunning = _CheckEngineStatus(!engineAutoLaunch);
 
 	// Subscribe to the Einsteinium Engine
 	if(engineIsRunning)
 		_Subscribe();
-	// TODO automatically start engine if not running
+	// Automatically start engine if not running
+	else if(engineAutoLaunch)
+		_LaunchEngine();
 
 	//Start watching for launches and quits of the Einsteinium Engine
 	result = be_roster->StartWatching(BMessenger(this),
@@ -129,6 +134,9 @@ ELShelfView::DetachedFromWindow()
 
 	// Unsubscribe from the Einsteinium Engine
 	_UnsubscribeFromEngine();
+
+	delete fSettingsFile;
+	fSettingsFile = NULL;
 }
 
 

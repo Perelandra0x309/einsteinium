@@ -103,10 +103,7 @@ prefsWindow::prefsWindow(BRect size)
 	_AddSettingsView(fLauncherBLI, fLAboutView);
 	_AddSettingsView(fLDeskbarSI, fLDeskbarView);
 	_AddSettingsView(fLRankSI, fLRankingsView);
-	// TODO impliment exclusions
 	_AddSettingsView(fLExclusionsSI, fLExclusionsView);
-//	fMainView->AddChild(fLExclusionsView);
-//	fLExclusionsView->Hide();
 
 	fCurrentView = fEmptySettingsView;
 	FrameResized(0,0);
@@ -120,7 +117,7 @@ prefsWindow::prefsWindow(BRect size)
 	minSize = fLRankingsView->GetMinSize();
 	minHeight = max_c(minHeight, minSize.height);
 	minWidth = max_c(minWidth, minSize.width);
-	minSize = fLExclusionsView->GetMinSize();
+	minSize = fLDeskbarView->GetMinSize();
 	minHeight = max_c(minHeight, minSize.height);
 	minWidth = max_c(minWidth, minSize.width);
 	float finalMinWidth = fPrefsListView->Frame().right + minWidth + 10;
@@ -200,7 +197,8 @@ prefsWindow::MessageReceived(BMessage *msg)
 			messenger.SendMessage(&msg);
 			break; }
 		// Deskbar settings changed
-		case EL_DESKBAR_CHANGED: {
+		case EL_DESKBAR_CHANGED:
+		case EL_ENGINELAUNCH_CHANGED: {
 			_WriteLauncherDeskbarSettings();
 			break;
 		}
@@ -332,6 +330,7 @@ prefsWindow::_ReadLauncherSettings()
 
 	// Deskbar settings
 	fLDeskbarView->SetDeskbarCount(fLauncherSettings->GetDeskbarCount());
+	fLDeskbarView->SetEngineAutoLaunch(fLauncherSettings->GetEngineAutoLaunch());
 }
 
 
@@ -340,6 +339,7 @@ void
 prefsWindow::_WriteLauncherDeskbarSettings()
 {
 	fLauncherSettings->SaveDeskbarCount(fLDeskbarView->GetDeskbarCount());
+	fLauncherSettings->SaveEngineAutoLaunch(fLDeskbarView->GetEngineAutoLaunch());
 }
 
 void

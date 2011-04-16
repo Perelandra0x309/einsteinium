@@ -32,6 +32,8 @@
 #define EL_XMLTEXT_CHILD_NAME_APP "app"
 #define EL_XMLTEXT_PROPERTY_SIGNATURE "sig"
 #define EL_XMLTEXT_PROPERTY_NAME "name"
+#define EL_XMLTEXT_CHILD_NAME_ENGINE "engine"
+#define EL_XMLTEXT_PROPERTY_AUTOLAUNCH "auto_launch"
 
 // Other text
 #define EL_SHELFVIEW_NAME "el_shelfview"
@@ -45,6 +47,7 @@
 #define DEFAULT_VALUE_LAST_SCALE 0
 #define DEFAULT_VALUE_INTERVAL_SCALE 0
 #define DEFAULT_VALUE_RUNTIME_SCALE 0
+#define DEFAULT_LAUNCH_ENGINE_ON_START true
 
 //Indexes
 enum scales_index
