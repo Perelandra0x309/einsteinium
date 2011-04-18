@@ -772,11 +772,8 @@ einsteinium_engine::_UpdateQuartiles(Subscriber *subscriber)
 	// Reset the count and calculate what the count should be to recalculate quartiles
 	subscriber->countSinceQuartilesUpdated = 0;
 	subscriber->recalcQuartilesCount = 2*int(sqrt(subscriber->appStatsList.CountItems()));
-//	printf("Count to recalculate quartiles=%i\n", subscriber->recalcQuartilesCount);
+//s	printf("Count to recalculate quartiles=%i\n", subscriber->recalcQuartilesCount);
 }
-
-// TODO there is a bug when there are less than 10 data sets available- score becomes
-// severly negative for apps that have more than one launch.  Needs to investigate this.
 
 
 template < class itemType >
@@ -786,7 +783,21 @@ einsteinium_engine::_GetQuartiles(itemType (*getFunc)(AppStats*), BList &working
 {
 	int count = workingList.CountItems();
 	if(count<5)
+	{
+		// No data if count is zero
+		if(count==0)
+			return;
+		// There are too few items to do quartiles- simulate quartiles by creating evenly spaced
+		// quartile values between the highest and lowest values
+		Q[4] = getFunc( (AppStats*)workingList.ItemAt(0) );
+		Q[0] = getFunc( (AppStats*)workingList.ItemAt(count-1) );
+		double delta = Q[4] - Q[0];
+		Q[1] = Q[0] + delta/4.0;
+		Q[2] = Q[0] + delta/2.0;
+		Q[3] = Q[0] + delta*3.0/4.0;
+//		printf("Q0=%f\nQ1=%f\nQ2=%f\nQ3=%f\nQ4=%f\n", Q[0], Q[1], Q[2], Q[3], Q[4]);
 		return;
+	}
 	double index;
 	itemType qLower, qUpper;
 	for(int i=0; i<5; i++)
@@ -812,7 +823,7 @@ einsteinium_engine::_GetQuartiles(itemType (*getFunc)(AppStats*), BList &working
 				// Multiply the two and get the fraction of the difference to add to the lower
 				// item value to get the final quartile value.
 		}
-		printf("Q%i (index value %f): %f\n", i, index, Q[i]);
+//		printf("Q%i (index value %f): %f\n", i, index, Q[i]);
 	}
 }
 
@@ -820,7 +831,7 @@ einsteinium_engine::_GetQuartiles(itemType (*getFunc)(AppStats*), BList &working
 void
 einsteinium_engine::_CalculateScores(Subscriber *subscriber)
 {
-	printf("Calculating scores\n");
+//	printf("Calculating scores\n");
 	int count = subscriber->appStatsList.CountItems();
 	for(int i=0; i<count; i++)
 	{
@@ -846,13 +857,41 @@ einsteinium_engine::_CalculateScore(Subscriber *subscriber, AppStats *appStats)
 		last_interval_value = .5;
 
 	int max_scale = 100000;
-	appStats->score = int(  max_scale*(launch_value * subscriber->launch_scale)
-				+ max_scale*(first_launch_value * subscriber->first_scale)
-				+ max_scale*(last_launch_value * subscriber->last_scale)
-				+ max_scale*((1 - last_interval_value) * subscriber->interval_scale)
+	appStats->score = int( (max_scale * launch_value * subscriber->launch_scale)
+				+ (max_scale * first_launch_value * subscriber->first_scale)
+				+ (max_scale * last_launch_value * subscriber->last_scale)
+				+ (max_scale * (1 - last_interval_value) * subscriber->interval_scale)
 					// Need to reverse interval scale, because longer intervals decrease the score
-				+ max_scale*(total_run_time_value * subscriber->runtime_scale));
-	printf("Score for %s is %i\n", appStats->app_sig.String(), appStats->score);
+				+ (max_scale * total_run_time_value * subscriber->runtime_scale) );
+/*	// Big debug string generator since printf does seem to work well referencing values inside objects
+	printf("--Score for %s is %i--\n", appStats->app_sig.String(), appStats->score);
+	BString test("Values: launch_value=");
+	test<<launch_value;
+	test.Append(" * launch_scale=");
+	int launch_scale = subscriber->launch_scale;
+	test<<launch_scale;
+	test.Append("\n+ first_value=");
+	test<<first_launch_value;
+	test.Append(" * first_scale=");
+	int first_scale = subscriber->first_scale;
+	test<<first_scale;
+	test.Append("\n+ last_value=");
+	test<<last_launch_value;
+	test.Append(" *  last_scale=");
+	int last_scale = subscriber->last_scale;
+	test<<last_scale;
+	test.Append("\n+ interval_value=");
+	test<<last_interval_value;
+	test.Append(" * interval_scale=");
+	int interval_scale = subscriber->interval_scale;
+	test<<interval_scale;
+	test.Append("\n+ runtime_value=");
+	test<<total_run_time_value;
+	test.Append(" * runtime_scale=");
+	int runtime_scale = subscriber->runtime_scale;
+	test<<runtime_scale;
+	test.Append("\n");
+	printf("%s", test.String());*/
 }
 
 
@@ -876,7 +915,11 @@ einsteinium_engine::_GetQuartileValue(const double *Q, double d)
 	}
 	else { return .5; }
 
-	return (.25*index + .25*((d - Q[index])/(Q[index+1-index_offset] - Q[index-index_offset])));
+	float value = .25*index;
+	// Avoid divide by zero problems when both quartile values are the same
+	if(Q[index+1-index_offset] != Q[index-index_offset])
+		value += .25*((d - Q[index])/(Q[index+1-index_offset] - Q[index-index_offset]));
+	return value;
 }
 
 
