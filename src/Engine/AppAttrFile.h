@@ -26,7 +26,7 @@ public:
 private:
 	bool			fNewSession;
 	AppStats		fAppStats;
-	BEntry			fAppEntry, fAppAttrEntry, fAppDataEntry;
+	BEntry			fAppEntry, fAppAttrEntry;
 	time_t			fEngineCurrentSession;
 	//Functions
 	void			_InitData(bool);

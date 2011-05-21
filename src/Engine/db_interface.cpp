@@ -13,30 +13,11 @@ Edb_open(sqlite3** dbpp, const char* file_path)
 {
 	int ret=0;
 //	printf("Opening database %s\n", file_path);
-	// Check to see if database file already exists before attempting to open it.
-	BEntry fileEntry(file_path);
-	bool newDatabase = !fileEntry.Exists();
-
-	// Open database
 	ret = sqlite3_open(file_path, dbpp);
 	if( ret ){
     	fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(*dbpp));
     	Edb_close(*dbpp);
-		return ret;
 	}
-	// Need to create table for new database
-	if(newDatabase)
-	{
-		BString sqlcmd("create table time_data(app_time_data blob);");
-		char *errorMsg = NULL;
-		ret = sqlite3_exec(*dbpp, sqlcmd.String(), NULL, NULL, &errorMsg);
-		if( ret!=SQLITE_OK ){
-			fprintf(stderr, "SQL error:%s\n", errorMsg);
-			sqlite3_free(errorMsg);
-			Edb_close(*dbpp);
-		}
-	}
-
 	return ret;
 }
 
@@ -48,6 +29,21 @@ Edb_close(sqlite3* dbp)
 	ret = sqlite3_close(dbp);
 	if( ret )
     	fprintf(stderr, "Can't close database: %s\n", sqlite3_errmsg(dbp));
+	return ret;
+}
+
+
+int
+Edb_create(sqlite3* dbp)
+{
+	// Need to create table for new database
+	BString sqlcmd("create table time_data(app_time_data blob);");
+	char *errorMsg = NULL;
+	int ret = sqlite3_exec(dbp, sqlcmd.String(), NULL, NULL, &errorMsg);
+	if( ret!=SQLITE_OK ){
+		fprintf(stderr, "SQL error:%s\n", errorMsg);
+		sqlite3_free(errorMsg);
+	}
 	return ret;
 }
 
@@ -235,6 +231,18 @@ Edb_getLastData(sqlite3* dbp, app_time_data* tm_data, long long int* row_key)
 	sqlite3_finalize(stmt);
 
 	return ret;
+}
+
+
+void
+Edb_Init(const char* file_path)
+{
+	sqlite3 *dbp = NULL;
+	int ret = Edb_open(&dbp, file_path);
+	if( ret != 0 )
+		return;
+	Edb_create(dbp);
+	Edb_close(dbp);
 }
 
 

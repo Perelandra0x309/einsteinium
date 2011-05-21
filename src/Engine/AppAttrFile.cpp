@@ -22,16 +22,18 @@ AppAttrFile::AppAttrFile(const char *appSig, const BEntry *appEntry)
 		//create paths for both the application and its attribute file
 	find_directory(B_USER_SETTINGS_DIRECTORY, &appAttrPath);
 	appAttrPath.Append("Einsteinium/Applications");
-	appAttrPath.Append(appPath.Leaf());
+	BString fileName(appPath.Leaf());
+	fileName.Append(".db");
+	appAttrPath.Append(fileName.String());
 	fAppAttrEntry.SetTo(appAttrPath.Path());
 	uint32 openMode = B_READ_WRITE;
 	bool newFile = false;
 		//flag to indicate if a new file must be created
-	printf("Finding appInfo file %s\n", appAttrPath.Path());
+//	printf("Finding appInfo file %s\n", appAttrPath.Path());
 	if(!fAppAttrEntry.Exists())
 	{	// TODO If the filename changed, need to search all attr files for app_sig
 		// But for now...
-		printf("Creating %s\n", appAttrPath.Path());
+//		printf("Creating %s\n", appAttrPath.Path());
 		openMode |= B_CREATE_FILE;
 		newFile = true;
 	}
@@ -39,6 +41,9 @@ AppAttrFile::AppAttrFile(const char *appSig, const BEntry *appEntry)
 
 	if(newFile)
 	{
+		// Create database tables
+		Edb_Init(appAttrPath.Path());
+
 		// Initialize starting attributes and stats
 		BNode attrNode(&fAppAttrEntry);
 		BNodeInfo attrNodeInfo(&attrNode);
@@ -78,19 +83,9 @@ AppAttrFile::_InitData(bool newFile)
 {
 	fEngineCurrentSession = ((einsteinium_engine*)be_app)->GetSession();
 
-	// Database path
-	BPath appAttrPath(&fAppAttrEntry);
-	BString dataPathStr(appAttrPath.Path());
-	dataPathStr.Append(".db");
-	fAppDataEntry.SetTo(dataPathStr.String());
-
+	// Read attributes from existing file
 	if(!newFile)
 		_ReadAttrValues();
-			// Read attributes from existing file
-
-	else if(fAppDataEntry.Exists())
-		RescanData();
-			// New attribute file, look for existing data file, if it exists rescan data
 }
 
 
@@ -106,9 +101,9 @@ AppAttrFile::UpdateAppLaunched()
 	time_t now = time(NULL);
 		//current time
 
-	//update database
-	BPath appDataPath(&fAppDataEntry);
-	Edb_Add_Launch_Time(appDataPath.Path(), fEngineCurrentSession, now);
+	// Update database
+	BPath dataPath(&fAppAttrEntry);
+	Edb_Add_Launch_Time(dataPath.Path(), fEngineCurrentSession, now);
 
 	// Update the attributes
 	if(fAppStats.launch_count == 0)
@@ -128,9 +123,9 @@ AppAttrFile::UpdateAppQuit()
 {
 	time_t now = time(NULL);
 
-	//update database
-	BPath appDataPath(&fAppDataEntry);
-	Edb_Add_Quit_Time(appDataPath.Path(), fEngineCurrentSession, now);
+	// Update database
+	BPath dataPath(&fAppAttrEntry);
+	Edb_Add_Quit_Time(dataPath.Path(), fEngineCurrentSession, now);
 
 	// Update the attributes
 	if( (!fNewSession) && (fAppStats.last_launch!=0) )
@@ -143,8 +138,9 @@ AppAttrFile::UpdateAppQuit()
 void
 AppAttrFile::RescanData()
 {
-	BPath appDataPath(&fAppDataEntry);
-	Edb_Rescan_Data(appDataPath.Path(), &fAppStats);
+	// Recreate attributes by scanning entire data
+	BPath dataPath(&fAppAttrEntry);
+	Edb_Rescan_Data(dataPath.Path(), &fAppStats);
 	_WriteAttrValues();
 }
 
