@@ -47,20 +47,23 @@ DaemonRelaunchView::DaemonRelaunchView(BRect size)
 							"be color coded based on the action specified, so you can quickly view all your\n"
 							"app settings.");
 
-	fRelaunchBox->AddChild(BGridLayoutBuilder(5, 5)
+	BGridLayout *boxLayout = new BGridLayout(5, 5);
+	fRelaunchBox->SetLayout(boxLayout);
+	BLayoutBuilder::Grid<>(boxLayout)
 		.Add(fAppsSView, 0, 0, 1, 3)
 		.Add(fAddAppB, 1, 0)
 		.Add(fRemoveAppB, 1, 1)
 		.Add(fAutoRelaunchRB, 0, 3, 2, 1)
 		.Add(fPromptRelaunchRB, 0, 4, 2, 1)
 		.Add(fDontRelaunchRB, 0, 5, 2, 1)
-		.SetInsets(5, 5, 5, 5)
-	);
+		.SetInsets(10, 20, 10, 10)
+	;
 
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
+	BGroupLayout *layout = new BGroupLayout(B_VERTICAL);
+	SetLayout(layout);
+	BLayoutBuilder::Group<>(layout)
 		.Add(fRelaunchBox)
-	);
+	;
 
 	//File Panel
 	fAppFilter = new AppRefFilter();

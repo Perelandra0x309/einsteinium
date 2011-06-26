@@ -10,17 +10,11 @@ DaemonStatusView::DaemonStatusView(BRect size)
 	fWatchingRoster(false),
 	fStatusBox(NULL)
 {
-	BRect viewRect(0,0,size.Width(), size.Height());
 
 	// About box
-//	fAboutBox = new BBox("About");
-	fAboutBox = new BBox(viewRect, "About", B_FOLLOW_LEFT_RIGHT);
+	fAboutBox = new BBox("About");
 	fAboutBox->SetLabel("About Einsteinum Daemon");
-//	fAboutTextView = new BTextView("About text");
-	viewRect.InsetBy(10, 5);
-	viewRect.top += 15;
-	BRect textRect(0,0,viewRect.Width(), viewRect.Height());
-	fAboutTextView = new BTextView(viewRect, "About text", textRect, B_FOLLOW_ALL);
+	fAboutTextView = new BTextView("About text");
 	fAboutTextView->SetText("The Einsteinium Daemon is a background app that watches"
 		" all the apps which are running.  The daemon can automatically restart an app which"
 		" quits or crashes, provide a prompt to ask whether the app should be restarted, or"
@@ -28,32 +22,27 @@ DaemonStatusView::DaemonStatusView(BRect size)
 		" appropriate action to take for each app by the settings you specify.");
 	fAboutTextView->MakeSelectable(false);
 	fAboutTextView->MakeEditable(false);
-/*	fAboutBox->AddChild(BGroupLayoutBuilder(B_HORIZONTAL, 5)
+
+	BGroupLayout *boxLayout = new BGroupLayout(B_VERTICAL);
+	fAboutBox->SetLayout(boxLayout);
+	BLayoutBuilder::Group<>(boxLayout)
 		.Add(fAboutTextView)
-		.SetInsets(5, 5, 5, 5)
-	);*/
+		.SetInsets(10, 20, 10, 10)
+	;
 
 	// Status Box
 	BEntry serviceEntry = GetEntryFromSig(e_daemon_sig);
 	if(serviceEntry.Exists())
-	{
 		fStatusBox = new SystemStatusBox("Daemon Running Status", serviceEntry, e_daemon_sig);
-		fStatusBox->ResizeToPreferred();
-	}
 
 	// Layout
-/*	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	BGroupLayoutBuilder builder(B_VERTICAL, 10);
+	BGroupLayout *layout = new BGroupLayout(B_VERTICAL);
+	SetLayout(layout);
+	BGroupLayoutBuilder builder(layout);
 	builder.Add(fAboutBox);
 	if(fStatusBox != NULL)
 		builder.Add(fStatusBox);
-	AddChild(builder
-		.AddGlue()
-	);*/
-	fAboutBox->AddChild(fAboutTextView);
-	AddChild(fAboutBox);
-	if(fStatusBox)
-		AddChild(fStatusBox);
+	builder.AddGlue();
 }
 
 

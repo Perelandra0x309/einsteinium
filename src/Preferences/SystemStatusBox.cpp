@@ -14,7 +14,6 @@ SystemStatusBox::SystemStatusBox(const char *label, BEntry entry, const char * s
 	entry.GetPath(&path);
 	fName.SetTo(path.Leaf());
 	SetLabel(label);
-	SetResizingMode(B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
 	fSignature.SetTo(sig);
 	fStatusSV = new BStringView("Status String", "Status: ");
 	fRestartB = new BButton("Restart", new BMessage(RESTART_SERVICE));
@@ -22,13 +21,15 @@ SystemStatusBox::SystemStatusBox(const char *label, BEntry entry, const char * s
 	fStartstopB = new BButton("Stop");
 	fStartstopB->SetEnabled(false);
 
-	AddChild(BGroupLayoutBuilder(B_HORIZONTAL, 10)
+	BGroupLayout *layout = new BGroupLayout(B_HORIZONTAL, 10);
+	SetLayout(layout);
+	BLayoutBuilder::Group<>(layout)
 		.Add(fStatusSV)
 		.AddGlue()
 		.Add(fRestartB)
 		.Add(fStartstopB)
-		.SetInsets(5, 5, 5, 5)
-	);
+		.SetInsets(5, 15, 5, 5)
+	;
 }
 
 

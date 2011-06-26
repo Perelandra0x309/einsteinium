@@ -9,6 +9,7 @@
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <GridLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include "prefs_constants.h"
 #include "stdlib.h"
 

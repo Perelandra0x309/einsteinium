@@ -10,17 +10,10 @@ EngineStatusView::EngineStatusView(BRect size)
 	fWatchingRoster(false),
 	fStatusBox(NULL)
 {
-	BRect viewRect(0,0,size.Width(), size.Height());
-
 	// About box
-//	fAboutBox = new BBox("About");
-	fAboutBox = new BBox(viewRect, "About", B_FOLLOW_LEFT_RIGHT);
+	fAboutBox = new BBox("About");
 	fAboutBox->SetLabel("About Einsteinum Engine");
-//	fAboutTextView = new BTextView("About text");
-	viewRect.InsetBy(10, 5);
-	viewRect.top += 15;
-	BRect textRect(0,0,viewRect.Width(), viewRect.Height());
-	fAboutTextView = new BTextView(viewRect, "About text", textRect, B_FOLLOW_ALL);
+	fAboutTextView = new BTextView("About text");
 	fAboutTextView->SetText("The Einsteinium Engine is a background app which keeps statistics"
 		" on every application that runs.  These statistics are available for anyone to use,"
 		" and can be used to create ranked lists of applications based on certain criteria."
@@ -30,34 +23,27 @@ EngineStatusView::EngineStatusView(BRect size)
 		" the Einsteinium Engine.");
 	fAboutTextView->MakeSelectable(false);
 	fAboutTextView->MakeEditable(false);
-/*	fAboutBox->AddChild(BGroupLayoutBuilder(B_HORIZONTAL, 5)
+	BGroupLayout *boxLayout = new BGroupLayout(B_VERTICAL);
+	fAboutBox->SetLayout(boxLayout);
+	BLayoutBuilder::Group<>(boxLayout)
 		.Add(fAboutTextView)
-		.SetInsets(5, 5, 5, 5)
-	);*/
+		.SetInsets(10, 20, 10, 10)
+	;
 
 	// Status Box
 	SetViewColor(bg_color);
 	BEntry serviceEntry = GetEntryFromSig(e_engine_sig);
 	if(serviceEntry.Exists())
-	{
 		fStatusBox = new SystemStatusBox("Engine Running Status", serviceEntry, e_engine_sig);
-		fStatusBox->ResizeToPreferred();
-	}
 
 	// Layout
-/*	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	BGroupLayoutBuilder builder(B_VERTICAL, 10);
+	BGroupLayout *layout = new BGroupLayout(B_VERTICAL);
+	SetLayout(layout);
+	BGroupLayoutBuilder builder(layout);
 	builder.Add(fAboutBox);
 	if(fStatusBox != NULL)
 		builder.Add(fStatusBox);
-	AddChild(builder
-		.AddGlue()
-	);*/
-
-	fAboutBox->AddChild(fAboutTextView);
-	AddChild(fAboutBox);
-	if(fStatusBox)
-		AddChild(fStatusBox);
+	builder.AddGlue();
 }
 
 

@@ -37,19 +37,20 @@ LauncherDeskbarView::LauncherDeskbarView(BRect size)
 	fEngineLaunchCB->SetToolTip("If this option is checked, when the Launcher starts\n"
 								"it will also automatically start the Engine.");
 
-	fDeskbarBox->AddChild(BGroupLayoutBuilder(B_VERTICAL, 5)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 5)
-			.Add(fItemCountTC)
-			.AddGlue()
-		)
+	BGroupLayout *boxLayout = new BGroupLayout(B_VERTICAL, 5);
+	fDeskbarBox->SetLayout(boxLayout);
+	BLayoutBuilder::Group<>(boxLayout)
+		.Add(fItemCountTC)
 		.Add(fEngineLaunchCB)
-		.SetInsets(5, 5, 5, 5)
-	);
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
+		.SetInsets(10, 20, 10, 10);
+	fItemCountTC->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_CENTER));
+
+	BGroupLayout *layout = new BGroupLayout(B_VERTICAL);
+	SetLayout(layout);
+	BLayoutBuilder::Group<>(layout)
 		.Add(fDeskbarBox)
-		.AddGlue()
-	);
+		.AddGlue();
+
 }
 
 
@@ -59,6 +60,7 @@ LauncherDeskbarView::FrameResized(float width, float height)
 	fDeskbarBox->Invalidate();
 	fItemCountTC->Invalidate();
 	fEngineLaunchCB->Invalidate();
+//	InvalidateLayout();
 	BView::FrameResized(width, height);
 }
 
@@ -67,7 +69,7 @@ BSize
 LauncherDeskbarView::GetMinSize()
 {
 	BSize size(B_SIZE_UNSET, B_SIZE_UNSET);
-	size.width = fEngineLaunchCB->MinSize().width + 20;
+	size.width = fEngineLaunchCB->MinSize().width + 30;
 	return size;
 }
 

@@ -53,18 +53,22 @@ LauncherExclusionsView::LauncherExclusionsView(BRect size)
 	// Inidividual app settings
 	fSettingsBox = new BBox("Application Attribute Settings");
 	fSettingsBox->SetLabel("Exclude These Apps From The Launcher");
-	fSettingsBox->AddChild(BGridLayoutBuilder(5, 5)
+
+	BGridLayout *boxLayout = new BGridLayout(5, 5);
+	fSettingsBox->SetLayout(boxLayout);
+	BLayoutBuilder::Grid<>(boxLayout)
 		.Add(fExclusionSView, 0, 0, 1, 3)
 		.Add(fAddB, 1, 0)
 		.Add(fRemoveB, 1, 1)
-		.SetInsets(5, 5, 5, 5)
-	);
+		.SetInsets(10, 20, 10, 10)
+	;
 
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
+	BGroupLayout *layout = new BGroupLayout(B_VERTICAL);
+	SetLayout(layout);
+	BLayoutBuilder::Group<>(layout)
 //		.Add(fDefaultSettingsBox)
 		.Add(fSettingsBox)
-	);
+	;
 
 }
 

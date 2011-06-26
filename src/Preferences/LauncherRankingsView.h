@@ -10,6 +10,7 @@
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <GridLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <fstream>
 #include "prefs_constants.h"
 #include "SystemStatusBox.h"

@@ -11,6 +11,7 @@
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <GridLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <fstream>
 #include "AppRefFilter.h"
 #include "EDSettingsFile.h"

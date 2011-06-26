@@ -12,6 +12,7 @@
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <GridLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <SpaceLayoutItem.h>
 #include "AppRefFilter.h"
 #include "launcher_constants.h"

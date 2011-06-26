@@ -10,6 +10,7 @@
 #include <Roster.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include "prefs_constants.h"
 
 

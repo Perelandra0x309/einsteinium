@@ -8,6 +8,7 @@
 #include <InterfaceKit.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include "engine_constants.h"
 #include "SystemStatusBox.h"
 

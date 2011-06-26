@@ -17,7 +17,6 @@ LauncherRankingsView::LauncherRankingsView(BRect size)
 {
 	SetViewColor(bg_color);
 
-	// TODO tooltips
 	fLaunchesSl = new BSlider("Launches", "Number of Launches",
 							new BMessage(EL_LAUNCHES_SL_CHANGED),
 							-5, 5, B_HORIZONTAL, B_TRIANGLE_THUMB);
@@ -63,7 +62,10 @@ LauncherRankingsView::LauncherRankingsView(BRect size)
 							"The Launcher menu will be updated with these new settings.");
 	fSlidersBox = new BBox("Rank Sliders");
 	fSlidersBox->SetLabel("Application Ranking Weights");
-	fSlidersBox->AddChild(BGroupLayoutBuilder(B_VERTICAL, 5)
+
+	BGroupLayout *boxLayout = new BGroupLayout(B_VERTICAL, 5);
+	fSlidersBox->SetLayout(boxLayout);
+	BLayoutBuilder::Group<>(boxLayout)
 		.AddGlue()
 		.Add(launchesBox)
 		.AddGlue()
@@ -79,13 +81,14 @@ LauncherRankingsView::LauncherRankingsView(BRect size)
 			.AddGlue()
 			.Add(fSetB)
 		)
-		.SetInsets(5, 5, 5, 5)
-	);
+		.SetInsets(10, 20, 10, 10)
+	;
 
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
+	BGroupLayout *layout = new BGroupLayout(B_VERTICAL);
+	SetLayout(layout);
+	BLayoutBuilder::Group<>(layout)
 		.Add(fSlidersBox)
-	);
+	;
 	_SetSlidersChanged(false);
 }
 
@@ -130,13 +133,13 @@ LauncherRankingsView::MessageReceived(BMessage* msg)
 void
 LauncherRankingsView::FrameResized(float width, float height)
 {
+	fSlidersBox->Invalidate();
 	fLaunchesSl->Invalidate();
 	fFirstSl->Invalidate();
 	fLastSl->Invalidate();
 	fIntervalSl->Invalidate();
 	fRuntimeSl->Invalidate();
 	fSetB->Invalidate();
-	fSlidersBox->Invalidate();
 	BView::FrameResized(width, height);
 }
 
