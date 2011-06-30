@@ -6,8 +6,6 @@
 #define EP_E_MAINTENANCE_VIEW
 
 #include <InterfaceKit.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
 #include <LayoutBuilder.h>
 #include "engine_constants.h"
 #include "SystemStatusBox.h"

@@ -7,7 +7,7 @@
 
 #include <InterfaceKit.h>
 #include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 
 class LauncherAboutView : public BView {
 public:

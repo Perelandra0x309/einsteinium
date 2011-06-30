@@ -39,10 +39,15 @@ DaemonStatusView::DaemonStatusView(BRect size)
 	BGroupLayout *layout = new BGroupLayout(B_VERTICAL);
 	SetLayout(layout);
 	BGroupLayoutBuilder builder(layout);
-	builder.Add(fAboutBox);
+	builder.Add(fAboutBox, 0);
 	if(fStatusBox != NULL)
-		builder.Add(fStatusBox);
+		builder.Add(fStatusBox, 1);
 	builder.AddGlue();
+
+	// TODO this isn't quite right, need to calculate based on TextView preferred size?
+	BSize minSize(PreferredSize());
+	minSize.height += 20;
+	fAboutBox->SetExplicitMinSize(minSize);
 }
 
 
@@ -103,29 +108,10 @@ DaemonStatusView::MessageReceived(BMessage* msg)
 void
 DaemonStatusView::FrameResized(float width, float height)
 {
-/*	BSize size = fAboutTextView->ExplicitMinSize();
-	size.height = fAboutTextView->TextHeight(0, fAboutTextView->TextLength());
-	fAboutTextView->SetExplicitMinSize(size);
-	fAboutTextView->SetExplicitMaxSize(size);*/
-	BRect textRect = fAboutTextView->Bounds();
-	fAboutTextView->SetTextRect(textRect);
-	textRect.bottom = fAboutTextView->TextHeight(0, fAboutTextView->TextLength());
-	fAboutTextView->SetTextRect(textRect);
-	BRect aboutFrame = fAboutBox->Frame();
-	fAboutBox->ResizeTo(aboutFrame.Width(), textRect.bottom + 25);
-	fStatusBox->MoveTo(aboutFrame.left, aboutFrame.bottom + 10);
-	fStatusBox->ResizeTo(aboutFrame.Width(), fStatusBox->Frame().Height());
-	fStatusBox->ResizeStatusText();
 	fAboutBox->Invalidate();
 	fAboutTextView->Invalidate();
 	fStatusBox->Invalidate();
-	Invalidate();
+	InvalidateLayout();
 	BView::FrameResized(width, height);
 }
 
-/*
-void
-DaemonStatusView::ResizeStatusBox()
-{
-	fStatusBox->ResizeStatusText();
-}*/

@@ -20,7 +20,6 @@ public:
 	virtual void	AttachedToWindow();
 	virtual void	MessageReceived(BMessage*);
 	virtual void	FrameResized(float width, float height);
-//	void			ResizeStatusBox();
 private:
 	BBox			*fAboutBox;
 	BTextView		*fAboutTextView;

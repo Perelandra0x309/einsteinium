@@ -6,9 +6,6 @@
 #define EP_L_DESKBAR_VIEW
 
 #include <InterfaceKit.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
-#include <GridLayoutBuilder.h>
 #include <LayoutBuilder.h>
 #include "prefs_constants.h"
 #include "stdlib.h"

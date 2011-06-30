@@ -50,17 +50,11 @@ prefsWindow::prefsWindow(BRect size)
 					Bounds().right - BORDER_SIZE, Bounds().bottom - BORDER_SIZE);
 
 	//Main about view
-	BRect aboutViewRect(0,0,viewRect.Width(), viewRect.Height());
 	fEmptySettingsView = new BView(viewRect, "Empty SettingsView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW);
 	fEmptySettingsView->SetViewColor(bg_color);
-//	fAboutBox = new BBox("Empty Box");
-	fAboutBox = new BBox(aboutViewRect, "About", B_FOLLOW_LEFT_RIGHT);
+	fAboutBox = new BBox("About");
 	fAboutBox->SetLabel("About Einsteinium Preferences");
-//	fAboutTextView = new BTextView("About text");
-	aboutViewRect.InsetBy(10, 5);
-	aboutViewRect.top += 15;
-	BRect textRect(0,0,aboutViewRect.Width(), aboutViewRect.Height());
-	fAboutTextView = new BTextView(aboutViewRect, "About text", textRect, B_FOLLOW_ALL);
+	fAboutTextView = new BTextView("About text");
 	fAboutTextView->SetText("Einsteinium provides smarter monitoring of applications and"
 		" system services for Haiku.  Currently the two major functions implimented are"
 		" automatically restarting applications and system services that quit or crash,"
@@ -72,16 +66,19 @@ prefsWindow::prefsWindow(BRect size)
 	fAboutTextView->MakeEditable(false);
 	fAboutTextView->SetViewColor(fMainView->ViewColor());
 	fCopyrightStringView = new BStringView("Copyright", "Einsteinium Copyright 2011 by Brian Hill");
-	fCopyrightStringView->ResizeToPreferred();
-/*	fAboutBox->AddChild(BGroupLayoutBuilder(B_HORIZONTAL, 5)
+	BGroupLayout *boxLayout = new BGroupLayout(B_VERTICAL, 5);
+	fAboutBox->SetLayout(boxLayout);
+	BLayoutBuilder::Group<>(boxLayout)
 		.Add(fAboutTextView)
-		.SetInsets(5, 5, 5, 5)
-	);
-	fEmptySettingsView->SetLayout(new BGroupLayout(B_HORIZONTAL));
-	fEmptySettingsView->AddChild(BGroupLayoutBuilder(B_VERTICAL, 10).Add(fAboutBox).AddGlue());*/
-	fAboutBox->AddChild(fAboutTextView);
-	fAboutBox->AddChild(fCopyrightStringView);
-	fEmptySettingsView->AddChild(fAboutBox);
+		.SetInsets(10, 20, 10, 10)
+	;
+	BGroupLayout *layout = new BGroupLayout(B_VERTICAL, 10);
+	fEmptySettingsView->SetLayout(layout);
+	BLayoutBuilder::Group<>(layout)
+		.Add(fAboutBox)
+		.Add(fCopyrightStringView)
+		.AddGlue()
+	;
 	fMainView->AddChild(fEmptySettingsView);
 	fEmptySettingsView->Hide();
 
@@ -106,7 +103,6 @@ prefsWindow::prefsWindow(BRect size)
 	_AddSettingsView(fLExclusionsSI, fLExclusionsView);
 
 	fCurrentView = fEmptySettingsView;
-	FrameResized(0,0);
 	fCurrentView->Show();
 
 	// resize main window and set min size based on the min sizes of each view
@@ -159,14 +155,6 @@ prefsWindow::QuitRequested()
 void
 prefsWindow::FrameResized(float width, float height)
 {
-	BRect textRect = fAboutTextView->Bounds();
-	fAboutTextView->SetTextRect(textRect);
-	textRect.bottom = fAboutTextView->TextHeight(0, fAboutTextView->TextLength());
-	fAboutTextView->SetTextRect(textRect);
-	fAboutTextView->ResizeTo(fAboutTextView->Bounds().Width(), textRect.Height());
-	fCopyrightStringView->MoveTo((textRect.Width() - fCopyrightStringView->Frame().Width())/2.0,
-									fAboutTextView->Frame().bottom + 30);
-	fAboutBox->ResizeTo(fAboutBox->Frame().Width(), fCopyrightStringView->Frame().bottom + 25);
 	fPrefsListView->Invalidate();
 	fPrefsScrollView->Invalidate();
 	fEmptySettingsView->Invalidate();

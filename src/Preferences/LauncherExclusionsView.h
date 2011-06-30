@@ -9,11 +9,7 @@
 #include <StorageKit.h>
 #include <SupportKit.h>
 #include <Roster.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
-#include <GridLayoutBuilder.h>
 #include <LayoutBuilder.h>
-#include <SpaceLayoutItem.h>
 #include "AppRefFilter.h"
 #include "launcher_constants.h"
 #include "prefs_constants.h"

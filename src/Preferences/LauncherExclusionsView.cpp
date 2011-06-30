@@ -112,12 +112,12 @@ LauncherExclusionsView::AddExclusion(BMessage* refMsg)
 	BNode node(&srcEntry);
 	char *buf = new char[B_ATTR_NAME_LENGTH];
 	ssize_t size = node.ReadAttr("BEOS:APP_SIG",0,0,buf,B_ATTR_NAME_LENGTH);
-	BPath path;
-	BEntry entry(&srcRef);
-	entry.GetPath(&path);
+//	BPath path;
+//	BEntry entry(&srcRef);
+//	entry.GetPath(&path);
 	if( size > 0 )
 	{
-		ExcludeItem *item = new ExcludeItem(buf, path.Leaf());
+		ExcludeItem *item = new ExcludeItem(buf, srcRef.name);
 		fExclusionLView->AddItem(item);
 		fExclusionLView->SortItems(SortExcludeItems);
 		fExclusionLView->Select(fExclusionLView->IndexOf(item));
@@ -126,7 +126,7 @@ LauncherExclusionsView::AddExclusion(BMessage* refMsg)
 	}
 	else
 	{
-		BString text(path.Leaf());
+		BString text(srcRef.name);
 		text.Append(" does not have an application signature");
 		(new BAlert("",text,"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go(NULL);
 	}

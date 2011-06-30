@@ -77,12 +77,10 @@ LauncherRankingsView::LauncherRankingsView(BRect size)
 		.AddGlue()
 		.Add(runtimeBox)
 		.AddGlue()
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 5)
-			.AddGlue()
-			.Add(fSetB)
-		)
+		.Add(fSetB)
 		.SetInsets(10, 20, 10, 10)
 	;
+	fSetB->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT, B_ALIGN_VERTICAL_CENTER));
 
 	BGroupLayout *layout = new BGroupLayout(B_VERTICAL);
 	SetLayout(layout);
