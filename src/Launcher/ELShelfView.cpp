@@ -56,7 +56,7 @@ ELShelfView::ELShelfView(BMessage *message)
 	status_t result = message->FindMessage("fIconArchive", &iconArchive);
 	if(result == B_OK)
 		fIcon = new BBitmap(&iconArchive);
-	// Apparently Haiku does not yet archive tool tips (Release 1 Alpha 2)
+	// Apparently Haiku does not yet archive tool tips (Release 1 Alpha 3)
 	SetToolTip(EL_TOOLTIP_TEXT);
 }
 
@@ -65,7 +65,6 @@ ELShelfView::~ELShelfView()
 {
 	delete fIcon;
 	delete fMenu;
-//	delete fSettingsFile;
 }
 
 
@@ -183,9 +182,11 @@ ELShelfView::MessageReceived(BMessage* msg)
 	switch(msg->what)
 	{
 		case B_SOME_APP_QUIT: {
-			// Look for the einsteinium engine signature
+			// Change the menu if the engine quit
 			const char* sig;
-			if (msg->FindString("be:signature", &sig) != B_OK) break;
+			status_t result = msg->FindString("be:signature", &sig);
+			if ( result != B_OK)
+				break;
 			if(strcmp(sig, einsteinium_engine_sig) == 0)
 			{
 				// Build an empty menu with an item that can be chosen to start the Engine
@@ -196,9 +197,11 @@ ELShelfView::MessageReceived(BMessage* msg)
 			break;
 		}
 		case B_SOME_APP_LAUNCHED: {
-			// Look for the einsteinium engine signature
+			// Subscribe if the engine has started
 			const char* sig;
-			if (msg->FindString("be:signature", &sig) != B_OK) break;
+			status_t result = msg->FindString("be:signature", &sig);
+			if ( result != B_OK)
+				break;
 			if(strcmp(sig, einsteinium_engine_sig) == 0)
 			{
 				// Renew subscription
@@ -231,10 +234,34 @@ ELShelfView::MessageReceived(BMessage* msg)
 			be_roster->Launch("application/x-vnd.Einsteinium_Preferences", &goToMessage);
 			break;
 		}
-		case EL_SHELFVIEW_LAUNCH_REF: {
+		case EL_SHELFVIEW_MENUITEM_INVOKED: {
 			entry_ref ref;
-			if(msg->FindRef("refs", &ref) == B_OK)
-				be_roster->Launch(&ref);
+			status_t result = msg->FindRef("refs", &ref);
+			if( result == B_OK)
+			{
+				// Determine if the user wants to remove the app from the menu
+				bool removeApp = true;
+				status_t result = msg->FindBool(EL_REMOVE_APPLICATION, &removeApp);
+				if(result==B_OK && removeApp==true)
+				{
+					// Add app to exclusions list
+					BEntry refEntry(&ref, true);
+					BNode refNode(&refEntry);
+					char *buf = new char[B_ATTR_NAME_LENGTH];
+					ssize_t size = refNode.ReadAttr("BEOS:APP_SIG",0,0,buf,B_ATTR_NAME_LENGTH);
+					if( size > 0 )
+					{
+						BMessage exclusionsList = fSettingsFile->GetExclusionsList();
+						exclusionsList.AddString(EL_EXCLUDE_SIGNATURE, buf);
+						exclusionsList.AddString(EL_EXCLUDE_NAME, ref.name);
+						fSettingsFile->SaveExclusionsList(exclusionsList);
+						// Subscribe with new parameters
+						_Subscribe();
+					}
+				}
+				else
+					be_roster->Launch(&ref);
+			}
 			break;
 		}
 		case EL_SHELFVIEW_MENU_QUIT: {
@@ -265,31 +292,35 @@ void
 ELShelfView::_BuildMenu(BMessage *message)
 {
 	delete fMenu;
-	fMenu = new BPopUpMenu(B_EMPTY_STRING, false, false);
+	//fMenu = new BPopUpMenu(B_EMPTY_STRING, false, false);
+	fMenu = new ModifierMenu(B_EMPTY_STRING, false, false);
 	fMenu->SetFont(be_plain_font);
 
 	// Add any refs found
-	int32 countFound = 0;
+	int32 fSubscriptionRefCount = 0;
 	if(message)
 	{
 		type_code typeFound;
-		message->GetInfo("refs", &typeFound, &countFound);
+		message->GetInfo("refs", &typeFound, &fSubscriptionRefCount);
 	//	printf("Found %i refs\n", countFound);
 		entry_ref newref;
-		for(int i=0; i<countFound; i++)
+		for(int i=0; i<fSubscriptionRefCount; i++)
 		{
 			message->FindRef("refs", i, &newref);
 	//		printf("Found ref %s\n", newref.name);
 			BNode refNode(&newref);
 			BNodeInfo refNodeInfo(&refNode);
-			BMessage *newMsg = new BMessage(EL_SHELFVIEW_LAUNCH_REF);
+			BMessage *newMsg = new BMessage(EL_SHELFVIEW_MENUITEM_INVOKED);
 			newMsg->AddRef("refs", &newref);
-			fMenu->AddItem(new IconMenuItem(newref.name, newMsg, &refNodeInfo, B_MINI_ICON));
+			//fMenu->AddItem(new IconMenuItem(newref.name, newMsg, &refNodeInfo, B_MINI_ICON));
+			fMenu->AddItem(new ModifierMenuItem(newref.name, newMsg, &refNodeInfo, B_MINI_ICON));
 		}
 	}
+	fMenu->SetRefCount(fSubscriptionRefCount);
+
 	// No applications to display- create a helpful message
 	bool showStartEngineItem = false;
-	if(message==NULL || countFound==0)
+	if(message==NULL || fSubscriptionRefCount==0)
 	{
 		// The engine is not running
 		if(!_IsEngineRunning())

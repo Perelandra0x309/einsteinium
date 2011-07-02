@@ -16,7 +16,9 @@
 #include <stdio.h>
 
 #include "EngineSubscriber.h"
-#include "IconMenuItem.h"
+//#include "IconMenuItem.h"
+#include "ModifierMenuItem.h"
+#include "ModifierMenu.h"
 #include "LauncherSettingsFile.h"
 #include "launcher_constants.h"
 
@@ -36,8 +38,9 @@ public:
 	virtual void			MessageReceived(BMessage* message);
 
 private:
-	BBitmap*				fIcon;
-	BPopUpMenu*				fMenu;
+	BBitmap					*fIcon;
+	//BPopUpMenu				*fMenu;
+	ModifierMenu			*fMenu;
 	int						fItemCount;
 	LauncherSettingsFile	*fSettingsFile;
 	BAlert					*fEngineAlert;
