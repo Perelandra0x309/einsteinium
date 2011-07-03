@@ -639,9 +639,7 @@ void
 einsteinium_engine::_CreateAppStatsList(Subscriber *subscriber, int sortAction=SORT_BY_NONE)
 {
 	_EmptyAppStatsList(subscriber->appStatsList);
-
-	// TODO what about missing app attribute files?
-
+	
 	//create path for the application attribute files directory
 	BPath appAttrDirPath(fSettingsDirPath);
 	appAttrDirPath.Append(e_settings_app_dir);

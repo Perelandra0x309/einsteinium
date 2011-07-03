@@ -165,7 +165,15 @@ AppAttrFile::_ReadAttrValues()
 	//Read each attribute.  If attribute isn't found, initialize to proper default value
 	//Application signature
 	if(GetAttrInfo(ATTR_APP_SIG_NAME, &info) == B_OK)
-	{	ReadAttrString(ATTR_APP_SIG_NAME, &fAppStats.app_sig); }
+	{	ReadAttrString(ATTR_APP_SIG_NAME, &fAppStats.app_sig);
+		//Check to be sure the application has not moved
+		if(!fAppEntry.Exists())
+		{
+			fAppEntry = GetEntryFromSig(fAppStats.app_sig);
+			appPath.SetTo(&fAppEntry);
+			fAppStats.app_path.SetTo(appPath.Path());
+		}
+	}
 	else
 	{	BNode appNode(appPath.Path());//get signature from application node
 		if(appNode.GetAttrInfo("BEOS:APP_SIG", &info) == B_OK)
