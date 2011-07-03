@@ -128,10 +128,11 @@ einsteinium_daemon::MessageReceived(BMessage *msg)
 				break;
 			// user wants to be prompted to restart app
 			if(actionToTake == ACTION_PROMPT)
-			{	BString alertS("The application '");
+			{	BString alertS("Einsteinium Daemon Alert:\n\nThe application '");
 				alertS.Append(appSettings->name);
 				alertS.Append("' has quit.  Do you wish to restart this app?");
-				RememberChoiceAlert *alert = new RememberChoiceAlert("",alertS.String(), "No", "Yes");
+				RememberChoiceAlert *alert = new RememberChoiceAlert("",alertS.String(), "No",
+					"Yes", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 					// Custom Alert window to prompt for app restart.
 				BMessage *runMessage = new BMessage(LAUNCH_APP);
 				runMessage->AddString("app_sig",sig);

@@ -31,10 +31,14 @@ EDSettingsFile::EDSettingsFile()
 	// create path for settings file
 	fSettingsPath.Append(ed_settings_file);
 	BEntry settingsEntry(fSettingsPath.Path());
+	// Settings file doesn't exist, create default settings file
 	if(!settingsEntry.Exists())
 	{
+		fSettingsList.AddItem(new AppRelaunchSettings("application/x-vnd.Be-input_server",
+					ACTION_AUTO));
+		fSettingsList.AddItem(new AppRelaunchSettings("application/x-vnd.Einsteinium_Launcher",
+					ACTION_IGNORE));
 		_WriteSettingsToFile(fSettingsPath);
-			//settings file doesn't exist, create default settings file
 	}
 	settingsEntry.GetNodeRef(&fSettingsNodeRef);
 

@@ -5,9 +5,12 @@
 #include "RememberChoiceAlert.h"
 
 RememberChoiceAlert::RememberChoiceAlert(const char* title, const char* text,
-								const char* button1, const char* button2 = NULL)
+								const char* button0Label, const char* button1Label = NULL,
+								const char* button2Label = NULL,
+								button_width widthStyle = B_WIDTH_AS_USUAL,
+								alert_type type = B_INFO_ALERT)
 	:
-	BAlert(title, text, button1, button2)
+	BAlert(title, text, button0Label, button1Label, button2Label, widthStyle, type)
 {
 	fInvoker = NULL;
 //	SetFlags(B_NOT_CLOSABLE | /*B_NOT_RESIZABLE | */B_ASYNCHRONOUS_CONTROLS);
