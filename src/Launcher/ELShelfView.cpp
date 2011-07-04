@@ -191,8 +191,10 @@ ELShelfView::MessageReceived(BMessage* msg)
 			{
 				// Build an empty menu with an item that can be chosen to start the Engine
 				_BuildMenu(NULL);
-				// Display an alert that the engine is not running
-				_CheckEngineStatus(true);
+				// Display an alert that the engine is not running if the Einsteinium
+				// Daemon isn't running (otherwise defer to the daemon)
+				if(!(be_roster->IsRunning(e_daemon_sig)))
+					_CheckEngineStatus(true);
 			}
 			break;
 		}

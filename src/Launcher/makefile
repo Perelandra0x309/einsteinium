@@ -30,7 +30,7 @@ SYSTEM_INCLUDE_PATHS := /boot/common/include/libxml2
 #       additional paths to look for local headers
 #       thes use the form: #include "header.h"
 #       source file directories are automatically included
-LOCAL_INCLUDE_PATHS := ../Engine ../Engine/Tracker
+LOCAL_INCLUDE_PATHS := ../Engine ../Engine/Tracker ../Daemon
 
 #       specify any preprocessor symbols to be defined.  The symbols will not
 #       have their values set automatically; you must supply the value (if any)

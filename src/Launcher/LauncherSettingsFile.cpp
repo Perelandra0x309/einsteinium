@@ -44,6 +44,8 @@ LauncherSettingsFile::LauncherSettingsFile(BHandler *messageHandler=NULL)
 	if(!settingsEntry.Exists())
 	{
 		//settings file doesn't exist, create default file
+		fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, e_launcher_sig);
+		fExclusionsList.AddString(EL_EXCLUDE_NAME, "Einsteinium_Launcher");
 		_WriteSettingsToFile();
 	}
 	else
