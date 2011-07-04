@@ -40,8 +40,6 @@ einsteinium_engine::einsteinium_engine()//Einsteinium Engine Constructor
 			return;
 		}
 	}
-
-	// TODO Register the signature of the preferences application
 }
 
 /*
@@ -56,6 +54,19 @@ einsteinium_engine::QuitRequested()
 	if(fWatchingRoster)
 	{	be_roster->StopWatching(be_app_messenger); }
 
+	//The engine will not receive quit or launch messages for itself, so simulate one
+	BMessage launchedMessage(B_SOME_APP_QUIT);
+	app_info appInfo;
+	status_t result = GetAppInfo(&appInfo);
+	if(result == B_OK)
+	{
+	//	printf("Sending engine quit message\n");
+		launchedMessage.AddRef("be:ref", &(appInfo.ref));
+		launchedMessage.AddString("be:signature", appInfo.signature);
+		MessageReceived(&launchedMessage);
+			// Need to call MessageReceived directly, otherwise this message will be discarded
+	}
+
 	// TODO wait for all messages to clear the message queue?
 
 	// Delete subscribers list items
@@ -63,6 +74,7 @@ einsteinium_engine::QuitRequested()
 	int subscribersCount = fSubscribersList.CountItems();
 	for(int i=0; i<subscribersCount; i++)
 	{
+		// TODO notify subscribers of shutdown?
 		sub = (Subscriber*)fSubscribersList.ItemAt(0);
 		_DeleteSubscriber(sub);
 	}
@@ -86,6 +98,18 @@ einsteinium_engine::ReadyToRun()
 	{	fWatchingRoster = true;
 			//set the flag to indicate we're watching the roster
 		printf("Einsteinium engine running.\n");
+	}
+
+	//The engine will not receive quit or launch messages for itself, so simulate one
+	BMessage launchedMessage(B_SOME_APP_LAUNCHED);
+	app_info appInfo;
+	status_t result = GetAppInfo(&appInfo);
+	if(result == B_OK)
+	{
+	//	printf("Sending engine launch message\n");
+		launchedMessage.AddRef("be:ref", &(appInfo.ref));
+		launchedMessage.AddString("be:signature", appInfo.signature);
+		be_app->PostMessage(&launchedMessage);
 	}
 }
 
@@ -639,7 +663,7 @@ void
 einsteinium_engine::_CreateAppStatsList(Subscriber *subscriber, int sortAction=SORT_BY_NONE)
 {
 	_EmptyAppStatsList(subscriber->appStatsList);
-	
+
 	//create path for the application attribute files directory
 	BPath appAttrDirPath(fSettingsDirPath);
 	appAttrDirPath.Append(e_settings_app_dir);
