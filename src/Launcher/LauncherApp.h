@@ -14,8 +14,10 @@ class LauncherApp : public BApplication {
 public:
 					LauncherApp();
 	virtual void	ReadyToRun();
+	virtual void	ArgvReceived(int32, char**);
 private:
 	void			_ShowShelfView(bool showShelfView);
+	bool			fQuitRequested;
 };
 
 #endif
