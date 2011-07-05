@@ -2,15 +2,15 @@
 resource app_signature "application/x-vnd.Einsteinium_Daemon";
 
 resource app_version {
-	major  = 0,
+	major  = 1,
 	middle = 0,
 	minor  = 0,
 
-	variety = B_APPV_DEVELOPMENT,
+	variety = B_APPV_FINAL,
 	internal = 0,
 
 	short_info = "Einsteinium Daemon",
-	long_info = "Einsteinium Daemon Developers Release"
+	long_info = "Einsteinium Daemon"
 };
 
 
@@ -119,4 +119,4 @@ resource mini_icon array {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 };
 
-resource app_flags B_EXCLUSIVE_LAUNCH | B_BACKGROUND_APP;
+resource app_flags B_EXCLUSIVE_LAUNCH;
