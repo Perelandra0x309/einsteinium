@@ -6,9 +6,9 @@
 #define EP_BITMAPLISTITEM_H
 
 #include <InterfaceKit.h>
+#include <IconUtils.h>
 #include "methods.h"
 #include "prefs_constants.h"
-#include "IconUtils.h"
 
 class BitmapListItem : public BStringItem {
 public:
