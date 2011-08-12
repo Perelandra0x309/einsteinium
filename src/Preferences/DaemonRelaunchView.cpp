@@ -76,10 +76,7 @@ DaemonRelaunchView::DaemonRelaunchView(BRect size)
 	fDefaultSettings = new AppRelaunchSettings("for all applications not in this list", path);
 
 	//Settings file
-	fDaemonSettings = new EDSettingsFile();
-	ReadSettings();
-
-	// TODO watch daemon settings file for changes to reload list
+	fDaemonSettings = new EDSettingsFile(this);
 }
 
 
@@ -215,6 +212,14 @@ DaemonRelaunchView::FrameResized(float width, float height)
 void
 DaemonRelaunchView::ReadSettings()
 {
+	//Remove List Items
+	RelaunchAppItem *Item;
+	do
+	{	Item = (RelaunchAppItem*)fAppsLView->RemoveItem(int32(0));
+		if(Item)
+			delete Item;
+	}while(Item);
+
 	// Add default settings item
 	fDefaultSettings->relaunchAction = fDaemonSettings->GetDefaultRelaunchAction();
 	fAppsLView->AddItem(new RelaunchAppItem(fDefaultSettings));

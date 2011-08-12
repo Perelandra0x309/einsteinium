@@ -250,7 +250,6 @@ LauncherExclusionsView::_EmptyExclusionsList()
 {
 	//Remove List Items
 	ExcludeItem *Item;
-	int32 count;
 	do
 	{	Item = (ExcludeItem*)fExclusionLView->RemoveItem(int32(0));
 		if(Item)

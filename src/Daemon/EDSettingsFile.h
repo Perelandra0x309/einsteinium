@@ -16,7 +16,7 @@
 
 class EDSettingsFile : public BHandler {
 public:
-							EDSettingsFile();
+							EDSettingsFile(BHandler *messageHandler=NULL);
 							~EDSettingsFile();
 	void					UpdateDefaultAction(int _relaunch);
 	void					UpdateActionForApp(const char *_signature, int _relaunch);
@@ -32,6 +32,7 @@ private:
 	node_ref				fSettingsNodeRef;//node_ref to watch for changes to settings file
 	BLooper					*fWatchingLooper;
 	bool					fWatchingSettingsNode;//true when settings file is being watched
+	BHandler				*fExternalMessageHandler;
 	int						fDefaultRelaunchAction;
 	status_t				fInitStatus;
 	void					_StartWatching();

@@ -52,8 +52,6 @@ public:
 	int				ICompare(RelaunchAppItem*);
 private:
 	AppRelaunchSettings *fSettings;
-//	void			Update(BView *owner, const BFont *font);
-//	virtual bool	InitiateDrag(BPoint point, int32 index, bool wasSelected);
 	friend class DaemonRelaunchView;
 };
 

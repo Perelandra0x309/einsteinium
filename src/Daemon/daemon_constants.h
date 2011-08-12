@@ -14,8 +14,8 @@
 
 //Enumerations for messages
 enum {
-	LAUNCH_APP,
-//	LAUNCH_APP_NEW
+	ED_LAUNCH_APP,
+	ED_SETTINGS_FILE_CHANGED_EXTERNALLY
 };
 
 enum {

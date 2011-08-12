@@ -134,7 +134,7 @@ einsteinium_daemon::MessageReceived(BMessage *msg)
 				RememberChoiceAlert *alert = new RememberChoiceAlert("",alertS.String(), "No",
 					"Yes", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 					// Custom Alert window to prompt for app restart.
-				BMessage *runMessage = new BMessage(LAUNCH_APP);
+				BMessage *runMessage = new BMessage(ED_LAUNCH_APP);
 				runMessage->AddString("app_sig",sig);
 				alert->Go(new BInvoker(runMessage, this));
 			}
@@ -144,7 +144,7 @@ einsteinium_daemon::MessageReceived(BMessage *msg)
 			break;
 		}
 		//message from RememberChoiceAlert window
-		case LAUNCH_APP: {
+		case ED_LAUNCH_APP: {
 			int32 selection;
 			msg->FindInt32("which", &selection);
 				//find which button was pressed

@@ -146,7 +146,6 @@ prefsWindow::~prefsWindow()
 bool
 prefsWindow::QuitRequested()
 {
-//	_StoreSettings();
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return(true);
 }
@@ -223,9 +222,14 @@ prefsWindow::MessageReceived(BMessage *msg)
 		case EL_SETTINGS_FILE_CHANGED_EXTERNALLY: {
 			_ReadLauncherSettings();
 			break; }
+		case ED_SETTINGS_FILE_CHANGED_EXTERNALLY: {
+			fDRelaunchView->ReadSettings();
+			break; }
+		// Show the launcher settings view, usually intiated by the Launcher app opening the Preferences
 		case EL_GOTO_LAUNCHER_SETTINGS: {
 			fPrefsListView->Select(fPrefsListView->IndexOf(fLauncherBLI));
 			break; }
+		// Pass these messages to the views that need them
 		case ED_RELAPP_SELECTION_CHANGED:
 		case ED_ADD_APPITEM:
 		case ED_ADD_APPITEM_REF:
@@ -259,43 +263,22 @@ prefsWindow::_AddSettingsView(BListItem *item, BView *view)
 	fSettingsViews.AddItem(view);
 }
 
-/*
-void
-prefsWindow::_StoreSettings()
-{
-//	_WriteDaemonSettings();
-}*/
-
 
 void
 prefsWindow::_ReadAllSettings()
 {
 	Lock();
-//	_ReadDaemonSettings();
+	_ReadDaemonSettings();
 	_ReadLauncherSettings();
 	Unlock();
 }
 
 
-/*void prefsWindow::_ReadDaemonSettings()
+void prefsWindow::_ReadDaemonSettings()
 {
-	appLaunchView->ReadSettings();
-}*/
-/*void prefsWindow::_WriteDaemonSettings()
-{
-	appLaunchView->WriteSettings();
-	/*
-	BPath settingsPath;
-	BString xml_text;
-	find_directory(B_USER_SETTINGS_DIRECTORY, &settingsPath);
-	settingsPath.Append("Einsteinium/daemon_settings");
-	BFile archive;
-	archive.SetTo(settingsPath.Path(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
-	archive.Write("<?xml version=\"1.0\"?>\n", 22);
-	appLaunchView->WriteSettings(xml_text);
-	archive.Write(xml_text.String(), xml_text.Length());
-	archive.Unset();*/
-//}
+	fDRelaunchView->ReadSettings();
+}
+
 
 void
 prefsWindow::_ReadLauncherSettings()

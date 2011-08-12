@@ -52,10 +52,8 @@ private:
 	AppRefFilter			*fAppFilter;
 	BFilePanel				*fAppsPanel;
 	void					_AddSettingsView(BListItem*, BView*);
-//	void					_StoreSettings();
 	void					_ReadAllSettings();
-//	void					_ReadDaemonSettings();
-//	void					_WriteDaemonSettings();
+	void					_ReadDaemonSettings();
 	void					_ReadLauncherSettings();
 	void					_WriteLauncherScaleSettings();
 //	void					_WriteLauncherListInclusionSetting();

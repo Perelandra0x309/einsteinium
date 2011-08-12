@@ -5,9 +5,10 @@
 #include "EDSettingsFile.h"
 
 
-EDSettingsFile::EDSettingsFile()
+EDSettingsFile::EDSettingsFile(BHandler *messageHandler=NULL)
 	:
 	BHandler("name"),
+	fExternalMessageHandler(messageHandler),
 	fDefaultRelaunchAction(ACTION_PROMPT),
 	fInitStatus(B_ERROR)
 {
@@ -362,6 +363,14 @@ EDSettingsFile::MessageReceived(BMessage *msg)
 						if(nref == fSettingsNodeRef)
 						{	printf("Daemon settings file changed, loading new settings...\n");
 							_ReadSettingsFromFile(fSettingsPath);
+							// Notify the external message handler if available
+							if(fExternalMessageHandler!=NULL)
+							{
+								status_t mErr;
+								BMessenger messenger(fExternalMessageHandler, NULL, &mErr);
+								if(messenger.IsValid())
+									messenger.SendMessage(ED_SETTINGS_FILE_CHANGED_EXTERNALLY);
+							}
 						}
 						break;
 					}
