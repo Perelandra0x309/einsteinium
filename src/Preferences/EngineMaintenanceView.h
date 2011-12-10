@@ -7,8 +7,8 @@
 
 #include <InterfaceKit.h>
 #include <LayoutBuilder.h>
-#include "engine_constants.h"
 #include "SystemStatusBox.h"
+#include "signatures.h"
 
 class EngineMaintenanceView : public BView {
 public:

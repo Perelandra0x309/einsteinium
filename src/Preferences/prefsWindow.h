@@ -16,9 +16,7 @@
 #include "LauncherExclusionsView.h"
 #include "LauncherRankingsView.h"
 #include "LauncherSettingsFile.h"
-#include "daemon_constants.h"
 #include "engine_constants.h"
-#include "launcher_constants.h"
 
 
 class prefsWindow : public BWindow {

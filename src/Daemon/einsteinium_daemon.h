@@ -11,6 +11,7 @@
 #include "daemon_constants.h"
 #include "EDSettingsFile.h"
 #include "RememberChoiceAlert.h"
+#include "signatures.h"
 
 class einsteinium_daemon : public BApplication {
 public:

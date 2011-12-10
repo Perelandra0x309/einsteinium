@@ -21,7 +21,6 @@
 #include "ModifierMenu.h"
 #include "LauncherSettingsFile.h"
 #include "launcher_constants.h"
-#include "daemon_constants.h"
 
 class _EXPORT ELShelfView : public BView, public EngineSubscriber {
 public:

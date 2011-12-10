@@ -7,8 +7,6 @@
 
 /*	Any global constants should be declared here */
 
-//Einsteinium_engine application signature
-#define e_engine_sig "application/x-vnd.Einsteinium_Engine"
 #define e_app_attr_filetype "document/x-E-app-attr"
 //Main directory for all Einsteinium settings
 #define e_settings_dir "Einsteinium"

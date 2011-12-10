@@ -48,7 +48,7 @@ LauncherSettingsFile::LauncherSettingsFile(BHandler *messageHandler=NULL)
 		fExclusionsList.AddString(EL_EXCLUDE_NAME, "Einsteinium_Launcher");
 		fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, e_daemon_sig);
 		fExclusionsList.AddString(EL_EXCLUDE_NAME, "einsteinium_daemon");
-		fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, einsteinium_engine_sig);
+		fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, e_engine_sig);
 		fExclusionsList.AddString(EL_EXCLUDE_NAME, "einsteinium_engine");
 		fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, e_preferences_sig);
 		fExclusionsList.AddString(EL_EXCLUDE_NAME, "Einsteinium_Preferences");

@@ -13,6 +13,7 @@
 #include "engine_constants.h"
 #include "EngineSubscriber.h"
 #include "methods.h"
+#include "signatures.h"
 
 
 struct Subscriber {

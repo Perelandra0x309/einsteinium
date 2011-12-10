@@ -8,10 +8,10 @@
 #include <InterfaceKit.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
-#include "daemon_constants.h"
 #include "methods.h"
 #include "prefs_constants.h"
 #include "SystemStatusBox.h"
+#include "signatures.h"
 
 class DaemonStatusView : public BView {
 public:

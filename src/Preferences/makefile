@@ -1,8 +1,8 @@
 NAME := Einsteinium_Preferences
 TYPE := APP
-SRCS := ../Daemon/AppRelaunchSettings.cpp \
+SRCS := ../Common/methods.cpp \
+		../Daemon/AppRelaunchSettings.cpp \
 		../Daemon/EDSettingsFile.cpp \
-		../Engine/methods.cpp \
 		../Launcher/LauncherSettingsFile.cpp \
 		AppRefFilter.cpp \
 		BitmapListItem.cpp \
@@ -41,7 +41,7 @@ SYSTEM_INCLUDE_PATHS := /boot/common/include/libxml2
 #       additional paths to look for local headers
 #       thes use the form: #include "header.h"
 #       source file directories are automatically included
-LOCAL_INCLUDE_PATHS := ../Daemon ../Engine ../Launcher
+LOCAL_INCLUDE_PATHS := ../Common ../Engine
 
 #       specify any preprocessor symbols to be defined.  The symbols will not
 #       have their values set automatically; you must supply the value (if any)

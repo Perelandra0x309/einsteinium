@@ -12,9 +12,8 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 #include "launcher_constants.h"
-#include "daemon_constants.h"
-#include "prefs_constants.h"
 #include "EngineSubscriber.h"
+#include "signatures.h"
 
 class LauncherSettingsFile : public BHandler
 {

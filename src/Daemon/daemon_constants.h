@@ -5,8 +5,6 @@
 #ifndef ED_CONSTANTS_H
 #define ED_CONSTANTS_H
 
-//Einsteinium_daemon application signature
-#define e_daemon_sig "application/x-vnd.Einsteinium_Daemon"
 //Main directory for all Einsteinium settings
 #define e_settings_dir "Einsteinium"
 //Settings file name

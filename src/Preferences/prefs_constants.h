@@ -8,7 +8,6 @@
 /*	constant definitions and message commands */
 
 #define BORDER_SIZE 5
-#define e_preferences_sig "application/x-vnd.Einsteinium_Preferences"
 static const rgb_color bg_color = {216,216,216,0};//grey background color
 
 //settings
