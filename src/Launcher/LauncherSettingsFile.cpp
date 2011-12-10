@@ -46,6 +46,17 @@ LauncherSettingsFile::LauncherSettingsFile(BHandler *messageHandler=NULL)
 		//settings file doesn't exist, create default file
 		fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, e_launcher_sig);
 		fExclusionsList.AddString(EL_EXCLUDE_NAME, "Einsteinium_Launcher");
+		fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, e_daemon_sig);
+		fExclusionsList.AddString(EL_EXCLUDE_NAME, "einsteinium_daemon");
+		fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, einsteinium_engine_sig);
+		fExclusionsList.AddString(EL_EXCLUDE_NAME, "einsteinium_engine");
+		fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, e_preferences_sig);
+		fExclusionsList.AddString(EL_EXCLUDE_NAME, "Einsteinium_Preferences");
+		fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, "application/x-vnd.Be-TSKB");
+		fExclusionsList.AddString(EL_EXCLUDE_NAME, "Deskbar");
+		fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, "application/x-vnd.Be-TRAK");
+		fExclusionsList.AddString(EL_EXCLUDE_NAME, "Tracker");
+
 		_WriteSettingsToFile();
 	}
 	else

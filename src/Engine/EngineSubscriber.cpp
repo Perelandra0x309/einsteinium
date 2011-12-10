@@ -15,7 +15,7 @@ SubscriberHandler::SubscriberHandler(EngineSubscriber *owner)
 void
 SubscriberHandler::MessageReceived(BMessage *message)
 {
-	printf("ESM_Handler received message\n");
+	//printf("ESM_Handler received message\n");
 	fOwner->_ProcessEngineMessage(message);
 }
 
@@ -23,6 +23,7 @@ SubscriberHandler::MessageReceived(BMessage *message)
 EngineSubscriber::EngineSubscriber()
 {
 	fUniqueID = time(NULL);
+	_ResetSubscriberValues();
 
 	//Start the Looper running
 	fHandler = new SubscriberHandler(this);
@@ -40,34 +41,114 @@ EngineSubscriber::~EngineSubscriber()
 
 
 void
-EngineSubscriber::_SubscribeToEngine(int itemCount, int numberOfLaunchesScale, int firstLaunchScale,
-							int latestLaunchScale, int lastIntervalScale, int totalRuntimeScale,
-							BMessage *excludeList = NULL)
+EngineSubscriber::_ResetSubscriberValues()
+{
+	fCount=10;
+	fLaunchesScale=0;
+	fFirstLaunchScale=0;
+	fLastLaunchScale=0;
+	fLastIntervalScale=0;
+	fTotalRuntimeScale=0;
+	fExcludeList.MakeEmpty();
+}
+
+
+void
+EngineSubscriber::_SetCount(int count)
+{
+	fCount = count;
+}
+
+void
+EngineSubscriber::_SetTotalLaunchesScale(int value)
+{
+	fLaunchesScale = value;
+}
+
+
+void
+EngineSubscriber::_SetFirstLaunchScale(int value)
+{
+	fFirstLaunchScale = value;
+}
+
+
+void
+EngineSubscriber::_SetLastLaunchScale(int value)
+{
+	fLastLaunchScale = value;
+}
+
+
+void
+EngineSubscriber::_SetLastIntervalScale(int value)
+{
+	fLastIntervalScale = value;
+}
+
+
+void
+EngineSubscriber::_SetTotalRuntimeScale(int value)
+{
+	fTotalRuntimeScale = value;
+}
+
+
+void
+EngineSubscriber::_SetExcludeList(BMessage *list = NULL)
+{
+	fExcludeList.MakeEmpty();
+	if(list)
+	{
+		type_code typeFound;
+		int32 countFound;
+		status_t exStatus = list->GetInfo(E_SUBSCRIPTION_EXCLUSIONS, &typeFound, &countFound);
+		if(exStatus==B_OK)
+		{
+			BString appSig;
+			for(int i=0; i<countFound; i++)
+			{
+				list->FindString(E_SUBSCRIPTION_EXCLUSIONS, i, &appSig);
+				fExcludeList.AddString(E_SUBSCRIPTION_EXCLUSIONS, appSig);
+			}
+		}
+	}
+}
+
+
+void
+EngineSubscriber::_AddExclusion(BString signature)
+{
+	fExcludeList.AddString(E_SUBSCRIPTION_EXCLUSIONS, signature);
+}
+
+
+void
+EngineSubscriber::_SubscribeToEngine()
 {
 	// Subscribe with the Einsteinium Engine to receive updates
 	BMessage subscribeMsg(E_SUBSCRIBE_RANKED_APPS);
 	subscribeMsg.AddInt32(E_SUBSCRIPTION_UNIQUEID, fUniqueID);
-	subscribeMsg.AddInt16(E_SUBSCRIPTION_COUNT, itemCount);
-	subscribeMsg.AddInt8(E_SUBSCRIPTION_LAUNCH_SCALE, numberOfLaunchesScale);
-	subscribeMsg.AddInt8(E_SUBSCRIPTION_FIRST_SCALE, firstLaunchScale);
-	subscribeMsg.AddInt8(E_SUBSCRIPTION_LAST_SCALE, latestLaunchScale);
-	subscribeMsg.AddInt8(E_SUBSCRIPTION_INTERVAL_SCALE, lastIntervalScale);
-	subscribeMsg.AddInt8(E_SUBSCRIPTION_RUNTIME_SCALE, totalRuntimeScale);
-	if(excludeList)
+	subscribeMsg.AddInt16(E_SUBSCRIPTION_COUNT, fCount);
+	subscribeMsg.AddInt8(E_SUBSCRIPTION_LAUNCH_SCALE, fLaunchesScale);
+	subscribeMsg.AddInt8(E_SUBSCRIPTION_FIRST_SCALE, fFirstLaunchScale);
+	subscribeMsg.AddInt8(E_SUBSCRIPTION_LAST_SCALE, fLastLaunchScale);
+	subscribeMsg.AddInt8(E_SUBSCRIPTION_INTERVAL_SCALE, fLastIntervalScale);
+	subscribeMsg.AddInt8(E_SUBSCRIPTION_RUNTIME_SCALE, fTotalRuntimeScale);
+
+	type_code typeFound;
+	int32 countFound;
+	status_t exStatus = fExcludeList.GetInfo(E_SUBSCRIPTION_EXCLUSIONS, &typeFound, &countFound);
+	if(exStatus==B_OK)
 	{
-		type_code typeFound;
-		int32 countFound;
-		status_t exStatus = excludeList->GetInfo(E_SUBSCRIPTION_EXCLUSIONS, &typeFound, &countFound);
 		BString appSig;
-		if(exStatus==B_OK)
+		for(int i=0; i<countFound; i++)
 		{
-			for(int i=0; i<countFound; i++)
-			{
-				excludeList->FindString(E_SUBSCRIPTION_EXCLUSIONS, i, &appSig);
-				subscribeMsg.AddString(E_SUBSCRIPTION_EXCLUSIONS, appSig);
-			}
+			fExcludeList.FindString(E_SUBSCRIPTION_EXCLUSIONS, i, &appSig);
+			subscribeMsg.AddString(E_SUBSCRIPTION_EXCLUSIONS, appSig);
 		}
 	}
+
 	status_t mErr;
 	BMessenger messenger(fHandler, NULL, &mErr);
 	if(!messenger.IsValid())
@@ -130,17 +211,17 @@ EngineSubscriber::_ProcessEngineMessage(BMessage *message)
 	switch(message->what)
 	{
 		case E_SUBSCRIBE_FAILED: {
-			printf("ESM_Handler received \'Subscribe Failed\' message\n");
+		//	printf("ESM_Handler received \'Subscribe Failed\' message\n");
 			_SubscribeFailed();
 			break;
 		}
 		case E_SUBSCRIBE_CONFIRMED: {
-			printf("ESM_Handler received \'Subscribe Confirmed\' message\n");
+		//	printf("ESM_Handler received \'Subscribe Confirmed\' message\n");
 			_SubscribeConfirmed();
 			break;
 		}
 		case E_SUBSCRIBER_UPDATE_RANKED_APPS: {
-			printf("ESM_Handler received \'Update Ranked Apps\' message\n");
+		//	printf("ESM_Handler received \'Update Ranked Apps\' message\n");
 			_UpdateReceived(message);
 			break;
 		}

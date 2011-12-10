@@ -54,9 +54,16 @@ public:
 							~EngineSubscriber();
 
 protected:
-	void					_SubscribeToEngine(int itemCount, int numberOfLaunchesScale,
-								int firstLaunchScale, int latestLaunchScale, int lastIntervalScale,
-								int totalRuntimeScale, BMessage *excludeList = NULL);
+	void					_ResetSubscriberValues();
+	void					_SetCount(int count);
+	void					_SetTotalLaunchesScale(int value);
+	void					_SetFirstLaunchScale(int value);
+	void					_SetLastLaunchScale(int value);
+	void					_SetLastIntervalScale(int value);
+	void					_SetTotalRuntimeScale(int value);
+	void					_SetExcludeList(BMessage *list = NULL);
+	void					_AddExclusion(BString signature);
+	void					_SubscribeToEngine();
 	void					_UnsubscribeFromEngine();
 	bool					_IsEngineRunning();
 	status_t				_LaunchEngine();
@@ -71,6 +78,9 @@ private:
 	int32					fUniqueID;
 	BLooper					*fLooper;
 	SubscriberHandler		*fHandler;
+	int						fCount, fLaunchesScale, fFirstLaunchScale, fLastLaunchScale,
+							fLastIntervalScale, fTotalRuntimeScale;
+	BMessage				fExcludeList;
 	void					_ProcessEngineMessage(BMessage *message);
 
 	friend SubscriberHandler;

@@ -27,7 +27,7 @@ ModifierMenuItem::DrawContent()
 		{
 			//SetLabel(fRemoveLabel);
 			BString truncLabel(fRemoveLabel);
-			float width = Frame().Width()-53; //(ContentLocation().x + 39);
+			float width = Frame().Width()-50; //(ContentLocation().x + 39);
 			BFont font;
 			font.TruncateString(&truncLabel, B_TRUNCATE_END, width);
 			SetLabel(truncLabel);

@@ -417,12 +417,22 @@ ELShelfView::_Quit()
 void
 ELShelfView::_Subscribe()
 {
-	// Subscribe to the Einsteinium Engine.  If already subscribed, this will update the settings
+	// Get values from the settings file
 	fItemCount = fSettingsFile->GetDeskbarCount();
 	const int *scales = fSettingsFile->GetScales();
 	BMessage exclusionsList = fSettingsFile->GetExclusionsList();
-	_SubscribeToEngine(fItemCount, scales[LAUNCH_INDEX], scales[FIRST_INDEX], scales[LAST_INDEX],
-						scales[INTERVAL_INDEX], scales[RUNTIME_INDEX], &exclusionsList);
+
+	// Subscribe to the Einsteinium Engine.  If already subscribed, this will update
+	// the values used for subscription messages
+	_ResetSubscriberValues();
+	_SetCount(fItemCount);
+	_SetTotalLaunchesScale(scales[LAUNCH_INDEX]);
+	_SetFirstLaunchScale(scales[FIRST_INDEX]);
+	_SetLastLaunchScale(scales[LAST_INDEX]);
+	_SetLastIntervalScale(scales[INTERVAL_INDEX]);
+	_SetTotalRuntimeScale(scales[RUNTIME_INDEX]);
+	_SetExcludeList(&exclusionsList);
+	_SubscribeToEngine();
 }
 
 
