@@ -23,8 +23,12 @@ if [ ! -d $appDir ]; then
     mkdir $appDir
 fi
 unzip -u $currDir/Einsteinium.pkg -d $appDir
+if [ "$?" -ne "0" ]; then
+    alert --stop --modal "There was an error extracting the Einsteinium package.  Installation cannot continue."
+    exit 1
+fi
 ln -s -f $appDir/ein* -t $binDir
-ln -s -f $appDir/Einsteinium_Launcher -t $beAppsDir
+ln -s -f $appDir/Einsteinium_Launcher "$beAppsDir/Einsteinium Launcher"
 ln -s -f $appDir/Einsteinium_Preferences $prefsDir/Einsteinium
 
 # Automatic startup option
@@ -41,7 +45,7 @@ $appDir/einsteinium_engine &
 sleep 1
 $appDir/einsteinium_daemon &
 $appDir/Einsteinium_Launcher &
-$appDir/Einsteinium_Preferences &
+open $appDir/ReadMe
 
 # Notification to user
 alert --modal "Einsteinium has been successfully installed.  You may uninstall Einsteinium by running the Uninstall.sh script." "OK"

@@ -30,7 +30,7 @@ rm -f $launchDir/einsteinium_engine
 rm -f $launchDir/Einsteinium_Launcher
 rm -f $binDir/einsteinium_daemon
 rm -f $binDir/einsteinium_engine
-rm -f $beAppsDir/Einsteinium_Launcher
+rm -f "$beAppsDir/Einsteinium Launcher"
 rm -f $prefsDir/Einsteinium
 rm -f -r $currDir
 
