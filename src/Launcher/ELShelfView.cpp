@@ -360,7 +360,7 @@ ELShelfView::_BuildMenu(BMessage *message)
 	}
 	fMenu->AddItem(new BMenuItem("Preferences"B_UTF8_ELLIPSIS,
 		new BMessage(EL_SHELFVIEW_OPENPREFS)));
-	fMenu->AddItem(new BMenuItem("Close Launch Menu", new BMessage(EL_SHELFVIEW_MENU_QUIT)));
+	fMenu->AddItem(new BMenuItem("Close Launcher", new BMessage(EL_SHELFVIEW_MENU_QUIT)));
 
 	BMenuItem* item;
 	BMessage* msg;
