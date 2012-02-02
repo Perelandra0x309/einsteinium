@@ -1,5 +1,5 @@
 /* einsteinium_daemon.h
- * Copyright 2010 Brian Hill
+ * Copyright 2012 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #ifndef EINSTEINIUM_DAEMON_H
@@ -24,6 +24,8 @@ public:
 private:
 	EDSettingsFile	*fSettingsFile;
 	bool			fWatchingRoster;//will be true when roster is being watched
+	entry_ref		fTrueRef;
+	status_t		fTrueRefStatus;
 };
 
 #endif

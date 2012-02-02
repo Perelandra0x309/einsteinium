@@ -1,5 +1,5 @@
 /* einsteinium_daemon.cpp
- * Copyright 2010 Brian Hill
+ * Copyright 2012 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "einsteinium_daemon.h"
@@ -17,6 +17,12 @@ einsteinium_daemon::einsteinium_daemon()
 		printf("Error creating Einsteinium Daemon settings file.  Cannot continue.\n");
 		be_app->PostMessage(B_QUIT_REQUESTED);//Quit. Can we do anthything w/o settings?
 	}
+
+	//Create a ref to the 'true' binary
+	BPath refPath;
+	find_directory(B_SYSTEM_BIN_DIRECTORY, &refPath);
+	refPath.Append("true");
+	fTrueRefStatus = get_ref_for_path(refPath.Path(), &fTrueRef);
 }
 
 
@@ -85,6 +91,15 @@ einsteinium_daemon::MessageReceived(BMessage *msg)
 			status_t result = msg->FindString("be:signature", (const char**)&sig);
 			if (result != B_OK)
 				break;
+
+			//If the system is shutting down do not continue
+			if(fTrueRefStatus == B_OK)
+			{
+				status_t launchResult = be_roster->Launch(&fTrueRef);
+				if(launchResult == B_SHUTTING_DOWN)
+					break;
+			}
+
 			AppRelaunchSettings *appSettings = fSettingsFile->FindSettingsForApp(sig);
 			if(appSettings == NULL)
 			{

@@ -119,4 +119,4 @@ resource mini_icon array {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 };
 
-resource app_flags B_EXCLUSIVE_LAUNCH;
+resource app_flags B_EXCLUSIVE_LAUNCH | B_BACKGROUND_APP;
