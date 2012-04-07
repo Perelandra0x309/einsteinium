@@ -1,10 +1,20 @@
 NAME := Einsteinium_Launcher
 TYPE := APP
 SRCS := ../Engine/EngineSubscriber.cpp \
+	LPopUpMenu.cpp \
+	AppsListView.cpp \
+	RecentDocsBListView.cpp \
+	MainView.cpp \
+	MainWindow.cpp \
+	SettingsView.cpp \
+	LauncherRankingsView.cpp \
+	SettingsWindow.cpp \
+	AppListItem.cpp \
+	DocListItem.cpp \
+	SuperTypeListItem.cpp \
 	LauncherSettingsFile.cpp \
 	ModifierMenuItem.cpp \
 	ModifierMenu.cpp \
-	ELShelfView.cpp \
 	LauncherApp.cpp \
 	main.cpp
 LIBS := be tracker stdc++.r4 xml2

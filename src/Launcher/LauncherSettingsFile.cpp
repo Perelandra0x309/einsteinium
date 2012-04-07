@@ -15,10 +15,16 @@ LauncherSettingsFile::LauncherSettingsFile(BHandler *messageHandler=NULL)
 	fLastScale(DEFAULT_VALUE_LAST_SCALE),
 	fIntervalScale(DEFAULT_VALUE_INTERVAL_SCALE),
 	fRuntimeScale(DEFAULT_VALUE_RUNTIME_SCALE),
-//	fInclusionDefault(EL_XMLTEXT_VALUE_PROMPT),
-	fDeskbarMenuCount(20),
+	fAppCount(DEFAULT_VALUE_RECENT_COUNT),
 	fExclusionsList(EL_MESSAGE_WHAT_EXCLUDED_APPS),
-	fLaunchEngineOnStart(DEFAULT_LAUNCH_ENGINE_ON_START)
+	fLaunchEngineOnStart(DEFAULT_LAUNCH_ENGINE_ON_START),
+	fMinAppIconSize(16),
+	fMaxAppIconSize(kIconDefaultSize),
+	fDocIconSize(kIconDefaultSize),
+	fRecentDocCount(DEFAULT_VALUE_RECENT_COUNT),
+	fFontSize(0),
+	fWindowLook(B_TITLED_WINDOW_LOOK),
+	fWindowFrame(0,0,0,0)
 {
 	// find path for settings directory
 	find_directory(B_USER_SETTINGS_DIRECTORY, &fSettingsPath);
@@ -87,10 +93,10 @@ void
 LauncherSettingsFile::_StartWatching(){
 	status_t error = watch_node(&fSettingsNodeRef, B_WATCH_STAT, this, fWatchingLooper);
 	fWatchingSettingsNode = (error==B_OK);
-	printf("Watching engine settings node was %ssuccessful.\n", fWatchingSettingsNode? "": "not ");
+/*	printf("Watching engine settings node was %ssuccessful.\n", fWatchingSettingsNode? "": "not ");
 	if(!fWatchingSettingsNode)
 		printf("Error=%i (B_BAD_VALUE=%i, B_NO_MEMORY=%i, B_ERROR=%i)\n",
-			error, B_BAD_VALUE, B_NO_MEMORY, B_ERROR);
+			error, B_BAD_VALUE, B_NO_MEMORY, B_ERROR);*/
 }
 
 
@@ -98,7 +104,7 @@ void
 LauncherSettingsFile::_StopWatching(){
 	if(fWatchingSettingsNode)
 	{	watch_node(&fSettingsNodeRef, B_STOP_WATCHING, this, fWatchingLooper);
-		printf("Stopped watching engine settings node\n");
+//		printf("Stopped watching engine settings node\n");
 		fWatchingSettingsNode = false;
 	}
 }
@@ -167,7 +173,50 @@ LauncherSettingsFile::_ReadSettingsFromFile(BPath file)
 		{
 //			xmlChar *value = xmlGetProp(cur, (const xmlChar *) EL_XMLTEXT_PROPERTY_SHOW);
 //			fShowDeskbarMenu = strcmp("true", (char *)value)==0;
-			fDeskbarMenuCount = _XmlGetIntProp(cur, EL_XMLTEXT_PROPERTY_COUNT);
+			fAppCount = _XmlGetIntProp(cur, EL_XMLTEXT_PROPERTY_COUNT);
+		}
+		// layout settings
+		if (!xmlStrcmp(cur->name, (const xmlChar *) EL_XMLTEXT_CHILD_NAME_LAYOUT))
+		{
+			fAppCount = _XmlGetIntProp(cur, EL_XMLTEXT_PROPERTY_APPCOUNT, DEFAULT_VALUE_RECENT_COUNT);
+			fMinAppIconSize = _XmlGetIntProp(cur, EL_XMLTEXT_PROPERTY_MINAPP, kIconDefaultSize);
+			fMaxAppIconSize = _XmlGetIntProp(cur, EL_XMLTEXT_PROPERTY_MAXAPP, kIconDefaultSize);
+			fDocIconSize = _XmlGetIntProp(cur, EL_XMLTEXT_PROPERTY_DOCICON, kIconDefaultSize);
+			fRecentDocCount = _XmlGetIntProp(cur, EL_XMLTEXT_PROPERTY_DOCCOUNT, DEFAULT_VALUE_RECENT_COUNT);
+			fFontSize = _XmlGetIntProp(cur, EL_XMLTEXT_PROPERTY_FONTSIZE);
+		}
+		// window settings
+		if (!xmlStrcmp(cur->name, (const xmlChar *) EL_XMLTEXT_CHILD_NAME_WINDOW))
+		{
+			int look = _XmlGetIntProp(cur, EL_XMLTEXT_PROPERTY_WINDOWLOOK);
+			switch(look)
+			{
+				case 0:
+				{
+					fWindowLook = B_TITLED_WINDOW_LOOK;
+					break;
+				}
+				case 1:
+				{
+					fWindowLook = B_FLOATING_WINDOW_LOOK;
+					break;
+				}
+				case 2:
+				{
+					fWindowLook = B_MODAL_WINDOW_LOOK;
+					break;
+				}
+				case 3:
+				{
+					fWindowLook = B_BORDERED_WINDOW_LOOK;
+					break;
+				}
+			}
+			int left = _XmlGetIntProp(cur, EL_XMLTEXT_PROPERTY_WINDOWFRAMELEFT);
+			int top = _XmlGetIntProp(cur, EL_XMLTEXT_PROPERTY_WINDOWFRAMETOP);
+			int right = _XmlGetIntProp(cur, EL_XMLTEXT_PROPERTY_WINDOWFRAMERIGHT);
+			int bottom = _XmlGetIntProp(cur, EL_XMLTEXT_PROPERTY_WINDOWFRAMEBOTTOM);
+			fWindowFrame.Set(left, top, right, bottom);
 		}
 		// exclusion settings
 		if (!xmlStrcmp(cur->name, (const xmlChar *) EL_XMLTEXT_CHILD_NAME_EXCLUSIONS))
@@ -205,12 +254,12 @@ LauncherSettingsFile::_ParseExclusionSettings(xmlDocPtr doc, xmlNodePtr cur)
 
 
 int
-LauncherSettingsFile::_XmlGetIntProp(xmlNodePtr cur, char *name)
+LauncherSettingsFile::_XmlGetIntProp(xmlNodePtr cur, char *name, int defaultValue=0)
 {
 	int intValue;
 	xmlChar *xmlValue = xmlGetProp(cur, (const xmlChar *) name);
 	if(xmlValue==NULL){
-		intValue = 0;
+		intValue = defaultValue;
 //		printf("%s property value: NULL, integer: %i\n", name, intValue);
 	}
 	else{
@@ -234,6 +283,41 @@ LauncherSettingsFile::_WriteSettingsToFile()
 	lastChar << fLastScale;
 	intervalChar << fIntervalScale;
 	runtimeChar << fRuntimeScale;
+	BString minAppIconChar, maxAppIconChar, docIconChar, docCountChar, fontSizeChar;
+	minAppIconChar << fMinAppIconSize;
+	maxAppIconChar << fMaxAppIconSize;
+	docIconChar << fDocIconSize;
+	docCountChar << fRecentDocCount;
+	fontSizeChar << int(fFontSize);
+	BString windowLookChar;
+	switch(fWindowLook){
+		case B_TITLED_WINDOW_LOOK:
+		{
+			windowLookChar << 0;
+			break;
+		}
+		case B_FLOATING_WINDOW_LOOK:
+		{
+			windowLookChar << 1;
+			break;
+		}
+		case B_MODAL_WINDOW_LOOK:
+		{
+			windowLookChar << 2;
+			break;
+		}
+		case B_BORDERED_WINDOW_LOOK:
+		{
+			windowLookChar << 3;
+			break;
+		}
+	}
+	BString frameLeftChar, frameTopChar, frameRightChar, frameBottomChar;
+	frameLeftChar << fWindowFrame.left;
+	frameTopChar << fWindowFrame.top;
+	frameRightChar << fWindowFrame.right;
+	frameBottomChar << fWindowFrame.bottom;
+
 
 	BString autoLaunchValue;
 	if(fLaunchEngineOnStart)
@@ -242,7 +326,7 @@ LauncherSettingsFile::_WriteSettingsToFile()
 		autoLaunchValue.SetTo("false");
 
 	BString countChar;
-	countChar << fDeskbarMenuCount;
+	countChar << fAppCount;
 
 	//Creates a new document, a node and set it as a root node
 	doc = xmlNewDoc(BAD_CAST "1.0");
@@ -279,6 +363,34 @@ LauncherSettingsFile::_WriteSettingsToFile()
 //				BAD_CAST showDeskbar.String() );
 	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_COUNT,
 				BAD_CAST countChar.String() );
+
+	// layout settings
+	child1node = xmlNewChild(root_node, NULL, BAD_CAST EL_XMLTEXT_CHILD_NAME_LAYOUT, NULL);
+	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_APPCOUNT,
+				BAD_CAST countChar.String() );
+	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_MINAPP,
+				BAD_CAST minAppIconChar.String() );
+	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_MAXAPP,
+				BAD_CAST maxAppIconChar.String() );
+	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_DOCICON,
+				BAD_CAST docIconChar.String() );
+	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_DOCCOUNT,
+				BAD_CAST docCountChar.String() );
+	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_FONTSIZE,
+				BAD_CAST fontSizeChar.String() );
+
+	// window settings
+	child1node = xmlNewChild(root_node, NULL, BAD_CAST EL_XMLTEXT_CHILD_NAME_WINDOW, NULL);
+	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_WINDOWLOOK,
+				BAD_CAST windowLookChar.String() );
+	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_WINDOWFRAMELEFT,
+				BAD_CAST frameLeftChar.String() );
+	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_WINDOWFRAMETOP,
+				BAD_CAST frameTopChar.String() );
+	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_WINDOWFRAMERIGHT,
+				BAD_CAST frameRightChar.String() );
+	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_WINDOWFRAMEBOTTOM,
+				BAD_CAST frameBottomChar.String() );
 
 	// Write excluded applications
 	child1node = xmlNewChild(root_node, NULL, BAD_CAST EL_XMLTEXT_CHILD_NAME_EXCLUSIONS, NULL);
@@ -357,6 +469,17 @@ LauncherSettingsFile::GetScales()
 
 
 void
+LauncherSettingsFile::GetScales(ScaleSettings* settings)
+{
+	settings->launches_scale=fLaunchScale;
+	settings->first_launch_scale=fFirstScale;
+	settings->last_launch_scale=fLastScale;
+	settings->interval_scale=fIntervalScale;
+	settings->total_run_time_scale=fRuntimeScale;
+}
+
+
+void
 LauncherSettingsFile::SaveScales(int *scales)
 {
 	fLaunchScale=scales[LAUNCH_INDEX];
@@ -364,6 +487,18 @@ LauncherSettingsFile::SaveScales(int *scales)
 	fLastScale=scales[LAST_INDEX];
 	fIntervalScale=scales[INTERVAL_INDEX];
 	fRuntimeScale=scales[RUNTIME_INDEX];
+	_WriteSettingsToFile();
+}
+
+
+void
+LauncherSettingsFile::SaveScales(ScaleSettings scales)
+{
+	fLaunchScale=scales.launches_scale;
+	fFirstScale=scales.first_launch_scale;
+	fLastScale=scales.last_launch_scale;
+	fIntervalScale=scales.interval_scale;
+	fRuntimeScale=scales.total_run_time_scale;
 	_WriteSettingsToFile();
 }
 
@@ -400,7 +535,7 @@ LauncherSettingsFile::SaveEngineAutoLaunch(bool autoLaunch)
 void
 LauncherSettingsFile::SaveDeskbarCount(int count)
 {
-	fDeskbarMenuCount = count;
+	fAppCount = count;
 	_WriteSettingsToFile();
 }
 
@@ -413,3 +548,76 @@ LauncherSettingsFile::SaveExclusionsList(BMessage &exclusionsList)
 	_WriteSettingsToFile();
 }
 
+void
+LauncherSettingsFile::AddToExclusionsList(const char *signature, const char *name)
+{
+	fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, signature);
+	fExclusionsList.AddString(EL_EXCLUDE_NAME, name);
+	_WriteSettingsToFile();
+}
+
+
+void
+LauncherSettingsFile::AddToExclusionsList(BMessage *msg)
+{
+	type_code typeFound;
+	int32 signatureCount = 0;
+	status_t result1 = msg->GetInfo(EL_EXCLUDE_SIGNATURE, &typeFound, &signatureCount);
+	BString sig, name;
+	for(int i=0; i<signatureCount; i++)
+	{
+		sig.SetTo("");
+		name.SetTo("");
+		msg->FindString(EL_EXCLUDE_SIGNATURE, i, &sig);
+		msg->FindString(EL_EXCLUDE_NAME, i, &name);
+		fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, sig);
+		fExclusionsList.AddString(EL_EXCLUDE_NAME, name);
+	}
+	_WriteSettingsToFile();
+}
+
+
+void
+LauncherSettingsFile::SaveAppIconSize(int minSize, int maxSize)
+{
+	fMinAppIconSize = minSize;
+	fMaxAppIconSize = maxSize;
+	_WriteSettingsToFile();
+}
+
+
+void
+LauncherSettingsFile::SaveDocIconSize(int size)
+{
+	fDocIconSize = size;
+	_WriteSettingsToFile();
+}
+
+void
+LauncherSettingsFile::SaveDocCount(uint count)
+{
+	fRecentDocCount = count;
+	_WriteSettingsToFile();
+}
+
+void
+LauncherSettingsFile::SaveFontSize(float fontSize)
+{
+	fFontSize = fontSize;
+	_WriteSettingsToFile();
+}
+
+void
+LauncherSettingsFile::SaveWindowLook(window_look look)
+{
+	fWindowLook = look;
+	_WriteSettingsToFile();
+}
+
+
+void
+LauncherSettingsFile::SaveWindowFrame(BRect frame)
+{
+	fWindowFrame = frame;
+	_WriteSettingsToFile();
+}
