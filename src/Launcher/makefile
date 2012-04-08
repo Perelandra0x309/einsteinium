@@ -7,7 +7,9 @@ SRCS := ../Engine/EngineSubscriber.cpp \
 	MainView.cpp \
 	MainWindow.cpp \
 	SettingsView.cpp \
+	AppRefFilter.cpp \
 	LauncherRankingsView.cpp \
+	LauncherExclusionsView.cpp \
 	SettingsWindow.cpp \
 	AppListItem.cpp \
 	DocListItem.cpp \

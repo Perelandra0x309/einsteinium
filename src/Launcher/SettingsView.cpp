@@ -6,7 +6,7 @@
 
 SettingsView::SettingsView(BRect size, AppSettings* settings)
 	:
-	BView(size, "General", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
+	BView(size, "Layout", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
 {
 /*	fOneLineRB = new BRadioButton("One Line", "Show application name and status on one line",
 		new BMessage(LINES_OPTION_CHANGED));
@@ -155,6 +155,7 @@ SettingsView::SettingsView(BRect size, AppSettings* settings)
 		.Add(appsBox)
 		.Add(filesBox)
 		.Add(allBox)
+		.AddGlue()
 		.SetInsets(4, 4, 4, 4)
 	);
 

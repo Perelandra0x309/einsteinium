@@ -8,6 +8,7 @@
 #include <Application.h>
 #include "launcher_constants.h"
 //#include "ELShelfView.h"
+#include "LauncherSettingsFile.h"
 #include "MainWindow.h"
 #include "SettingsWindow.h"
 

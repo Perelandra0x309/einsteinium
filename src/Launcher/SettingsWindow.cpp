@@ -4,20 +4,25 @@
  */
 #include "SettingsWindow.h"
 
-SettingsWindow::SettingsWindow(AppSettings* settings, ScaleSettings* scales)
+SettingsWindow::SettingsWindow(AppSettings* settings, ScaleSettings* scales,
+								BMessage *appExclusions)
 	:
 	BWindow(BRect(), "Einsteinium Launcher Settings", B_FLOATING_WINDOW_LOOK,
-	B_MODAL_ALL_WINDOW_FEEL, B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS)
+	B_MODAL_ALL_WINDOW_FEEL, B_NOT_ZOOMABLE | /*B_NOT_RESIZABLE | */B_ASYNCHRONOUS_CONTROLS)
 {
 	Lock();
-	fLayoutView = new SettingsView(Bounds(), settings);
-	fRankingView = new LauncherRankingsView(Bounds(), scales);
+	BRect bounds = Bounds();
+	fLayoutView = new SettingsView(bounds, settings);
+	fRankingView = new LauncherRankingsView(bounds, scales);
+	fExclusionsView = new LauncherExclusionsView(bounds, appExclusions);
 //	AddChild(fView);
 	BTabView *tabView = new BTabView("Settings", B_WIDTH_FROM_LABEL);
 	BTab *guiTab = new BTab();
 	tabView->AddTab(fLayoutView, guiTab);
 	BTab *rankTab = new BTab();
 	tabView->AddTab(fRankingView, rankTab);
+	BTab *exclusionsTab = new BTab();
+	tabView->AddTab(fExclusionsView, exclusionsTab);
 
 	SetLayout(new BGroupLayout(B_VERTICAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL)
@@ -92,4 +97,19 @@ SettingsWindow::GetScaleSettings()
 	ScaleSettings settings;
 	fRankingView->GetSliderValues(settings);
 	return settings;
+}
+
+
+BMessage
+SettingsWindow::GetAppExclusions()
+{
+	BMessage list(EL_MESSAGE_WHAT_EXCLUDED_APPS);
+	fExclusionsView->GetExclusionsList(list);
+	return list;
+}
+
+void
+SettingsWindow::SetAppExclusions(BMessage *exclusionsList)
+{
+	fExclusionsView->PopulateExclusionsList(*exclusionsList);
 }

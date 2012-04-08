@@ -320,13 +320,13 @@ AppsListView::_InvokeSelectedItem()
 	if(selectedIndex >= 0)
 	{
 		uint32 modifier = modifiers();
-		if(modifier & kRemoveAppModifier)
+		if(modifier & kExcludeAppModifier)
 		{
 			AppListItem *selectedItem = (AppListItem*)ItemAt(selectedIndex);
 			BMessage message(EL_ADD_APP_EXCLUSION);
 			message.AddString(EL_EXCLUDE_SIGNATURE, selectedItem->GetSignature());
 			message.AddString(EL_EXCLUDE_NAME, selectedItem->GetName());
-			Window()->PostMessage(&message);
+			be_app->PostMessage(&message);
 		}
 		else
 		{
@@ -349,7 +349,7 @@ AppsListView::_InitPopUpMenu(int32 selectedIndex)
 		fMenu->AddItem(fStartStopMI);
 		fTrackerMI = new BMenuItem("Show in Tracker", new BMessage(EL_SHOW_IN_TRACKER));
 		fMenu->AddItem(fTrackerMI);
-		fRemoveMI = new BMenuItem("Remove from Launcher", new BMessage(EL_ADD_APP_EXCLUSION));
+		fRemoveMI = new BMenuItem("Exclude from Apps list", new BMessage(EL_ADD_APP_EXCLUSION));
 		fMenu->AddItem(fRemoveMI);
 		fMenu->AddSeparatorItem();
 		fSettingsMI = new BMenuItem("Settings" B_UTF8_ELLIPSIS, new BMessage(EL_SHOW_SETTINGS));

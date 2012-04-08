@@ -9,7 +9,7 @@ AppListItem::AppListItem(BEntry entry, const char * sig, AppSettings *settings)
 	:
 	BListItem(),
 //	fDrawTwoLines(false),
-	fRemoveName("Remove "),
+	fRemoveName("Exclude "),
 	fInitStatus(B_ERROR)
 {
 	// Draw Settings
@@ -276,7 +276,7 @@ AppListItem::DrawItem(BView *owner, BRect item_rect, bool complete = false)
 	float listItemHeight = Height();
 	rgb_color backgroundColor;
 	uint32 modifier = modifiers();
-	bool showRemoveLabel = modifier & kRemoveAppModifier;//modifier == B_LEFT_CONTROL_KEY || modifier == B_RIGHT_CONTROL_KEY;
+	bool showRemoveLabel = modifier & kExcludeAppModifier;//modifier == B_LEFT_CONTROL_KEY || modifier == B_RIGHT_CONTROL_KEY;
 
 	//background
 	if(IsSelected()) {

@@ -12,29 +12,14 @@ LauncherApp::LauncherApp()
 	fQuitRequested(false)
 {
 	// Get saved settings
-/*	BPath settingsPath;
-	find_directory(B_USER_SETTINGS_DIRECTORY, &settingsPath);
-	settingsPath.Append(settings_filename);
-	BFile settingsFile;
-	BMessage savedSettings;
-	BRect mainWindowRect(0,0,200,400);
-	status_t frameResult = B_ERROR;
-	status_t result = settingsFile.SetTo(settingsPath.Path(), B_READ_ONLY);
-	if(result == B_OK)
-	{
-		savedSettings.Unflatten(&settingsFile);
-		frameResult = savedSettings.FindRect(NAME_WINDOW_FRAME, &mainWindowRect);
-	}*/
 	BPath settingsPath;
 	find_directory(B_USER_SETTINGS_DIRECTORY, &settingsPath);
 	settingsPath.Append(e_settings_dir);
 	settingsPath.Append(el_settings_file);
-	BFile settingsFile;
-//	BMessage savedSettings;
-//	BRect mainWindowRect(0,0,200,400);
 
 	AppSettings settings;
 	ScaleSettings scaleSettings;
+	BMessage appExclusions;
 	BRect mainWindowRect;
 	status_t frameResult = B_ERROR;
 	fSettingsFile = new LauncherSettingsFile(this);
@@ -57,10 +42,13 @@ LauncherApp::LauncherApp()
 
 		// App rank scales settings
 		fSettingsFile->GetScales(&scaleSettings);
+
+		// App exclusion settings
+		appExclusions = fSettingsFile->GetExclusionsList();
 	}
 
 	// Create Windows
-	fSettings = new SettingsWindow(&settings, &scaleSettings);
+	fSettings = new SettingsWindow(&settings, &scaleSettings, &appExclusions);
 	settings = fSettings->GetAppSettings();
 	fWindow = new MainWindow(mainWindowRect, settings);
 	// Set feel outside of constructor- setting a feel of B_MODAL_ALL_WINDOW_FEEL
@@ -185,6 +173,15 @@ LauncherApp::MessageReceived(BMessage* msg)
 			_Subscribe();
 			break;
 		}
+		case EL_EXCLUSIONS_CHANGED:
+		{
+			// Save to file
+			BMessage newExclusionsList = fSettings->GetAppExclusions();
+			fSettingsFile->SaveExclusionsList(newExclusionsList);
+			// Resubscribe with new settings
+			_Subscribe();
+			break;
+		}
 		case EL_SHOW_SETTINGS:
 		{
 			if(fSettings->IsHidden())
@@ -230,13 +227,15 @@ LauncherApp::MessageReceived(BMessage* msg)
 			// TODO update settings window
 
 			_Subscribe();
-			//_BuildDocsListView(true);
 			be_app->PostMessage(EL_UPDATE_RECENT_DOCS_FORCE);
 			break;
 		}
 		case EL_ADD_APP_EXCLUSION:
 		{
+			// Add app to exclusion list and resubscribe
 			fSettingsFile->AddToExclusionsList(msg);
+			BMessage exclusionsList = fSettingsFile->GetExclusionsList();
+			fSettings->SetAppExclusions(&exclusionsList);
 			_Subscribe();
 			break;
 		}
@@ -269,16 +268,6 @@ LauncherApp::_ShowShelfView(bool showShelfView)
 void
 LauncherApp::_SaveSettingsToFile(uint32 what, AppSettings settings)
 {
-/*
-	BMessage settings;
-	fSettings->GetSettingsToSave(&settings);
-	settings.AddRect(NAME_WINDOW_FRAME, fWindow->Frame());
-	BPath settingsPath;
-	find_directory(B_USER_SETTINGS_DIRECTORY, &settingsPath);
-	settingsPath.Append(settings_filename);
-	BFile settingsFile(settingsPath.Path(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
-	settings.Flatten(&settingsFile);*/
-
 	switch(what)
 	{
 		case EL_APP_COUNT_OPTION_CHANGED:
@@ -370,6 +359,5 @@ LauncherApp::_UpdateReceived(BMessage *message)
 {
 	// Rebuild the application selection view with the list received from the Engine
 //	printf("Received update from Engine.\n");
-//	_BuildAppsListView(message);
 	fWindow->BuildAppsListView(message);
 }

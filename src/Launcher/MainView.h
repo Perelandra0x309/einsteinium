@@ -11,21 +11,16 @@
 #include <fs_attr.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
-#include <Roster.h>
 #include "launcher_constants.h"
-#include "LauncherSettingsFile.h"
 #include "AppsListView.h"
 #include "RecentDocsBListView.h"
-#include "AppListItem.h"
-#include "EngineSubscriber.h"
 
 
-class MainView : public BTabView/*, public EngineSubscriber*/ {
+class MainView : public BTabView {
 public:
 						MainView(BRect, AppSettings);
 //						~MainView();
 	virtual void		AttachedToWindow();
-	virtual void		DetachedFromWindow();
 	virtual void		MessageReceived(BMessage*);
 //	virtual void		MouseDown(BPoint pos);
 	virtual void		KeyDown(const char* bytes, int32 numbytes);
@@ -40,18 +35,10 @@ private:
 	RecentDocsBListView		*fDocsListView;
 	int32					fTabCount;
 	BListView				*fSelectedListView;
-//	bool					fWatchingRoster;
-//	LauncherSettingsFile	*fSettingsFile;
 	AppSettings				fCurrentSettings;
 	entry_ref				fLastRecentDocRef;
 	void					_UpdateSelectedListView();
 	status_t				_AddAppListItem(BEntry appEntry, int totalCount, int index);
-//	void					_BuildAppsListView(BMessage *message);
-//	void					_Subscribe();
-	// virtual functions inherited from the EngineSubscriber class
-//	virtual void			_SubscribeFailed();
-//	virtual void			_SubscribeConfirmed();
-//	virtual void			_UpdateReceived(BMessage *message);
 	void					_BuildDocsListView(bool force=false);
 };
 

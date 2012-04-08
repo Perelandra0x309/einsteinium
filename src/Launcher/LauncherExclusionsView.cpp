@@ -5,11 +5,11 @@
 #include "LauncherExclusionsView.h"
 
 
-LauncherExclusionsView::LauncherExclusionsView(BRect size)
+LauncherExclusionsView::LauncherExclusionsView(BRect size, BMessage *appExclusions)
 	:
-	BView(size, "Recent Apps Rank", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS)
+	BView(size, "Apps Exclusions", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS)
 {
-	SetViewColor(bg_color);
+//	SetViewColor(bg_color);
 	BRect viewRect;
 
 	// Default Settings
@@ -51,7 +51,7 @@ LauncherExclusionsView::LauncherExclusionsView(BRect size)
 								"from this list will instantly update the Launcher.");
 
 	// Inidividual app settings
-	fSettingsBox = new BBox("Application Attribute Settings");
+	fSettingsBox = new BBox("Exclusion Settings");
 	fSettingsBox->SetLabel("Exclude These Apps From The Launcher");
 
 	BGridLayout *boxLayout = new BGridLayout(5, 5);
@@ -65,11 +65,19 @@ LauncherExclusionsView::LauncherExclusionsView(BRect size)
 
 	BGroupLayout *layout = new BGroupLayout(B_VERTICAL);
 	SetLayout(layout);
-	BLayoutBuilder::Group<>(layout)
+//	BLayoutBuilder::Group<>(layout)
+	AddChild(BGroupLayoutBuilder(B_VERTICAL, 3)
 //		.Add(fDefaultSettingsBox)
 		.Add(fSettingsBox)
-	;
+		.SetInsets(4, 4, 4, 4)
+	);
 
+	//File Panel
+	fAppFilter = new AppRefFilter();
+	fAppsPanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL, B_FILE_NODE, false, NULL, fAppFilter);
+	fAppsPanel->Window()->SetFeel(B_MODAL_ALL_WINDOW_FEEL);
+
+	_RebuildExclusionsList(*appExclusions);
 }
 
 
@@ -78,15 +86,44 @@ LauncherExclusionsView::~LauncherExclusionsView()
 	_EmptyExclusionsList();
 }
 
-/*
+
+void
+LauncherExclusionsView::AttachedToWindow()
+{
+	BView::AttachedToWindow();
+	fAddB->SetTarget(this);
+	fRemoveB->SetTarget(this);
+	fExclusionLView->SetTarget(this);
+}
+
+
 void
 LauncherExclusionsView::MessageReceived(BMessage* msg)
-{	switch(msg->what)
+{
+	switch(msg->what)
 	{
-
+		case EL_ADD_EXCLUSION: {
+			BMessage addmsg(EL_ADD_EXCLUSION_REF);
+			fAppsPanel->SetMessage(&addmsg);
+			fAppsPanel->SetTarget(this);
+			fAppsPanel->Show();
+			break; }
+		case EL_ADD_EXCLUSION_REF: {
+			bool success = AddExclusion(msg);
+			if(success)
+				be_app->PostMessage(EL_EXCLUSIONS_CHANGED);
+			break; }
+		case EL_REMOVE_EXCLUSION: {
+			bool success = RemoveSelectedExclusion();
+			if(success)
+				be_app->PostMessage(EL_EXCLUSIONS_CHANGED);
+			break; }
+		case EL_EXCLUSION_SELECTION_CHANGED: {
+			UpdateSelectedItem();
+			break; }
 	}
 	BView::MessageReceived(msg);
-}*/
+}
 
 
 void
@@ -184,7 +221,9 @@ LauncherExclusionsView::GetLinkInclusionDefault(BString &value)
 void
 LauncherExclusionsView::PopulateExclusionsList(BMessage &exclusionsList)
 {
+	Window()->Lock();
 	_RebuildExclusionsList(exclusionsList);
+	Window()->Unlock();
 }
 
 
@@ -293,7 +332,7 @@ ExcludeItem::DrawItem(BView* owner, BRect item_rect, bool complete)
 	rgb_color color;
 	bool selected = IsSelected();
 	if(selected)
-		color = selected_color;
+		color = ui_color(B_MENU_SELECTED_BACKGROUND_COLOR);
 	else
 		color = owner->ViewColor();
 	owner->SetLowColor(color);
@@ -302,7 +341,7 @@ ExcludeItem::DrawItem(BView* owner, BRect item_rect, bool complete)
 	{	owner->SetHighColor(color);
 		owner->FillRect(item_rect);
 	}
-	owner->SetHighColor(enabled_color);
+	owner->SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
 	BString text(fAppName);
 	text.Append(" (").Append(fAppSig).Append(")");
 	owner->DrawString(text.String(), BPoint(item_rect.left+5.0,item_rect.bottom - 2.0));

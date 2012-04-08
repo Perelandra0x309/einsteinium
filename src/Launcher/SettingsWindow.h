@@ -13,21 +13,26 @@
 #include <stdlib.h>
 #include "launcher_constants.h"
 #include "SettingsView.h"
+#include "LauncherExclusionsView.h"
 #include "LauncherRankingsView.h"
 
 
 class SettingsWindow : public BWindow {
 public:
-							SettingsWindow(AppSettings* settings, ScaleSettings* scales);
+							SettingsWindow(AppSettings* settings, ScaleSettings* scales,
+											BMessage *appExclusions);
 	virtual	bool			QuitRequested();
 	virtual void			MessageReceived(BMessage*);
 			void			Show(BRect);
 			AppSettings		GetAppSettings();
 			ScaleSettings	GetScaleSettings();
+			BMessage		GetAppExclusions();
+			void			SetAppExclusions(BMessage *exclusionsList);
 
 private:
 	SettingsView			*fLayoutView;
 	LauncherRankingsView	*fRankingView;
+	LauncherExclusionsView	*fExclusionsView;
 };
 
 #endif

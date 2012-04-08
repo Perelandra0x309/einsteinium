@@ -17,7 +17,7 @@ const int32 kIconDefaultSize = 32;
 const int kIconMargin = 2;
 const int kTextMargin = 2;
 const uint32 kPreventHideModifier = B_SHIFT_KEY | B_OPTION_KEY | B_COMMAND_KEY;
-const uint32 kRemoveAppModifier = B_CONTROL_KEY;
+const uint32 kExcludeAppModifier = B_CONTROL_KEY;
 
 struct AppSettings {
 //	bool drawTwoLines;
@@ -153,6 +153,7 @@ enum launcher_messages
 	EL_ADD_EXCLUSION,
 	EL_ADD_EXCLUSION_REF,
 	EL_REMOVE_EXCLUSION,
+	EL_EXCLUSIONS_CHANGED,
 	EL_DESKBAR_CHANGED,
 	EL_ENGINELAUNCH_CHANGED
 };

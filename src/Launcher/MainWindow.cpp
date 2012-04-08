@@ -44,8 +44,7 @@ MainWindow::MessageReceived(BMessage* msg)
 	switch(msg->what)
 	{
 		case B_MOUSE_WHEEL_CHANGED:
-		case EL_UPDATE_RECENT_DOCS:
-		case EL_ADD_APP_EXCLUSION: {
+		case EL_UPDATE_RECENT_DOCS: {
 			fView->MessageReceived(msg);
 			break;
 		}

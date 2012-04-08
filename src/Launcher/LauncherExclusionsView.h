@@ -10,9 +10,9 @@
 #include <SupportKit.h>
 #include <Roster.h>
 #include <LayoutBuilder.h>
+#include <GroupLayoutBuilder.h>
 #include "AppRefFilter.h"
 #include "launcher_constants.h"
-#include "prefs_constants.h"
 #include "EngineSubscriber.h"
 
 
@@ -20,9 +20,10 @@ class ExcludeItem;
 
 class LauncherExclusionsView : public BView {
 public:
-					LauncherExclusionsView(BRect);
+					LauncherExclusionsView(BRect, BMessage *appExclusions);
 					~LauncherExclusionsView();
-//	virtual void	MessageReceived(BMessage*);
+	virtual void	AttachedToWindow();
+	virtual void	MessageReceived(BMessage*);
 	virtual void	FrameResized(float width, float height);
 	bool			AddExclusion(BMessage* refMsg);
 	bool			RemoveSelectedExclusion();
@@ -39,6 +40,8 @@ private:
 	BListView		*fExclusionLView;
 	BScrollView		*fExclusionSView;
 	ExcludeItem		*fSelectedItem;
+	AppRefFilter	*fAppFilter;
+	BFilePanel		*fAppsPanel;
 	void			_RebuildExclusionsList(BMessage &exclusionsList);
 	void			_EmptyExclusionsList();
 };

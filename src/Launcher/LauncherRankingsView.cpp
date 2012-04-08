@@ -13,7 +13,7 @@ rgb_color kBarColor = {205,205,255,0};
 
 LauncherRankingsView::LauncherRankingsView(BRect size, ScaleSettings* scales)
 	:
-	BView(size, "Recent Apps Rank", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS)
+	BView(size, "Apps Ranking", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS)
 {
 //	SetViewColor(bg_color);
 
@@ -91,7 +91,6 @@ LauncherRankingsView::LauncherRankingsView(BRect size, ScaleSettings* scales)
 	);
 
 	SetSliderValues(*scales);
-	_SetSlidersChanged(false);
 }
 
 /*
