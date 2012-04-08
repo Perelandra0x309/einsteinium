@@ -12,10 +12,10 @@
 #include "EngineMaintenanceView.h"
 #include "EngineStatusView.h"
 #include "LauncherAboutView.h"
-#include "LauncherDeskbarView.h"
-#include "LauncherExclusionsView.h"
-#include "LauncherRankingsView.h"
-#include "LauncherSettingsFile.h"
+//#include "LauncherDeskbarView.h"
+//#include "LauncherExclusionsView.h"
+//#include "LauncherRankingsView.h"
+//#include "LauncherSettingsFile.h"
 #include "engine_constants.h"
 
 
@@ -28,7 +28,7 @@ public:
 	virtual void			MessageReceived(BMessage*);
 
 private:
-	scale_settings			fScales;
+//	scale_settings			fScales;
 	BView					*fMainView, *fEmptySettingsView, *fCurrentView;
 	BBox					*fAboutBox;
 	BTextView				*fAboutTextView;
@@ -41,22 +41,22 @@ private:
 	DaemonRelaunchView		*fDRelaunchView;
 	DaemonStatusView		*fDStatusView;
 	LauncherAboutView		*fLAboutView;
-	LauncherRankingsView	*fLRankingsView;
-	LauncherExclusionsView	*fLExclusionsView;
-	LauncherDeskbarView		*fLDeskbarView;
+//	LauncherRankingsView	*fLRankingsView;
+//	LauncherExclusionsView	*fLExclusionsView;
+//	LauncherDeskbarView		*fLDeskbarView;
 	EngineMaintenanceView	*fMaintenanceView;
 	EngineStatusView		*fEStatusView;
-	LauncherSettingsFile	*fLauncherSettings;
+//	LauncherSettingsFile	*fLauncherSettings;
 	AppRefFilter			*fAppFilter;
 	BFilePanel				*fAppsPanel;
 	void					_AddSettingsView(BListItem*, BView*);
 	void					_ReadAllSettings();
 	void					_ReadDaemonSettings();
-	void					_ReadLauncherSettings();
-	void					_WriteLauncherScaleSettings();
+//	void					_ReadLauncherSettings();
+//	void					_WriteLauncherScaleSettings();
 //	void					_WriteLauncherListInclusionSetting();
-	void					_WriteLauncherDeskbarSettings();
-	void					_WriteLauncherExclusions();
+//	void					_WriteLauncherDeskbarSettings();
+//	void					_WriteLauncherExclusions();
 };
 
 #endif

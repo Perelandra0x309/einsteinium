@@ -16,7 +16,7 @@ prefs_app::~prefs_app()
 {	}
 
 
-
+/*
 void
 prefs_app::MessageReceived(BMessage *msg)
 {
@@ -31,4 +31,4 @@ prefs_app::MessageReceived(BMessage *msg)
 		}
 	}
 	BApplication::MessageReceived(msg);
-}
+}*/

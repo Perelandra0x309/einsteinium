@@ -3,13 +3,9 @@ TYPE := APP
 SRCS := ../Common/methods.cpp \
 		../Daemon/AppRelaunchSettings.cpp \
 		../Daemon/EDSettingsFile.cpp \
-		../Launcher/LauncherSettingsFile.cpp \
 		AppRefFilter.cpp \
 		BitmapListItem.cpp \
 		LauncherAboutView.cpp \
-		LauncherExclusionsView.cpp \
-		LauncherDeskbarView.cpp \
-		LauncherRankingsView.cpp \
 		EngineMaintenanceView.cpp \
 		EngineStatusView.cpp \
 		DaemonRelaunchView.cpp \

@@ -12,7 +12,7 @@ class prefs_app : public BApplication {
 public:
 					prefs_app();
 					~prefs_app();
-	virtual void	MessageReceived(BMessage*);
+//	virtual void	MessageReceived(BMessage*);
 private:
 	prefsWindow		*fMainWindow;
 };

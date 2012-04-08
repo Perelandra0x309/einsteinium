@@ -6,16 +6,16 @@
 
 prefsWindow::prefsWindow(BRect size)
 	:
-	BWindow(size, "Einsteinium Preferences", B_TITLED_WINDOW, B_NOT_ZOOMABLE),
-	fLauncherSettings(NULL)
+	BWindow(size, "Einsteinium Preferences", B_TITLED_WINDOW, B_NOT_ZOOMABLE)
+//	fLauncherSettings(NULL)
 {
 	//Defaults
-	fScales.launches_scale = DEFAULT_VALUE_LAUNCH_SCALE;
+/*	fScales.launches_scale = DEFAULT_VALUE_LAUNCH_SCALE;
 	fScales.first_launch_scale = DEFAULT_VALUE_FIRST_SCALE;
 	fScales.last_launch_scale = DEFAULT_VALUE_LAST_SCALE;
 	fScales.interval_scale = DEFAULT_VALUE_INTERVAL_SCALE;
 	fScales.total_run_time_scale = DEFAULT_VALUE_RUNTIME_SCALE;
-
+	*/
 	Lock();
 	BRect viewRect(Bounds());
 	fMainView = new BView(viewRect, "Background View", B_FOLLOW_ALL_SIDES, B_WILL_DRAW);
@@ -88,19 +88,19 @@ prefsWindow::prefsWindow(BRect size)
 	fEStatusView = new EngineStatusView(viewRect);
 	fMaintenanceView = new EngineMaintenanceView(viewRect);
 	fLAboutView = new LauncherAboutView(viewRect);
-	fLDeskbarView = new LauncherDeskbarView(viewRect);
-	fLRankingsView = new LauncherRankingsView(viewRect);
-	fLExclusionsView = new LauncherExclusionsView(viewRect);
+//	fLDeskbarView = new LauncherDeskbarView(viewRect);
+//	fLRankingsView = new LauncherRankingsView(viewRect);
+//	fLExclusionsView = new LauncherExclusionsView(viewRect);
 
 	//Add all the ListItems and settings views to the window
 	_AddSettingsView(fDaemonBLI, fDStatusView);
 	_AddSettingsView(fDAppLaunchSI, fDRelaunchView);
 	_AddSettingsView(fEngineBLI, fEStatusView);
 	_AddSettingsView(fEMaintSI, fMaintenanceView);
-	_AddSettingsView(fLauncherBLI, fLAboutView);
-	_AddSettingsView(fLDeskbarSI, fLDeskbarView);
-	_AddSettingsView(fLRankSI, fLRankingsView);
-	_AddSettingsView(fLExclusionsSI, fLExclusionsView);
+//	_AddSettingsView(fLauncherBLI, fLAboutView);
+//	_AddSettingsView(fLDeskbarSI, fLDeskbarView);
+//	_AddSettingsView(fLRankSI, fLRankingsView);
+//	_AddSettingsView(fLExclusionsSI, fLExclusionsView);
 
 	fCurrentView = fEmptySettingsView;
 	fCurrentView->Show();
@@ -110,19 +110,21 @@ prefsWindow::prefsWindow(BRect size)
 	BSize minSize = fDRelaunchView->GetMinSize();
 	minHeight = minSize.height;
 	minWidth = minSize.width;
-	minSize = fLRankingsView->GetMinSize();
-	minHeight = max_c(minHeight, minSize.height);
-	minWidth = max_c(minWidth, minSize.width);
-	minSize = fLDeskbarView->GetMinSize();
-	minHeight = max_c(minHeight, minSize.height);
-	minWidth = max_c(minWidth, minSize.width);
+//	minSize = fLRankingsView->GetMinSize();
+//	minHeight = max_c(minHeight, minSize.height);
+//	minWidth = max_c(minWidth, minSize.width);
+//	minSize = fLDeskbarView->GetMinSize();
+//	minHeight = max_c(minHeight, minSize.height);
+//	minWidth = max_c(minWidth, minSize.width);
+	// Make height minimum of 500
+	minHeight = max_c(minHeight, 500);
 	float finalMinWidth = fPrefsListView->Frame().right + minWidth + 10;
 	float finalMinHeight = minHeight + 10;
 	SetSizeLimits(finalMinWidth, B_SIZE_UNLIMITED, finalMinHeight, B_SIZE_UNLIMITED);
 	ResizeTo(finalMinWidth, finalMinHeight);
 
 	//Settings
-	fLauncherSettings = new LauncherSettingsFile(this);
+//	fLauncherSettings = new LauncherSettingsFile(this);
 	_ReadAllSettings();
 
 	//File Panel
@@ -137,7 +139,7 @@ prefsWindow::prefsWindow(BRect size)
 prefsWindow::~prefsWindow()
 {
 	fSettingsViews.MakeEmpty();
-	delete fLauncherSettings;
+//	delete fLauncherSettings;
 	delete fAppsPanel;
 	delete fAppFilter;
 }
@@ -184,7 +186,7 @@ prefsWindow::MessageReceived(BMessage *msg)
 			messenger.SendMessage(&msg);
 			break; }
 		// Deskbar settings changed
-		case EL_DESKBAR_CHANGED:
+/*		case EL_DESKBAR_CHANGED:
 		case EL_ENGINELAUNCH_CHANGED: {
 			_WriteLauncherDeskbarSettings();
 			break;
@@ -193,13 +195,13 @@ prefsWindow::MessageReceived(BMessage *msg)
 		case EL_SAVE_RANKING: {
 			_WriteLauncherScaleSettings();
 			fLRankingsView->MessageReceived(msg);
-			break; }
+			break; }*/
 		// Save exclusion settings
 /*		case EL_LIST_INCLUSION_CHANGED: {
 			_WriteLauncherListInclusionSetting();
 			break; }*/
 		// Add exclusion to list
-		case EL_ADD_EXCLUSION: {
+/*		case EL_ADD_EXCLUSION: {
 			BMessage addmsg(EL_ADD_EXCLUSION_REF);
 			fAppsPanel->SetMessage(&addmsg);
 			fAppsPanel->SetTarget(this);
@@ -221,14 +223,14 @@ prefsWindow::MessageReceived(BMessage *msg)
 		// Settings file was updated by an external application
 		case EL_SETTINGS_FILE_CHANGED_EXTERNALLY: {
 			_ReadLauncherSettings();
-			break; }
+			break; }*/
 		case ED_SETTINGS_FILE_CHANGED_EXTERNALLY: {
 			fDRelaunchView->ReadSettings();
 			break; }
 		// Show the launcher settings view, usually intiated by the Launcher app opening the Preferences
-		case EL_GOTO_LAUNCHER_SETTINGS: {
+/*		case EL_GOTO_LAUNCHER_SETTINGS: {
 			fPrefsListView->Select(fPrefsListView->IndexOf(fLauncherBLI));
-			break; }
+			break; }*/
 		// Pass these messages to the views that need them
 		case ED_RELAPP_SELECTION_CHANGED:
 		case ED_ADD_APPITEM:
@@ -237,13 +239,13 @@ prefsWindow::MessageReceived(BMessage *msg)
 		case ED_AUTO_RELAUNCH_CHANGED: {
 			fDRelaunchView->MessageReceived(msg);
 			break; }
-		case EL_LAUNCHES_SL_CHANGED:
+/*		case EL_LAUNCHES_SL_CHANGED:
 		case EL_FIRST_SL_CHANGED:
 		case EL_LAST_SL_CHANGED:
 		case EL_INTERVAL_SL_CHANGED:
 		case EL_RUNTIME_SL_CHANGED: {
 			fLRankingsView->MessageReceived(msg);
-			break; }
+			break; }*/
 		default: {
 			BWindow::MessageReceived(msg);
 			break; }
@@ -269,7 +271,7 @@ prefsWindow::_ReadAllSettings()
 {
 	Lock();
 	_ReadDaemonSettings();
-	_ReadLauncherSettings();
+//	_ReadLauncherSettings();
 	Unlock();
 }
 
@@ -279,7 +281,7 @@ void prefsWindow::_ReadDaemonSettings()
 	fDRelaunchView->ReadSettings();
 }
 
-
+/*
 void
 prefsWindow::_ReadLauncherSettings()
 {
@@ -325,7 +327,7 @@ prefsWindow::_WriteLauncherScaleSettings()
 	scales[INTERVAL_INDEX] = fScales.interval_scale;
 	scales[RUNTIME_INDEX] = fScales.total_run_time_scale;
 	fLauncherSettings->SaveScales(scales);
-}
+}*/
 
 /*
 void
@@ -336,11 +338,12 @@ prefsWindow::_WriteLauncherListInclusionSetting()
 	fLauncherSettings->SaveLinkInclusionDefaultValue(inclusionValue.String());
 }*/
 
+/*
 void
 prefsWindow::_WriteLauncherExclusions()
 {
 	BMessage exclusionsList(EL_MESSAGE_WHAT_EXCLUDED_APPS);
 	fLExclusionsView->GetExclusionsList(exclusionsList);
 	fLauncherSettings->SaveExclusionsList(exclusionsList);
-}
+}*/
 
