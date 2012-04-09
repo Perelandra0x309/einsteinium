@@ -129,7 +129,14 @@ MainView::KeyDown(const char* bytes, int32 numbytes)
 			}
 			default:
 			{
-				BTabView::KeyDown(bytes, numbytes);
+				if( bytes[0] >= 'A' && bytes[0] <= 'z')
+				{
+				//	printf("Key: %c\n", bytes[0]);
+					if(fSelectedListView==fAppsListView)
+						fAppsListView->ScrollToNextAppBeginningWith(bytes[0]);
+				}
+				else
+					BTabView::KeyDown(bytes, numbytes);
 			}
 		}
 	}

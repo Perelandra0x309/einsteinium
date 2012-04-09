@@ -312,6 +312,41 @@ AppsListView::SetFontSizeForValue(float fontSize)
 	BListView::SetFontSize(fontSize);
 }
 
+
+void
+AppsListView::ScrollToNextAppBeginningWith(char letter)
+{
+	int32 selectedIndex = CurrentSelection();
+	// If no item is selected start at beginning
+	if(selectedIndex<0)
+		selectedIndex=-1;
+	letter = BString(&letter).Truncate(1).ToLower()[0];
+	int totalCount = CountItems();
+	for(int i=selectedIndex+1; i<totalCount; i++)
+	{
+		AppListItem* item = (AppListItem*)(ItemAt(i));
+		bool match = item->BeginsWith(letter);
+		if(match)
+		{
+			Select(i);
+			return;
+		}
+	}
+	// If we are here, we reached the end of the list without finding
+	// a match.  Now start at the beginning of the list
+	for(int i=0; i<selectedIndex; i++)
+	{
+		AppListItem* item = (AppListItem*)(ItemAt(i));
+		bool match = item->BeginsWith(letter);
+		if(match)
+		{
+			Select(i);
+			return;
+		}
+	}
+}
+
+
 status_t
 AppsListView::_InvokeSelectedItem()
 {

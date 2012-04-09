@@ -27,6 +27,7 @@ AppListItem::AppListItem(BEntry entry, const char * sig, AppSettings *settings)
 	fRemoveName.Append(fName);
 	fSignature.SetTo(sig);
 	entry.GetRef(&fEntryRef);
+	fNameFirstChar = BString(fName).Truncate(1).ToLower()[0];
 
 //	_GetIcon();
 	fInitStatus = B_OK;
@@ -110,6 +111,13 @@ AppListItem::ShowInTracker()
 	message.AddRef("refs", &folderRef);
 	status_t rc = tracker.SendMessage(&message);
 	return rc;
+}
+
+
+bool
+AppListItem::BeginsWith(char letter)
+{
+	return (fNameFirstChar==letter);
 }
 
 

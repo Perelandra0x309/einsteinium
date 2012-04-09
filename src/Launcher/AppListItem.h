@@ -25,6 +25,7 @@ public:
 			bool			IsRunning();
 			status_t		Launch();
 			status_t		ShowInTracker();
+			bool			BeginsWith(char letter);
 //			void			SetDrawTwoLines(bool value);
 			void			SetIconSize(int value);
 			void			SetIconSize(int minIconSize, int maxIconSize, int totalCount, int index);
@@ -33,6 +34,7 @@ private:
 	status_t				fInitStatus;
 	entry_ref				fEntryRef;
 	BString					fSignature, fName, fRemoveName;
+	char					fNameFirstChar;
 	float					fFontHeight, fFontAscent, fTextOnlyHeight;
 	BBitmap					*fIcon, *fShadowIcon;
 //	bool					fDrawTwoLines;

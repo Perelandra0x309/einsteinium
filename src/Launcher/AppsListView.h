@@ -24,6 +24,7 @@ public:
 			void		SettingsChanged(uint32 what, AppSettings settings);
 			void		SetFontSizeForValue(float fontSize);
 			void		SetShowing(bool showing) { isShowing = showing; };
+			void		ScrollToNextAppBeginningWith(char letter);
 
 private:
 	LPopUpMenu			*fMenu;
