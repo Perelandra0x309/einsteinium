@@ -4,6 +4,7 @@ SRCS := ../Engine/EngineSubscriber.cpp \
 	LPopUpMenu.cpp \
 	AppsListView.cpp \
 	RecentDocsBListView.cpp \
+	RecentFoldersBListView.cpp \
 	MainView.cpp \
 	MainWindow.cpp \
 	SettingsView.cpp \

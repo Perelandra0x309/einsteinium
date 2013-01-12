@@ -6,33 +6,12 @@
 
 AppsListView::AppsListView(BRect size)
 	:
-	BListView(size, "Launcher List", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES),
+	BListView(size, "Apps List", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES),
 	fMenu(NULL),
 	isShowing(false)
 {
-/*	fMenu = new LPopUpMenu(B_EMPTY_STRING);
-	fStartStopMI = new BMenuItem("Start", new BMessage());
-	fMenu->AddItem(fStartStopMI);
-	fTrackerMI = new BMenuItem("Show in Tracker", new BMessage(SHOW_IN_TRACKER));
-	fMenu->AddItem(fTrackerMI);
-	fRemoveMI = new BMenuItem("Remove from Launcher", new BMessage(ADD_APP_EXCLUSION));
-	fMenu->AddItem(fRemoveMI);
-	fMenu->AddSeparatorItem();
-	fSettingsMI = new BMenuItem("Settings" B_UTF8_ELLIPSIS, new BMessage(SHOW_SETTINGS));
-	fMenu->AddItem(fSettingsMI);*/
-//	_InitPopUpMenu(-1);
 
 }
-
-/*
-void
-AppsListView::AttachedToWindow()
-{
-	BListView::AttachedToWindow();
-
-	fMenu->SetTargetForItems(this);
-	fSettingsMI->SetTarget(be_app);
-}*/
 
 
 void
@@ -85,7 +64,7 @@ AppsListView::MessageReceived(BMessage* msg)
 	}
 }
 
-/*
+
 void
 AppsListView::MouseDown(BPoint pos)
 {
@@ -118,65 +97,6 @@ AppsListView::MouseDown(BPoint pos)
 			return;
 
 		_InitPopUpMenu(selectedIndex);
-
-		ConvertToScreen(&pos);
-		//fMenu->Go(pos, false, false, true);
-		fMenu->Go(pos, true, true, BRect(pos.x - 2, pos.y - 2,
-			pos.x + 2, pos.y + 2), true);
-	}
-}
-*/
-
-
-void
-AppsListView::MouseDown(BPoint pos)
-{
-	int32 button=0;
-	Looper()->CurrentMessage()->FindInt32("buttons", &button);
-	if ( button & B_PRIMARY_MOUSE_BUTTON )
-	{
-		// Select list item under mouse pointer, then launch item
-		int32 index = IndexOf(pos);
-		if(index>=0)
-		{
-			Select(index);
-			_InvokeSelectedItem();
-		}
-	}
-	else if ( button & B_TERTIARY_MOUSE_BUTTON )
-	{
-		// Launch the currently selected item
-		_InvokeSelectedItem();
-	}
-	else if (button & B_SECONDARY_MOUSE_BUTTON)
-	{
-		// Select list item under mouse pointer and show menu
-		int32 index = IndexOf(pos);
-		if(index < 0)
-			return;
-		Select(index);
-		int32 selectedIndex = CurrentSelection();
-		if(selectedIndex < 0)
-			return;
-	/*	AppListItem *selectedItem = (AppListItem*)ItemAt(selectedIndex);
-		bool isRunning = selectedItem->IsRunning();
-		if(isRunning)
-		{
-			fStartStopMI->SetLabel("Quit");
-			fStartStopMI->Message()->what = STOP_SERVICE;
-		}
-		else
-		{
-			fStartStopMI->SetLabel("Launch");
-			fStartStopMI->Message()->what = START_SERVICE;
-		}
-		BMessage *message = fRemoveMI->Message();
-		message->MakeEmpty();
-		message->AddString(EL_EXCLUDE_SIGNATURE, selectedItem->GetSignature());
-		message->AddString(EL_EXCLUDE_NAME, selectedItem->GetName());
-	*/
-		_InitPopUpMenu(selectedIndex);
-
 		ConvertToScreen(&pos);
 		//fMenu->Go(pos, false, false, true);
 		fMenu->Go(pos, true, true, BRect(pos.x - 2, pos.y - 2,
@@ -301,6 +221,29 @@ AppsListView::SettingsChanged(uint32 what, AppSettings settings)
 		}
 	}
 	Window()->Unlock();
+}
+
+
+void
+AppsListView::SelectionChanged()
+{
+	SendInfoViewUpdate();
+}
+
+
+void
+AppsListView::SendInfoViewUpdate()
+{
+	BString infoString("");
+	int32 currentSelection = CurrentSelection();
+	if(currentSelection>=0)
+	{
+		BListItem *selectedItem = ItemAt(currentSelection);
+		infoString.SetTo(((AppListItem*)selectedItem)->GetPath());
+	}
+	BMessage infoMsg(EL_UPDATE_INFOVIEW);
+	infoMsg.AddString(EL_INFO_STRING, infoString);
+	be_app->PostMessage(&infoMsg);
 }
 
 

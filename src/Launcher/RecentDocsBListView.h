@@ -16,23 +16,27 @@
 class RecentDocsBListView : public BOutlineListView {
 public:
 						RecentDocsBListView(BRect size);
-//			void		AttachedToWindow();
+	virtual void		AttachedToWindow();
 	virtual void		MessageReceived(BMessage*);
 	virtual void		MouseDown(BPoint pos);
 	virtual void		KeyDown(const char* bytes, int32 numbytes);
-//			bool		AddDoc(entry_ref *fileRef, AppSettings *settings);
+	virtual void		SelectionChanged();
+			void		SendInfoViewUpdate();
 			void		HandleMouseWheelChanged(BMessage *msg);
 			void		SetShowing(bool showing) { isShowing = showing; };
 			void		SettingsChanged(uint32 what, AppSettings settings);
 			void		SetFontSizeForValue(float fontSize);
 			void		BuildList(AppSettings *settings, bool force=false);
+protected:
+	BWindow				*fWindow;
+
 private:
 	LPopUpMenu			*fMenu;
 	BMenuItem			*fSettingsMI, *fTrackerMI;
 	bool				isShowing;
 	entry_ref			fLastRecentDocRef;
-	SuperTypeListItem	*fGenericSuperItem;
 	BMessage			fSuperListPointers;
+	SuperTypeListItem	*fGenericSuperItem;
 	SuperTypeListItem*		_GetSuperItem(const char *mimeString, AppSettings *settings);
 	SuperTypeListItem*		_GetGenericSuperItem(AppSettings *settings);
 	virtual status_t	_InvokeSelectedItem();

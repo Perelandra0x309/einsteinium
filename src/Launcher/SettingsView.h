@@ -32,6 +32,10 @@ public:
 			void			SetDocIconSize(int value);
 			uint			GetRecentDocCount();
 			void			SetRecentDocCount(int value);
+			uint			GetRecentFolderCount();
+			void			SetRecentFolderCount(int value);
+			uint			GetRecentQueryCount();
+			void			SetRecentQueryCount(int value);
 			float			GetFontSize();
 			window_look		GetWindowLook();
 //			window_feel		GetFloat();
@@ -44,7 +48,7 @@ private:
 	BSlider					*fMaxIconsizeS, *fMinIconsizeS, *fDocIconsizeS;
 	BPopUpMenu				*fFontSizeMenu, *fWindowLookMenu;
 	BMenuField				*fFontSizeMF, *fWindowLookMF;
-	BTextControl			*fAppsCountTC, *fRecentFilesCountTC;
+	BTextControl			*fAppsCountTC, *fRecentFilesCountTC, *fRecentFoldersCountTC, *fRecentQueriesCountTC;
 //	BCheckBox				*fFloatCB;
 //	BButton					*fAboutB;
 	void					_SetFontSize(float size);

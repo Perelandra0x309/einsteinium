@@ -45,6 +45,10 @@ public:
 	void					SaveDocIconSize(int size);
 	uint					GetDocCount() { return fRecentDocCount; }
 	void					SaveDocCount(uint count);
+	uint					GetFolderCount() { return fRecentFolderCount; }
+	void					SaveFolderCount(uint count);
+	uint					GetQueryCount() { return fRecentQueryCount; }
+	void					SaveQueryCount(uint count);
 	float					GetFontSize() { return fFontSize; }
 	void					SaveFontSize(float fontSize);
 	window_look				GetWindowLook() { return fWindowLook; }
@@ -63,7 +67,7 @@ private:
 	// Engine settings that can change
 	int						fLaunchScale, fFirstScale, fLastScale, fIntervalScale, fRuntimeScale;
 	int						fMinAppIconSize, fMaxAppIconSize, fDocIconSize;
-	uint					fRecentDocCount;
+	uint					fRecentDocCount, fRecentFolderCount, fRecentQueryCount;
 	float					fFontSize;
 	window_look				fWindowLook;
 	BRect					fWindowFrame;

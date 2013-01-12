@@ -21,6 +21,8 @@ public:
 			void			BuildAppsListView(BMessage *msg);
 private:
 	MainView				*fView;
+	BStringView				*fInfoView;
+//	BTextView				*fAboutTextView;
 };
 
 #endif

@@ -85,6 +85,22 @@ SettingsView::SettingsView(BRect size, AppSettings* settings)
 	textView->AllowChar(B_BACKSPACE);
 	textView->SetMaxBytes(3);
 
+	fRecentFoldersCountTC = new BTextControl("Show this many recent folders:", "",
+								new BMessage(EL_FOLDER_COUNT_OPTION_CHANGED));
+	textView = fRecentFoldersCountTC->TextView();
+	for (i=0; i<256; i++) textView->DisallowChar(i);
+	for (i ='0'; i<='9'; i++) textView->AllowChar(i);
+	textView->AllowChar(B_BACKSPACE);
+	textView->SetMaxBytes(3);
+
+	fRecentQueriesCountTC = new BTextControl("Show this many recent queries:", "",
+								new BMessage(EL_QUERY_COUNT_OPTION_CHANGED));
+	textView = fRecentQueriesCountTC->TextView();
+	for (i=0; i<256; i++) textView->DisallowChar(i);
+	for (i ='0'; i<='9'; i++) textView->AllowChar(i);
+	textView->AllowChar(B_BACKSPACE);
+	textView->SetMaxBytes(3);
+
 	fFontSizeMenu = new BPopUpMenu("Font Size Menu");
 	fFontSizeMenu->AddItem(new BMenuItem("System size", new BMessage(EL_FONT_OPTION_CHANGED)));
 	BString fontSize;
@@ -122,12 +138,20 @@ SettingsView::SettingsView(BRect size, AppSettings* settings)
 	;
 
 	BBox *filesBox = new BBox("Recent Files");
-	filesBox->SetLabel("Recent Files");
+	filesBox->SetLabel("Files, Folders and Queries");
 	BGroupLayout *filesBoxLayout = new BGroupLayout(B_VERTICAL);
 	filesBox->SetLayout(filesBoxLayout);
 	BLayoutBuilder::Group<>(filesBoxLayout)
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
 			.Add(fRecentFilesCountTC)
+			.AddGlue()
+		)
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+			.Add(fRecentFoldersCountTC)
+			.AddGlue()
+		)
+		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+			.Add(fRecentQueriesCountTC)
 			.AddGlue()
 		)
 		.Add(fDocIconsizeS)
@@ -169,6 +193,8 @@ SettingsView::AttachedToWindow()
 	BView::AttachedToWindow();
 	fAppsCountTC->SetTarget(this);
 	fRecentFilesCountTC->SetTarget(be_app);
+	fRecentFoldersCountTC->SetTarget(be_app);
+	fRecentQueriesCountTC->SetTarget(be_app);
 	fFontSizeMenu->SetTargetForItems(be_app);
 	fWindowLookMenu->SetTargetForItems(be_app);
 	MakeFocus();
@@ -324,6 +350,38 @@ SettingsView::SetRecentDocCount(int value)
 }
 
 
+uint
+SettingsView::GetRecentFolderCount()
+{
+	return atoi(fRecentFoldersCountTC->Text());
+}
+
+
+void
+SettingsView::SetRecentFolderCount(int value)
+{
+	BString count;
+	count << value;
+	fRecentFoldersCountTC->SetText(count);
+}
+
+
+uint
+SettingsView::GetRecentQueryCount()
+{
+	return atoi(fRecentQueriesCountTC->Text());
+}
+
+
+void
+SettingsView::SetRecentQueryCount(int value)
+{
+	BString count;
+	count << value;
+	fRecentQueriesCountTC->SetText(count);
+}
+
+
 float
 SettingsView::GetFontSize()
 {
@@ -426,6 +484,8 @@ SettingsView::GetAppSettings()
 	settings.maxIconSize = GetMaxIconSize();
 	settings.docIconSize = GetDocIconSize();
 	settings.recentDocCount = GetRecentDocCount();
+	settings.recentFolderCount = GetRecentFolderCount();
+	settings.recentQueryCount = GetRecentQueryCount();
 	settings.fontSize = GetFontSize();
 	settings.windowLook = GetWindowLook();
 	return settings;
@@ -441,6 +501,8 @@ SettingsView::SetAppSettings(AppSettings* settings)
 	SetMaxIconSize(settings->maxIconSize);
 	SetDocIconSize(settings->docIconSize);
 	SetRecentDocCount(settings->recentDocCount);
+	SetRecentFolderCount(settings->recentFolderCount);
+	SetRecentQueryCount(settings->recentQueryCount);
 	_SetFontSize(settings->fontSize);
 	_SetWindowLook(settings->windowLook);
 }

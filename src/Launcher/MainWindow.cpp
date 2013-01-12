@@ -9,23 +9,51 @@ MainWindow::MainWindow(BRect size, AppSettings settings)
 	BWindow(size, "Einsteinium Launcher", settings.windowLook, B_NORMAL_WINDOW_FEEL, B_NOT_ZOOMABLE, B_ALL_WORKSPACES)
 {
 	Lock();
-	const int inset = 2;
-	fView = new MainView(Bounds(), settings);
+	const int inset = 0;
+	BRect frameRect(Bounds());
+//	frameRect.InsetBy(-1,0);
+	frameRect.bottom-=25;
+	fView = new MainView(frameRect, settings);
+	fInfoView = new BStringView("InfoView","");
+//	fInfoView->SetExplicitMaxSize(BSize(100, 20));
+/*	fAboutTextView = new BTextView(BRect(-10,0,0,1), "About text", BRect(0,0,0,0), B_FOLLOW_NONE);
+	fAboutTextView->SetText("");
+	fAboutTextView->MakeSelectable(false);
+	fAboutTextView->MakeEditable(false);
+	fAboutTextView->MakeResizable(true);
+	fAboutTextView->SetExplicitMaxSize(BSize(9999, 20));
+//	fAboutTextView->SetViewColor(fView->ViewColor());
+//	fAboutTextView->SetTextRect(BRect(0,0,999,40));*/
+
+
 	SetLayout(new BGroupLayout(B_VERTICAL));
-//	AddChild(fView);
 	AddChild(BGroupLayoutBuilder(B_VERTICAL)
-		.Add(fView)
+		//.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+			.Add(fView)
+		//	.AddGlue()
+		//)
+		// TODO info view layout bug- long paths
+		//.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+		//	.Add(fInfoView)
+		//	.AddGlue()
+		//)
+		.Add(fInfoView)
+	//	.Add(fAboutTextView)
 		.SetInsets(inset, inset, inset, inset)
 	);
-/*	BView *containerView = new BView(Bounds(), "Services", B_FOLLOW_ALL_SIDES, B_FRAME_EVENTS);
+	/*
+	BRect frameRect(Bounds());
+	frameRect.InsetBy(-1,0);
+	frameRect.bottom-=20;
+	fView = new MainView(frameRect, settings);
+	BRect newFrameRect(Bounds());
+	newFrameRect.top = frameRect.bottom + 1;
+//s	newFrameRect.left+=1;
+	fInfoView = new BStringView(newFrameRect, "InfoView","", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
+	AddChild(fView);
+	AddChild(fInfoView);*/
 
-	AddChild(containerView);
-	containerView->SetLayout(new BGroupLayout(B_VERTICAL));
-	containerView->AddChild(BGroupLayoutBuilder(B_VERTICAL)
-		.Add(fView)
-		.SetInsets(3, 3, 3, 3)
-	);*/
-	SetSizeLimits(fView->TabFrame(0).Width() + 2*inset, 9999, 100, 9999);
+	SetSizeLimits(fView->TabFrame(fView->CountTabs()-1).right + 2*inset, 9999, 200, 9999);
 	Unlock();
 }
 
@@ -44,8 +72,21 @@ MainWindow::MessageReceived(BMessage* msg)
 	switch(msg->what)
 	{
 		case B_MOUSE_WHEEL_CHANGED:
-		case EL_UPDATE_RECENT_DOCS: {
+		case EL_UPDATE_RECENT_LISTS:
+		case EL_UPDATE_RECENT_LISTS_FORCE:
+		{
+		//	Lock();
 			fView->MessageReceived(msg);
+		//	Unlock();
+			break;
+		}
+		case EL_UPDATE_INFOVIEW:
+		{
+			BString textStr;
+			msg->FindString(EL_INFO_STRING, &textStr);
+			fInfoView->TruncateString(&textStr, B_TRUNCATE_SMART, Bounds().Width());
+			fInfoView->SetText(textStr);
+		//	fAboutTextView->SetText(textStr);
 			break;
 		}
 		default:

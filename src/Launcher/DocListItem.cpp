@@ -5,9 +5,9 @@
 #include "DocListItem.h"
 
 
-DocListItem::DocListItem(entry_ref *entry, AppSettings *settings)
+DocListItem::DocListItem(entry_ref *entry, AppSettings *settings, int level=0)
 	:
-	BListItem(),
+	BListItem(level),
 //	fDrawTwoLines(false),
 	fInitStatus(B_ERROR)
 {
@@ -36,10 +36,9 @@ DocListItem::DocListItem(entry_ref *entry, AppSettings *settings)
 		char mimeString[B_MIME_TYPE_LENGTH];
 		if(nodeInfo.GetType(mimeString) == B_OK)
 		{
-			BMimeType nodeType;
-			nodeType.SetTo(mimeString);
+			fMimeType.SetTo(mimeString);
 			// TODO: recurse to be sure we have the final super type?
-			nodeType.GetSupertype(&fSuperMimeType);
+			fMimeType.GetSupertype(&fSuperMimeType);
 		}
 	}
 
@@ -108,6 +107,11 @@ DocListItem::GetSuperTypeName()
 		return EL_UNKNOWN_SUPERTYPE;
 }
 
+const char*
+DocListItem::GetTypeName()
+{
+	return fMimeType.Type();
+}
 
 
 status_t
@@ -131,6 +135,16 @@ DocListItem::ShowInTracker()
 	status_t rc = tracker.SendMessage(&message);
 	return rc;
 }
+
+
+BString
+DocListItem::GetPath()
+{
+	BPath docPath(&fEntryRef);
+	BString pathStr(docPath.Path());
+	return pathStr;
+}
+
 
 void
 DocListItem::_GetIcon()

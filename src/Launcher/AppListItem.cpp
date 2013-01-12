@@ -114,6 +114,15 @@ AppListItem::ShowInTracker()
 }
 
 
+BString
+AppListItem::GetPath()
+{
+	BPath docPath(&fEntryRef);
+	BString pathStr(docPath.Path());
+	return pathStr;
+}
+
+
 bool
 AppListItem::BeginsWith(char letter)
 {

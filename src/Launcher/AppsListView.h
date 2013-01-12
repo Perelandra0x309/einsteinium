@@ -16,12 +16,13 @@
 class AppsListView : public BListView {
 public:
 						AppsListView(BRect size);
-//			void		AttachedToWindow();
 	virtual void		MessageReceived(BMessage*);
 	virtual void		MouseDown(BPoint pos);
 	virtual void		KeyDown(const char* bytes, int32 numbytes);
 			void		HandleMouseWheelChanged(BMessage *msg);
 			void		SettingsChanged(uint32 what, AppSettings settings);
+	virtual void		SelectionChanged();
+			void		SendInfoViewUpdate();
 			void		SetFontSizeForValue(float fontSize);
 			void		SetShowing(bool showing) { isShowing = showing; };
 			void		ScrollToNextAppBeginningWith(char letter);

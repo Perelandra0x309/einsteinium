@@ -20,7 +20,6 @@ public:
 							~SuperTypeListItem();
 	virtual void			DrawItem(BView *owner, BRect item_rect, bool complete = false);
 	virtual void			Update(BView *owner, const BFont *font);
-//			void			ProcessMessage(BMessage*);
 			void			SetIconSize(int value);
 			void			SetName(const char *name) { fName.SetTo(name); }
 			status_t		InitStatus() { return fInitStatus; }
@@ -33,7 +32,6 @@ private:
 	int						fIconSize;
 	void					_GetIcon();
 //	BBitmap*				_ConvertToGrayscale(const BBitmap* bitmap) const;
-//	status_t				_StopService();
 	void					_UpdateHeight(const BFont*);
 
 };

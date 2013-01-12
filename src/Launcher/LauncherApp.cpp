@@ -32,6 +32,8 @@ LauncherApp::LauncherApp()
 		settings.maxIconSize = fSettingsFile->GetMaxAppIconSize();
 		settings.docIconSize = fSettingsFile->GetDocIconSize();
 		settings.recentDocCount = fSettingsFile->GetDocCount();
+		settings.recentFolderCount = fSettingsFile->GetFolderCount();
+		settings.recentQueryCount = fSettingsFile->GetQueryCount();
 		settings.fontSize = fSettingsFile->GetFontSize();
 		settings.windowLook = fSettingsFile->GetWindowLook();
 		mainWindowRect = fSettingsFile->GetWindowFrame();
@@ -53,7 +55,7 @@ LauncherApp::LauncherApp()
 	fWindow = new MainWindow(mainWindowRect, settings);
 	// Set feel outside of constructor- setting a feel of B_MODAL_ALL_WINDOW_FEEL
 	// inside constructor causes CTRL-Q and CTRL-W to not work.
-	fWindow->SetFeel(B_MODAL_ALL_WINDOW_FEEL);
+//	fWindow->SetFeel(B_MODAL_ALL_WINDOW_FEEL);
 	if(frameResult != B_OK)
 		fWindow->CenterOnScreen();
 	fWindow->Show();
@@ -97,7 +99,7 @@ LauncherApp::ReadyToRun()
 	}*/
 
 	_Subscribe();
-	be_app->PostMessage(EL_UPDATE_RECENT_DOCS);
+//	be_app->PostMessage(EL_UPDATE_RECENT_LISTS);
 }
 
 
@@ -141,6 +143,8 @@ LauncherApp::MessageReceived(BMessage* msg)
 		case EL_APP_ICON_OPTION_CHANGED:
 		case EL_DOC_ICON_OPTION_CHANGED:
 		case EL_DOC_COUNT_OPTION_CHANGED:
+		case EL_FOLDER_COUNT_OPTION_CHANGED:
+		case EL_QUERY_COUNT_OPTION_CHANGED:
 		case EL_FONT_OPTION_CHANGED: {
 			AppSettings settings = fSettings->GetAppSettings();
 			fWindow->SettingsChanged(msg->what, settings);
@@ -200,7 +204,7 @@ LauncherApp::MessageReceived(BMessage* msg)
 			else
 				be_roster->ActivateApp(Team());
 
-			be_app->PostMessage(EL_UPDATE_RECENT_DOCS);
+			be_app->PostMessage(EL_UPDATE_RECENT_LISTS);
 			break;
 		}
 		case EL_WINDOW_MOVED:
@@ -215,8 +219,9 @@ LauncherApp::MessageReceived(BMessage* msg)
 			fWindow->Hide();
 			break;
 		}
-		case EL_UPDATE_RECENT_DOCS:
-		case EL_UPDATE_RECENT_DOCS_FORCE:
+		case EL_UPDATE_RECENT_LISTS:
+		case EL_UPDATE_RECENT_LISTS_FORCE:
+		case EL_UPDATE_INFOVIEW:
 		{
 			fWindow->PostMessage(msg);
 			break;
@@ -227,7 +232,7 @@ LauncherApp::MessageReceived(BMessage* msg)
 			// TODO update settings window
 
 			_Subscribe();
-			be_app->PostMessage(EL_UPDATE_RECENT_DOCS_FORCE);
+			fWindow->PostMessage(EL_UPDATE_RECENT_LISTS_FORCE);
 			break;
 		}
 		case EL_ADD_APP_EXCLUSION:
@@ -288,6 +293,16 @@ LauncherApp::_SaveSettingsToFile(uint32 what, AppSettings settings)
 		case EL_DOC_COUNT_OPTION_CHANGED:
 		{
 			fSettingsFile->SaveDocCount(settings.recentDocCount);
+			break;
+		}
+		case EL_FOLDER_COUNT_OPTION_CHANGED:
+		{
+			fSettingsFile->SaveFolderCount(settings.recentFolderCount);
+			break;
+		}
+		case EL_QUERY_COUNT_OPTION_CHANGED:
+		{
+			fSettingsFile->SaveQueryCount(settings.recentQueryCount);
 			break;
 		}
 		case EL_FONT_OPTION_CHANGED:

@@ -30,25 +30,6 @@ SuperTypeListItem::~SuperTypeListItem()
 	delete fShadowIcon;
 }
 
-/*
-void
-SuperTypeListItem::ProcessMessage(BMessage* msg)
-{
-	switch(msg->what)
-	{
-		case START_SERVICE:
-		{
-			status_t rc = _OpenDoc();
-			break;
-		}
-		case STOP_SERVICE:
-		{
-			status_t rc = _StopService();
-			break;
-		}
-	}
-}*/
-
 
 void
 SuperTypeListItem::SetIconSize(int value)
@@ -141,24 +122,6 @@ SuperTypeListItem::_ConvertToGrayscale(const BBitmap* bitmap) const
     return convertedBitmap;
 }*/
 
-
-/*
-status_t
-SuperTypeListItem::_StopService()
-{
-	status_t rc = B_ERROR;
-	BMessenger appMessenger(fSignature.String());
-	if(!appMessenger.IsValid())
-	{
-		BString err("Error: Could not create messenger for service ");
-		err.Append(fName);
-		(new BAlert("", err.String(),"OK"))->Go(NULL);
-		return rc;
-	}
-	rc = appMessenger.SendMessage(B_QUIT_REQUESTED);
-	return rc;
-}
-*/
 
 void
 SuperTypeListItem::DrawItem(BView *owner, BRect item_rect, bool complete = false)

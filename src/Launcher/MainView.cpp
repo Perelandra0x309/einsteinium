@@ -7,43 +7,53 @@
 
 MainView::MainView(BRect size, AppSettings settings)
 	:
-	BTabView("Services", B_WIDTH_FROM_LABEL),
+	BTabView("MainView", B_WIDTH_FROM_LABEL),
 	fSelectedListView(NULL),
 	fLastRecentDocRef()
 {
 	fCurrentSettings = settings;
-
-	fAppsListView = new AppsListView(size);
+	BRect viewRect(Bounds());
+//	viewRect.InsetBy(-2,-2);
+//	viewRect.right-=(B_V_SCROLL_BAR_WIDTH+6);
+//	viewRect.bottom-=(TabHeight()+6);
+	fAppsListView = new AppsListView(viewRect);
 	fAppsListView->SetFontSizeForValue(settings.fontSize);
-	fAppsScrollView = new BScrollView("Apps", fAppsListView, 0, false, true);
+	fAppsScrollView = new BScrollView("Apps", fAppsListView, /*B_FOLLOW_ALL_SIDES, */0, false, true, B_NO_BORDER);
 
-	fDocsListView = new RecentDocsBListView(size);
+	fDocsListView = new RecentDocsBListView(viewRect);
 	fDocsListView->SetFontSizeForValue(settings.fontSize);
-	fDocsScrollView = new BScrollView("Recent Files", fDocsListView, 0, false, true);
+	fDocsScrollView = new BScrollView("Files", fDocsListView, /*B_FOLLOW_ALL_SIDES, */0, false, true, B_NO_BORDER);
+
+	fFoldersListView = new RecentFoldersBListView(viewRect);
+	fFoldersListView->SetFontSizeForValue(settings.fontSize);
+	fFoldersScrollView = new BScrollView("Folders & Queries", fFoldersListView, /*B_FOLLOW_ALL_SIDES, */0, false, true, B_NO_BORDER);
 
 	fAppsTab = new BTab();
 	AddTab(fAppsScrollView, fAppsTab);
 	fRecentDocsTab = new BTab();
 	AddTab(fDocsScrollView, fRecentDocsTab);
+	fRecentFoldersTab = new BTab();
+	AddTab(fFoldersScrollView, fRecentFoldersTab);
 
 	fTabCount = CountTabs();
 }
 
-/*
-MainView::~MainView()
+
+void
+MainView::AllAttached()
 {
+	BTabView::AllAttached();
+	SelectDefaultTab();
+	be_app->PostMessage(EL_UPDATE_RECENT_LISTS);
+}
 
-}*/
-
-
+/*
 void
 MainView::AttachedToWindow()
 {
 	BTabView::AttachedToWindow();
-	fSelectedListView = fAppsListView;
-	SelectDefaultTab();
-}
-
+	//be_app->PostMessage(EL_UPDATE_RECENT_LISTS);
+}*/
 
 void
 MainView::MessageReceived(BMessage* msg)
@@ -60,16 +70,20 @@ MainView::MessageReceived(BMessage* msg)
 				fAppsListView->HandleMouseWheelChanged(msg);
 			else if(fSelectedListView==fDocsListView)
 				fDocsListView->HandleMouseWheelChanged(msg);
+			else if(fSelectedListView==fFoldersListView)
+				fFoldersListView->HandleMouseWheelChanged(msg);
 			break;
 		}
-		case EL_UPDATE_RECENT_DOCS:
+		case EL_UPDATE_RECENT_LISTS:
 		{
 			_BuildDocsListView();
+			_BuildFoldersListView();
 			break;
 		}
-		case EL_UPDATE_RECENT_DOCS_FORCE:
+		case EL_UPDATE_RECENT_LISTS_FORCE:
 		{
 			_BuildDocsListView(true);
+			_BuildFoldersListView(true);
 			break;
 		}
 		case B_MODIFIERS_CHANGED:
@@ -87,18 +101,6 @@ MainView::MessageReceived(BMessage* msg)
 			BTabView::MessageReceived(msg);
 	}
 }
-
-/*
-void
-MainView::MouseDown(BPoint pos)
-{
-	int32 button=0;
-	Looper()->CurrentMessage()->FindInt32("buttons", &button);
-	if (button & B_TERTIARY_MOUSE_BUTTON)
-		fSelectedListView->MouseDown(pos);
-	else
-		BTabView::MouseDown(pos);
-}*/
 
 
 void
@@ -173,9 +175,16 @@ MainView::SettingsChanged(uint32 what, AppSettings settings)
 			_BuildDocsListView(true);
 			break;
 		}
+		case EL_FOLDER_COUNT_OPTION_CHANGED:
+		case EL_QUERY_COUNT_OPTION_CHANGED:
+		{
+			_BuildFoldersListView(true);
+			break;
+		}
 		default:
 			fAppsListView->SettingsChanged(what, settings);
 			fDocsListView->SettingsChanged(what, settings);
+			fFoldersListView->SettingsChanged(what, settings);
 	}
 
 }
@@ -189,16 +198,25 @@ MainView::_UpdateSelectedListView()
 		case 0: {
 			Window()->UpdateIfNeeded();
 			fSelectedListView = fAppsListView;
+			fAppsListView->SendInfoViewUpdate();
 			break;
 		}
 		case 1: {
 			fSelectedListView = fDocsListView;
 			_BuildDocsListView();
+			fDocsListView->SendInfoViewUpdate();
+			break;
+		}
+		case 2: {
+			fSelectedListView = fFoldersListView;
+			_BuildFoldersListView();
+			fFoldersListView->SendInfoViewUpdate();
 			break;
 		}
 	}
 	fAppsListView->SetShowing(fSelectedListView==fAppsListView);
 	fDocsListView->SetShowing(fSelectedListView==fDocsListView);
+	fFoldersListView->SetShowing(fSelectedListView==fFoldersListView);
 }
 
 
@@ -281,6 +299,7 @@ MainView::BuildAppsListView(BMessage *message)
 	MakeFocus();
 
 	// No applications to display- create a helpful message
+	// TODO
 /*	bool showStartEngineItem = false;
 	if(message==NULL || fSubscriptionRefCount==0)
 	{
@@ -316,6 +335,18 @@ MainView::BuildAppsListView(BMessage *message)
 void
 MainView::_BuildDocsListView(bool force=false)
 {
+//	Window()->Lock();
 	fDocsListView->BuildList(&fCurrentSettings, force);
 	MakeFocus();
+//	Window()->Unlock();
 }
+
+void
+MainView::_BuildFoldersListView(bool force=false)
+{
+//	Window()->Lock();
+	fFoldersListView->BuildList(&fCurrentSettings, force);
+	MakeFocus();
+//	Window()->Unlock();
+}
+

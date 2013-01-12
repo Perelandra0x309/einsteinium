@@ -22,6 +22,8 @@ LauncherSettingsFile::LauncherSettingsFile(BHandler *messageHandler=NULL)
 	fMaxAppIconSize(kIconDefaultSize),
 	fDocIconSize(kIconDefaultSize),
 	fRecentDocCount(DEFAULT_VALUE_RECENT_COUNT),
+	fRecentFolderCount(DEFAULT_VALUE_RECENT_COUNT),
+	fRecentQueryCount(DEFAULT_VALUE_RECENT_COUNT),
 	fFontSize(0),
 	fWindowLook(B_TITLED_WINDOW_LOOK),
 	fWindowFrame(0,0,0,0)
@@ -183,6 +185,8 @@ LauncherSettingsFile::_ReadSettingsFromFile(BPath file)
 			fMaxAppIconSize = _XmlGetIntProp(cur, EL_XMLTEXT_PROPERTY_MAXAPP, kIconDefaultSize);
 			fDocIconSize = _XmlGetIntProp(cur, EL_XMLTEXT_PROPERTY_DOCICON, kIconDefaultSize);
 			fRecentDocCount = _XmlGetIntProp(cur, EL_XMLTEXT_PROPERTY_DOCCOUNT, DEFAULT_VALUE_RECENT_COUNT);
+			fRecentFolderCount = _XmlGetIntProp(cur, EL_XMLTEXT_PROPERTY_FOLDERCOUNT, DEFAULT_VALUE_RECENT_COUNT);
+			fRecentQueryCount = _XmlGetIntProp(cur, EL_XMLTEXT_PROPERTY_QUERYCOUNT, DEFAULT_VALUE_RECENT_COUNT);
 			fFontSize = _XmlGetIntProp(cur, EL_XMLTEXT_PROPERTY_FONTSIZE);
 		}
 		// window settings
@@ -283,11 +287,13 @@ LauncherSettingsFile::_WriteSettingsToFile()
 	lastChar << fLastScale;
 	intervalChar << fIntervalScale;
 	runtimeChar << fRuntimeScale;
-	BString minAppIconChar, maxAppIconChar, docIconChar, docCountChar, fontSizeChar;
+	BString minAppIconChar, maxAppIconChar, docIconChar, docCountChar, folderCountChar, queryCountChar, fontSizeChar;
 	minAppIconChar << fMinAppIconSize;
 	maxAppIconChar << fMaxAppIconSize;
 	docIconChar << fDocIconSize;
 	docCountChar << fRecentDocCount;
+	folderCountChar << fRecentFolderCount;
+	queryCountChar << fRecentQueryCount;
 	fontSizeChar << int(fFontSize);
 	BString windowLookChar;
 	switch(fWindowLook){
@@ -376,6 +382,10 @@ LauncherSettingsFile::_WriteSettingsToFile()
 				BAD_CAST docIconChar.String() );
 	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_DOCCOUNT,
 				BAD_CAST docCountChar.String() );
+	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_FOLDERCOUNT,
+				BAD_CAST folderCountChar.String() );
+	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_QUERYCOUNT,
+				BAD_CAST queryCountChar.String() );
 	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_FONTSIZE,
 				BAD_CAST fontSizeChar.String() );
 
@@ -597,6 +607,20 @@ void
 LauncherSettingsFile::SaveDocCount(uint count)
 {
 	fRecentDocCount = count;
+	_WriteSettingsToFile();
+}
+
+void
+LauncherSettingsFile::SaveFolderCount(uint count)
+{
+	fRecentFolderCount = count;
+	_WriteSettingsToFile();
+}
+
+void
+LauncherSettingsFile::SaveQueryCount(uint count)
+{
+	fRecentQueryCount = count;
 	_WriteSettingsToFile();
 }
 

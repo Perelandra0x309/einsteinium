@@ -16,17 +16,19 @@
 class DocListItem : public BListItem
 {
 public:
-							DocListItem(entry_ref *entry, AppSettings *settings);
+							DocListItem(entry_ref *entry, AppSettings *settings, int level=0);
 							~DocListItem();
 	virtual void			DrawItem(BView *owner, BRect item_rect, bool complete = false);
 	virtual void			Update(BView *owner, const BFont *font);
 			void			ProcessMessage(BMessage*);
 			status_t		Launch();
 			status_t		ShowInTracker();
+			BString			GetPath();
 //			void			SetDrawTwoLines(bool value);
 			void			SetIconSize(int value);
 //			void			SetIconSize(int minIconSize, int maxIconSize, int totalCount, int index);
 			const char*		GetSuperTypeName();
+			const char*		GetTypeName();
 			status_t		InitStatus() { return fInitStatus; }
 private:
 	status_t				fInitStatus;
@@ -36,7 +38,7 @@ private:
 	BBitmap					*fIcon, *fShadowIcon;
 //	bool					fDrawTwoLines;
 	int						fIconSize;
-	BMimeType				fSuperMimeType;
+	BMimeType				fMimeType, fSuperMimeType;
 	void					_GetIcon();
 //	BBitmap*				_ConvertToGrayscale(const BBitmap* bitmap) const;
 	status_t				_OpenDoc();

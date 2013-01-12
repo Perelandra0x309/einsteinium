@@ -18,11 +18,15 @@ const int kIconMargin = 2;
 const int kTextMargin = 2;
 const uint32 kPreventHideModifier = B_SHIFT_KEY | B_OPTION_KEY | B_COMMAND_KEY;
 const uint32 kExcludeAppModifier = B_CONTROL_KEY;
+static const char* kQueryType = "application/x-vnd.Be-query";
+static const char* kQueryTemplateType = "application/x-vnd.Be-queryTemplate";
+static const char* kApplicationType = "application/x-vnd.Be-elfexecutable";
+static const char* kDirectoryType = "application/x-vnd.Be-directory";
 
 struct AppSettings {
 //	bool drawTwoLines;
 	int minIconSize, maxIconSize, docIconSize;
-	uint appCount, recentDocCount;
+	uint appCount, recentDocCount, recentFolderCount, recentQueryCount;
 	float fontSize;
 	window_look windowLook;
 };
@@ -55,6 +59,8 @@ struct ScaleSettings
 #define EL_XMLTEXT_PROPERTY_MINAPP "min_app_icon"
 #define EL_XMLTEXT_PROPERTY_DOCICON	"doc_icon"
 #define EL_XMLTEXT_PROPERTY_DOCCOUNT "doc_count"
+#define EL_XMLTEXT_PROPERTY_FOLDERCOUNT "folder_count"
+#define EL_XMLTEXT_PROPERTY_QUERYCOUNT "query_count"
 #define EL_XMLTEXT_PROPERTY_FONTSIZE "font_size"
 #define EL_XMLTEXT_CHILD_NAME_WINDOW "window"
 #define EL_XMLTEXT_PROPERTY_WINDOWLOOK "look"
@@ -78,6 +84,7 @@ struct ScaleSettings
 #define EL_REMOVE_APPLICATION "RemoveApp"
 #define EL_UNKNOWN_SUPERTYPE "Unknown"
 #define EL_SUPERTYPE_NAMES "names"
+#define EL_INFO_STRING "info_text"
 
 //Defaults
 #define DEFAULT_VALUE_LAUNCH_SCALE 4
@@ -89,7 +96,7 @@ struct ScaleSettings
 #define DEFAULT_VALUE_RECENT_COUNT 25
 
 // Preferences
-#define NAME_LINES_OPTION "linesOption"
+/*#define NAME_LINES_OPTION "linesOption"
 #define NAME_MAX_ICON_OPTION "maxIconSize"
 #define NAME_MIN_ICON_OPTION "minIconSize"
 #define NAME_DOC_ICON_OPTION "docIconSize"
@@ -97,7 +104,7 @@ struct ScaleSettings
 #define NAME_FONT_OPTION "fontSize"
 #define NAME_WINDOW_FRAME "windowFrame"
 #define NAME_LOOK_OPTION "windowLook"
-#define NAME_FEEL_OPTION "windowFeel"
+#define NAME_FEEL_OPTION "windowFeel"*/
 
 //Indexes
 enum scales_index
@@ -131,14 +138,14 @@ enum launcher_messages
 	EL_FLOAT_OPTION_CHANGED,
 	EL_SHOW_WINDOW,
 	EL_HIDE_APP,
-	EL_UPDATE_RECENT_DOCS,
+	EL_UPDATE_RECENT_LISTS,
 	EL_SHOW_IN_TRACKER,
 	EL_APP_ICON_OPTION_DRAG,
 	EL_DOC_ICON_OPTION_DRAG,
 	EL_DOC_COUNT_OPTION_CHANGED,
 	EL_ADD_APP_EXCLUSION,
 	EL_REDIRECTED_MOUSE_WHEEL_CHANGED,
-	EL_UPDATE_RECENT_DOCS_FORCE,
+	EL_UPDATE_RECENT_LISTS_FORCE,
 	EL_WINDOW_MOVED,
 	EL_APP_COUNT_OPTION_CHANGED,
 	//Launcher settings messages
@@ -155,7 +162,10 @@ enum launcher_messages
 	EL_REMOVE_EXCLUSION,
 	EL_EXCLUSIONS_CHANGED,
 	EL_DESKBAR_CHANGED,
-	EL_ENGINELAUNCH_CHANGED
+	EL_ENGINELAUNCH_CHANGED,
+	EL_FOLDER_COUNT_OPTION_CHANGED,
+	EL_QUERY_COUNT_OPTION_CHANGED,
+	EL_UPDATE_INFOVIEW
 };
 
 #endif

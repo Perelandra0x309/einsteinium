@@ -25,6 +25,7 @@ public:
 			bool			IsRunning();
 			status_t		Launch();
 			status_t		ShowInTracker();
+			BString			GetPath();
 			bool			BeginsWith(char letter);
 //			void			SetDrawTwoLines(bool value);
 			void			SetIconSize(int value);

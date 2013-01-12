@@ -6,31 +6,22 @@
 
 RecentDocsBListView::RecentDocsBListView(BRect size)
 	:
-//	BOutlineListView(size)
 	BOutlineListView(size, "Files List", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES),
 	fMenu(NULL),
 	fGenericSuperItem(NULL),
 	fLastRecentDocRef(),
-	isShowing(false)
+	isShowing(false),
+	fWindow(NULL)
 {
-/*	fMenu = new LPopUpMenu(B_EMPTY_STRING);
-	fTrackerMI = new BMenuItem("Show in Tracker", new BMessage(SHOW_IN_TRACKER));
-	fSettingsMI = new BMenuItem("Settings" B_UTF8_ELLIPSIS, new BMessage(SHOW_SETTINGS));
-	fMenu->AddItem(fTrackerMI);
-	fMenu->AddSeparatorItem();
-	fMenu->AddItem(fSettingsMI);*/
+
 }
 
-/*
+
 void
 RecentDocsBListView::AttachedToWindow()
 {
-	LListView::AttachedToWindow();
-//	SetEventMask(B_POINTER_EVENTS | B_KEYBOARD_EVENTS);
-
-	fMenu->SetTargetForItems(this);
-	fSettingsMI->SetTarget(be_app);
-}*/
+	fWindow = Window();
+}
 
 
 void
@@ -159,7 +150,7 @@ RecentDocsBListView::KeyDown(const char* bytes, int32 numbytes)
 			}
 			case B_RIGHT_ARROW:
 			{
-				// Fix a bug in R1A3 where the 0 level list items do not
+				// Fix a bug in R1A4 where the 0 level list items do not
 				// always expand when the right arrow is pressed
 				int32 currentSelection = CurrentSelection();
 				BListItem *selectedItem = ItemAt(currentSelection);
@@ -180,19 +171,31 @@ RecentDocsBListView::KeyDown(const char* bytes, int32 numbytes)
 }
 
 
-/*
-bool
-RecentDocsBListView::AddDoc(entry_ref *fileRef, AppSettings *settings)
+void
+RecentDocsBListView::SelectionChanged()
 {
-	DocListItem *newItem = new DocListItem(fileRef, settings);
-	if(newItem->InitStatus() != B_OK)
-		return false;
-	SuperTypeListItem *superItem = _GetSuperItem(fileRef, settings);
-	if(superItem!=NULL)
-		return AddUnder(newItem, superItem);
-	else
-		return false;
-}*/
+	SendInfoViewUpdate();
+}
+
+
+void
+RecentDocsBListView::SendInfoViewUpdate()
+{
+	BString infoString("");
+	int32 currentSelection = CurrentSelection();
+	if(currentSelection>=0)
+	{
+		BListItem *selectedItem = ItemAt(currentSelection);
+		// Only populate info for files
+		if(selectedItem->OutlineLevel())
+		{
+			infoString.SetTo(((DocListItem*)selectedItem)->GetPath());
+		}
+	}
+	BMessage infoMsg(EL_UPDATE_INFOVIEW);
+	infoMsg.AddString(EL_INFO_STRING, infoString);
+	be_app->PostMessage(&infoMsg);
+}
 
 
 void
@@ -258,13 +261,6 @@ RecentDocsBListView::SettingsChanged(uint32 what, AppSettings settings)
 		case EL_FONT_OPTION_CHANGED:
 		{
 			SetFontSizeForValue(settings.fontSize);
-		/*	int count = CountItems();
-			for(int i=0; i<count; i++)
-			{
-				DocListItem* item = (DocListItem*)(ItemAt(0));
-				RemoveItem(item);
-				AddItem(item);
-			}*/
 			BuildList(&settings, true);
 			Select(currentSelection);
 			ScrollToSelection();
@@ -287,6 +283,13 @@ RecentDocsBListView::SetFontSizeForValue(float fontSize)
 void
 RecentDocsBListView::BuildList(AppSettings *settings, bool force=false)
 {
+	if(!fWindow)
+	{
+//		printf("No window found\n");
+		return;
+	}
+//	else
+//		printf("Found window\n");
 	// Check if we need to update list
 	BMessage refList;
 	if(!force)
@@ -296,14 +299,14 @@ RecentDocsBListView::BuildList(AppSettings *settings, bool force=false)
 		status_t result = refList.FindRef("refs", 0, &recentRef);
 		if(result==B_OK && recentRef==fLastRecentDocRef)
 		{
-			Window()->UpdateIfNeeded();
+			fWindow->UpdateIfNeeded();
 			return;
 		}
 		refList.MakeEmpty();
 	}
 
 	// Remove existing items
-	Window()->Lock();
+	fWindow->Lock();
 	while(!IsEmpty())
 	{
 		BListItem *item = RemoveItem(int32(0));
@@ -312,18 +315,6 @@ RecentDocsBListView::BuildList(AppSettings *settings, bool force=false)
 		if(item->OutlineLevel())
 			delete item;
 	}
-/*	int32 itemCount = CountItems();
-	if(itemCount)
-	{
-		const BListItem** itemPtr = Items();
-		MakeEmpty();
-		Window()->UpdateIfNeeded();
-		for(int32 i = itemCount; i>0; i--)
-		{
-			delete *itemPtr;
-			*itemPtr++;
-		}
-	}*/
 
 	// Get recent documents with a buffer of extra in case there are any that
 	// no longer exist
@@ -350,18 +341,23 @@ RecentDocsBListView::BuildList(AppSettings *settings, bool force=false)
 			newEntry.SetTo(&newref);
 			if(newEntry.Exists())
 			{
-				// Save first recent doc entry
-				if(needFirstRecentDoc)
-				{
-					fLastRecentDocRef = newref;
-					needFirstRecentDoc = false;
-				}
-
 				DocListItem *newItem = new DocListItem(&newref, settings);
 				if(newItem->InitStatus() == B_OK)
 				{
-					docListItems.AddItem(newItem);
 					const char *superTypeName = newItem->GetSuperTypeName();
+					if(strcmp(superTypeName, "application")==0)
+					{
+						BString typeName(newItem->GetTypeName());
+						// Ignore queries and query templates
+						if( (typeName.ICompare(kQueryType)==0) || (typeName.ICompare(kQueryTemplateType)==0) )
+							continue;
+						// Ignore applications
+						if(typeName.ICompare(kApplicationType)==0)
+							continue;
+
+					}
+
+					docListItems.AddItem(newItem);
 					bool foundBool;
 					if(superTypesAdded.FindBool(superTypeName, &foundBool)!=B_OK)
 					{
@@ -373,6 +369,9 @@ RecentDocsBListView::BuildList(AppSettings *settings, bool force=false)
 						else
 						{
 							SuperTypeListItem *superItem = _GetSuperItem(superTypeName, settings);
+							// Change application supertype to display "Other" instead
+							if(strcmp(superTypeName, "application")==0)
+								superItem->SetName("Other");
 							fSuperListPointers.AddPointer(superTypeName, superItem);
 							fSuperListPointers.AddString(EL_SUPERTYPE_NAMES, superTypeName);
 							AddItem(superItem);
@@ -381,6 +380,12 @@ RecentDocsBListView::BuildList(AppSettings *settings, bool force=false)
 						superTypesAdded.AddBool(superTypeName, true);
 					}
 					totalCount++;
+					// Save first recent doc entry
+					if(needFirstRecentDoc)
+					{
+						fLastRecentDocRef = newref;
+						needFirstRecentDoc = false;
+					}
 				}
 				else
 					delete newItem;
@@ -406,19 +411,19 @@ RecentDocsBListView::BuildList(AppSettings *settings, bool force=false)
 			if(!refreshCount)
 			{
 				Select(0);
-				Window()->UpdateIfNeeded();
+				fWindow->UpdateIfNeeded();
 				refreshCount = 20;
 			}
 		}
 
-		Window()->UpdateIfNeeded();
+		fWindow->UpdateIfNeeded();
 		if(!IsEmpty())
 		{
 			Select(0);
 		}
 	}
 
-	Window()->Unlock();
+	fWindow->Unlock();
 }
 
 
