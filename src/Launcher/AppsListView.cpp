@@ -1,5 +1,5 @@
 /* AppsListView.cpp
- * Copyright 2012 Brian Hill
+ * Copyright 2013 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "AppsListView.h"
@@ -8,9 +8,18 @@ AppsListView::AppsListView(BRect size)
 	:
 	BListView(size, "Apps List", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES),
 	fMenu(NULL),
-	isShowing(false)
+	fLastRecentAppRef(),
+	isShowing(false),
+	fWindow(NULL)
 {
 
+}
+
+
+void
+AppsListView::AttachedToWindow()
+{
+	fWindow = Window();
 }
 
 
@@ -185,10 +194,11 @@ AppsListView::HandleMouseWheelChanged(BMessage *msg)
 
 
 void
-AppsListView::SettingsChanged(uint32 what, AppSettings settings)
+AppsListView::SettingsChanged(uint32 what)
 {
 	Window()->Lock();
 	int32 currentSelection = CurrentSelection();
+	AppSettings* settings = GetAppSettings();
 	switch(what)
 	{
 		case EL_APP_ICON_OPTION_CHANGED:
@@ -197,7 +207,7 @@ AppsListView::SettingsChanged(uint32 what, AppSettings settings)
 			for(int i=0; i<count; i++)
 			{
 				AppListItem* item = (AppListItem*)(ItemAt(0));
-				item->SetIconSize(settings.minIconSize, settings.maxIconSize, count, i);
+				item->SetIconSize(settings->minIconSize, settings->maxIconSize, count, i);
 				RemoveItem(item);
 				AddItem(item);
 			}
@@ -207,7 +217,7 @@ AppsListView::SettingsChanged(uint32 what, AppSettings settings)
 		}
 		case EL_FONT_OPTION_CHANGED:
 		{
-			SetFontSizeForValue(settings.fontSize);
+			SetFontSizeForValue(settings->fontSize);
 			int count = CountItems();
 			for(int i=0; i<count; i++)
 			{
@@ -287,6 +297,173 @@ AppsListView::ScrollToNextAppBeginningWith(char letter)
 			return;
 		}
 	}
+}
+
+
+void
+AppsListView::BuildAppsListView(BMessage *message)
+{
+	if(!fWindow)
+		return;
+
+	AppSettings* settings = GetAppSettings();
+
+	// Remove existing items
+	fWindow->Lock();
+	while(!IsEmpty())
+	{
+		BListItem *item = RemoveItem(int32(0));
+		delete item;
+	}
+
+	// Add any refs found
+	int32 subscriptionRefCount = 0;
+	if(message)
+	{
+		type_code typeFound;
+		message->GetInfo("refs", &typeFound, &subscriptionRefCount);
+	//	printf("Found %i refs\n", countFound);
+		entry_ref newref;
+		int entryCount=0;
+		for(int i=0; i<subscriptionRefCount; i++)
+		{
+			message->FindRef("refs", i, &newref);
+	//		printf("Found ref %s\n", newref.name);
+			BEntry newEntry(&newref);
+			if(newEntry.Exists())
+			{
+				status_t result = _AddAppListItem(newEntry, subscriptionRefCount, entryCount, settings);
+				if(result == B_OK)
+					entryCount++;
+				else
+					printf("Error initializing new list item for %s.\n", newref.name);
+			}
+		}
+		if(!IsEmpty())
+			Select(0);
+	}
+	fWindow->Unlock();
+}
+
+
+void
+AppsListView::BuildAppsListFromRecent(bool force=false)
+{
+	if(!fWindow)
+		return;
+
+	AppSettings* settings = GetAppSettings();
+	if(settings->subscribedToEngine)
+		return;
+
+	// Check if we need to update list
+	BMessage refList;
+	if(!force)
+	{
+		entry_ref recentRef;
+		be_roster->GetRecentApps(&refList, 1);
+		status_t result = refList.FindRef("refs", 0, &recentRef);
+		if(result==B_OK && recentRef==fLastRecentAppRef)
+		{
+			fWindow->UpdateIfNeeded();
+			//printf("List not updated\n");
+			return;
+		}
+		refList.MakeEmpty();
+	}
+
+
+	// Remove existing items
+	fWindow->Lock();
+	while(!IsEmpty())
+	{
+		BListItem *item = RemoveItem(int32(0));
+		delete item;
+	}
+
+	// Get recent documents with a buffer of extra in case there are any that
+	// no longer exist
+	int appCount = settings->appCount;
+	be_roster->GetRecentApps(&refList, 2*appCount);
+	int32 refCount = 0, totalCount = 0;
+	type_code typeFound;
+	refList.GetInfo("refs", &typeFound, &refCount);
+	entry_ref newref;
+	bool needFirstRecentApp = true;
+	BList recentAppsList;
+
+	for(int i=0; i<refCount && totalCount<appCount; i++)
+	{
+		refList.FindRef("refs", i, &newref);
+	//		printf("Found ref %s\n", newref.name);
+		BFile appFile(&newref, B_READ_ONLY);
+		if((appFile.InitCheck())==B_OK)
+		{
+			char appSignature[B_MIME_TYPE_LENGTH];
+			BAppFileInfo appInfo(&appFile);
+			if(appInfo.GetSignature(appSignature)==B_OK)
+			{
+			//	BString sigString(appSignature);
+				if(!(settings->exclusionsSignatureList.HasString(appSignature)))
+				{
+					BEntry *newEntry = new BEntry(&newref);
+					recentAppsList.AddItem(newEntry);
+					totalCount++;
+					// Save first recent app entry
+					if(needFirstRecentApp)
+					{
+						fLastRecentAppRef = newref;
+						needFirstRecentApp = false;
+					}
+				}
+			}
+		}
+	}
+	int entryCount=0;
+	while(!recentAppsList.IsEmpty())
+	{
+		BEntry *item = (BEntry*)(recentAppsList.RemoveItem(int32(0)));
+		status_t result = _AddAppListItem(*item, totalCount, entryCount, settings);
+		delete item;
+		if(result==B_OK)
+			entryCount++;
+	}
+	fWindow->UpdateIfNeeded();
+	if(!IsEmpty())
+		Select(0);
+	fWindow->Unlock();
+}
+
+
+status_t
+AppsListView::_AddAppListItem(BEntry appEntry, int totalCount, int index, AppSettings *settings)
+{
+	BNode serviceNode;
+	BNodeInfo serviceNodeInfo;
+	char nodeType[B_MIME_TYPE_LENGTH];
+	attr_info info;
+	BString sig;
+	if( (serviceNode.SetTo(&appEntry)) != B_OK)
+		return B_ERROR;
+	if( (serviceNodeInfo.SetTo(&serviceNode)) != B_OK)
+		return B_ERROR;
+	if( (serviceNodeInfo.GetType(nodeType)) != B_OK)
+		return B_ERROR;
+	if( strcmp(nodeType, "application/x-vnd.Be-elfexecutable") != 0 &&
+		strcmp(nodeType, "application/x-vnd.be-elfexecutable") != 0	)
+		return B_ERROR;
+	if(serviceNode.GetAttrInfo("BEOS:APP_SIG", &info) != B_OK)
+		return B_ERROR;
+	serviceNode.ReadAttrString("BEOS:APP_SIG", &sig);
+	AppListItem *newItem = new AppListItem(appEntry, sig.String(), settings->maxIconSize);
+	newItem->SetIconSize(settings->minIconSize, settings->maxIconSize, totalCount, index);
+	status_t initStatus = newItem->InitStatus();
+	if(initStatus == B_OK)
+		AddItem(newItem);
+	else
+		delete newItem;
+
+	return initStatus;
 }
 
 

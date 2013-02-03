@@ -1,5 +1,5 @@
 /* SettingsView.cpp
- * Copyright 2012 Brian Hill
+ * Copyright 2013 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "SettingsView.h"
@@ -460,7 +460,11 @@ SettingsView::_SetWindowLook(window_look look)
 	}
 	BMenuItem* item = fWindowLookMenu->ItemAt(selection);
 	if(item != NULL)
+	{
+	//	Window()->Lock();
 		item->SetMarked(true);
+	//	Window()->Unlock();
+	}
 }
 
 /*
@@ -475,21 +479,18 @@ SettingsView::GetFloat()
 }*/
 
 
-AppSettings
-SettingsView::GetAppSettings()
+void
+SettingsView::PopulateAppSettings(AppSettings *settings)
 {
-	AppSettings settings;
-	settings.appCount = GetAppCount();
-	settings.minIconSize = GetMinIconSize();
-	settings.maxIconSize = GetMaxIconSize();
-	settings.docIconSize = GetDocIconSize();
-	settings.recentDocCount = GetRecentDocCount();
-	settings.recentFolderCount = GetRecentFolderCount();
-	settings.recentQueryCount = GetRecentQueryCount();
-	settings.fontSize = GetFontSize();
-	settings.windowLook = GetWindowLook();
-	return settings;
-
+	settings->appCount = GetAppCount();
+	settings->minIconSize = GetMinIconSize();
+	settings->maxIconSize = GetMaxIconSize();
+	settings->docIconSize = GetDocIconSize();
+	settings->recentDocCount = GetRecentDocCount();
+	settings->recentFolderCount = GetRecentFolderCount();
+	settings->recentQueryCount = GetRecentQueryCount();
+	settings->fontSize = GetFontSize();
+	settings->windowLook = GetWindowLook();
 }
 
 

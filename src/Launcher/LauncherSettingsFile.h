@@ -1,5 +1,5 @@
 /* LauncherSettingsFile.h
- * Copyright 2011 Brian Hill
+ * Copyright 2013 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #ifndef EINSTEINIUM_LAUNCHER_SETTINGSFILE_H
@@ -13,9 +13,12 @@
 #include <Window.h>
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
+#include "AppSettings.h"
 #include "launcher_constants.h"
 #include "EngineSubscriber.h"
 #include "signatures.h"
+
+class ScaleSettings;
 
 class LauncherSettingsFile : public BHandler
 {

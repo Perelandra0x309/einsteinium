@@ -1,5 +1,5 @@
 /* SettingsWindow.h
- * Copyright 2012 Brian Hill
+ * Copyright 2013 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #ifndef EINSTEINIUM_LAUNCHER_SETTINGSSWINDOW_H
@@ -24,7 +24,8 @@ public:
 	virtual	bool			QuitRequested();
 	virtual void			MessageReceived(BMessage*);
 			void			Show(BRect);
-			AppSettings		GetAppSettings();
+//			AppSettings		GetAppSettings();
+			void			PopulateAppSettings(AppSettings *settings);
 			ScaleSettings	GetScaleSettings();
 			BMessage		GetAppExclusions();
 			void			SetAppExclusions(BMessage *exclusionsList);

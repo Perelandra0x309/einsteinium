@@ -1,11 +1,11 @@
 /* AppListItem.cpp
- * Copyright 2012 Brian Hill
+ * Copyright 2013 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "AppListItem.h"
 
 
-AppListItem::AppListItem(BEntry entry, const char * sig, AppSettings *settings)
+AppListItem::AppListItem(BEntry entry, const char * sig, int iconSize)
 	:
 	BListItem(),
 //	fDrawTwoLines(false),
@@ -14,7 +14,7 @@ AppListItem::AppListItem(BEntry entry, const char * sig, AppSettings *settings)
 {
 	// Draw Settings
 //	fDrawTwoLines = settings->drawTwoLines;
-	fIconSize = settings->maxIconSize;
+	fIconSize = iconSize;
 	fIcon = NULL;
 	fShadowIcon = NULL;
 

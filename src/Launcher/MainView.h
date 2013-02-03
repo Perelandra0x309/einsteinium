@@ -1,5 +1,5 @@
 /* MainView.h
- * Copyright 2012 Brian Hill
+ * Copyright 2013 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #ifndef EINSTEINIUM_LAUNCHER_MAIN_VIEW_H
@@ -11,6 +11,7 @@
 #include <fs_attr.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+#include <StringList.h>
 #include "launcher_constants.h"
 #include "AppsListView.h"
 #include "RecentDocsBListView.h"
@@ -19,14 +20,14 @@
 
 class MainView : public BTabView {
 public:
-						MainView(BRect size, AppSettings);
+						MainView(BRect size);
 	virtual void		AllAttached();
 //	virtual void		AttachedToWindow();
 	virtual void		MessageReceived(BMessage*);
 	virtual void		KeyDown(const char* bytes, int32 numbytes);
 	virtual void		Select(int32 tab);
 			void		SelectDefaultTab();
-			void		SettingsChanged(uint32 what, AppSettings settings);
+			void		SettingsChanged(uint32 what);
 			void		BuildAppsListView(BMessage *message);
 private:
 	BTab					*fAppsTab, *fRecentDocsTab, *fRecentFoldersTab;
@@ -36,10 +37,9 @@ private:
 	RecentFoldersBListView	*fFoldersListView;
 	int32					fTabCount;
 	BListView				*fSelectedListView;
-	AppSettings				fCurrentSettings;
 	entry_ref				fLastRecentDocRef;
 	void					_UpdateSelectedListView();
-	status_t				_AddAppListItem(BEntry appEntry, int totalCount, int index);
+	void					_BuildAppsListViewFromRecent(bool force=false);
 	void					_BuildDocsListView(bool force=false);
 	void					_BuildFoldersListView(bool force=false);
 };

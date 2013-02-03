@@ -1,5 +1,5 @@
 /* DocListItem.cpp
- * Copyright 2012 Brian Hill
+ * Copyright 2013 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "DocListItem.h"

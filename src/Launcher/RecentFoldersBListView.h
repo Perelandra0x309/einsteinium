@@ -1,5 +1,5 @@
 /* RecentFoldersBListView.h
- * Copyright 2012 Brian Hill
+ * Copyright 2013 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #ifndef EINSTEINIUM_LAUNCHER_RECFOLDERSBLISTVIEW_H
@@ -11,8 +11,8 @@
 class RecentFoldersBListView : public RecentDocsBListView {
 public:
 						RecentFoldersBListView(BRect size);
-		virtual	void		BuildList(AppSettings *settings, bool force=false);
-		virtual	void		SettingsChanged(uint32 what, AppSettings settings);
+		virtual	void		BuildList(bool force=false);
+		virtual	void		SettingsChanged(uint32 what);
 
 private:
 

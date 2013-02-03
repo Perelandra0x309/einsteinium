@@ -1,5 +1,5 @@
 /* RecentDocsBListView.cpp
- * Copyright 2012 Brian Hill
+ * Copyright 2013 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "RecentDocsBListView.h"
@@ -232,10 +232,11 @@ RecentDocsBListView::HandleMouseWheelChanged(BMessage *msg)
 
 
 void
-RecentDocsBListView::SettingsChanged(uint32 what, AppSettings settings)
+RecentDocsBListView::SettingsChanged(uint32 what)
 {
 	Window()->Lock();
 	int32 currentSelection = CurrentSelection();
+	AppSettings* settings = GetAppSettings();
 	switch(what)
 	{
 		case EL_DOC_ICON_OPTION_CHANGED:
@@ -249,19 +250,19 @@ RecentDocsBListView::SettingsChanged(uint32 what, AppSettings settings)
 				status_t result = fSuperListPointers.FindPointer(nameString, &item);
 				if(result==B_OK)
 				{
-					((SuperTypeListItem*)item)->SetIconSize(settings.docIconSize);
+					((SuperTypeListItem*)item)->SetIconSize(settings->docIconSize);
 				}
 				index++;
 			}
-			BuildList(&settings, true);
+			BuildList(true);
 			Select(currentSelection);
 			ScrollToSelection();
 			break;
 		}
 		case EL_FONT_OPTION_CHANGED:
 		{
-			SetFontSizeForValue(settings.fontSize);
-			BuildList(&settings, true);
+			SetFontSizeForValue(settings->fontSize);
+			BuildList(true);
 			Select(currentSelection);
 			ScrollToSelection();
 			break;
@@ -281,7 +282,7 @@ RecentDocsBListView::SetFontSizeForValue(float fontSize)
 
 
 void
-RecentDocsBListView::BuildList(AppSettings *settings, bool force=false)
+RecentDocsBListView::BuildList(bool force=false)
 {
 	if(!fWindow)
 	{
@@ -304,6 +305,8 @@ RecentDocsBListView::BuildList(AppSettings *settings, bool force=false)
 		}
 		refList.MakeEmpty();
 	}
+
+	AppSettings* settings = GetAppSettings();
 
 	// Remove existing items
 	fWindow->Lock();
@@ -368,7 +371,7 @@ RecentDocsBListView::BuildList(AppSettings *settings, bool force=false)
 						}
 						else
 						{
-							SuperTypeListItem *superItem = _GetSuperItem(superTypeName, settings);
+							SuperTypeListItem *superItem = _GetSuperItem(superTypeName, settings->docIconSize);
 							// Change application supertype to display "Other" instead
 							if(strcmp(superTypeName, "application")==0)
 								superItem->SetName("Other");
@@ -402,7 +405,7 @@ RecentDocsBListView::BuildList(AppSettings *settings, bool force=false)
 			status_t result = fSuperListPointers.FindPointer(superTypeName, &superItemPointer);
 			if(result!=B_OK)
 			{
-				superItemPointer = _GetGenericSuperItem(settings);
+				superItemPointer = _GetGenericSuperItem(settings->docIconSize);
 				if(!HasItem((SuperTypeListItem*)superItemPointer))
 					AddItem((SuperTypeListItem*)superItemPointer);
 			}
@@ -428,7 +431,7 @@ RecentDocsBListView::BuildList(AppSettings *settings, bool force=false)
 
 
 SuperTypeListItem*
-RecentDocsBListView::_GetSuperItem(const char *mimeString, AppSettings *settings)
+RecentDocsBListView::_GetSuperItem(const char *mimeString, int docIconSize)
 {
 /*	BNode node;
 	if (node.SetTo(newref) != B_OK)
@@ -446,7 +449,7 @@ RecentDocsBListView::_GetSuperItem(const char *mimeString, AppSettings *settings
 	BMimeType superType(mimeString);
 	if(superType.IsValid())
 	{
-		SuperTypeListItem *item = new SuperTypeListItem(&superType, settings);
+		SuperTypeListItem *item = new SuperTypeListItem(&superType, docIconSize);
 		if(item->InitStatus()==B_OK)
 		{
 //			AddItem(item);
@@ -454,12 +457,12 @@ RecentDocsBListView::_GetSuperItem(const char *mimeString, AppSettings *settings
 		}
 	}
 
-	return _GetGenericSuperItem(settings);
+	return _GetGenericSuperItem(docIconSize);
 }
 
 
 SuperTypeListItem*
-RecentDocsBListView::_GetGenericSuperItem(AppSettings *settings)
+RecentDocsBListView::_GetGenericSuperItem(int docIconSize)
 {
 	if(fGenericSuperItem==NULL)
 	{
@@ -467,7 +470,7 @@ RecentDocsBListView::_GetGenericSuperItem(AppSettings *settings)
 		BMimeType superType;
 		if(genericType.GetSupertype(&superType)!=B_OK)
 			return NULL;
-		fGenericSuperItem = new SuperTypeListItem(&superType, settings);
+		fGenericSuperItem = new SuperTypeListItem(&superType, docIconSize);
 		if(fGenericSuperItem->InitStatus()!=B_OK)
 		{
 			delete fGenericSuperItem;

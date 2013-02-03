@@ -1,5 +1,5 @@
 /* LauncherRankingsView.h
- * Copyright 2012 Brian Hill
+ * Copyright 2013 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #ifndef EP_L_RANKINGS_VIEW
@@ -10,6 +10,7 @@
 #include <Application.h>
 #include <LayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
+#include "AppSettings.h"
 #include "launcher_constants.h"
 
 class LauncherRankingsView : public BView {

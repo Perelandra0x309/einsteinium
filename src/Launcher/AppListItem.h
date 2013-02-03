@@ -1,5 +1,5 @@
 /* AppListItem.h
- * Copyright 2012 Brian Hill
+ * Copyright 2013 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #ifndef EINSTEINIUM_LAUNCHER_LISTITEM_H
@@ -8,6 +8,7 @@
 #include <InterfaceKit.h>
 #include <StorageKit.h>
 #include <Roster.h>
+#include "AppSettings.h"
 #include "IconUtils.h"
 #include "launcher_constants.h"
 
@@ -15,7 +16,7 @@
 class AppListItem : public BListItem
 {
 public:
-							AppListItem(BEntry entry, const char * sig, AppSettings *settings);
+							AppListItem(BEntry entry, const char * sig, int iconSize);
 							~AppListItem();
 	virtual void			DrawItem(BView *owner, BRect item_rect, bool complete = false);
 	virtual void			Update(BView *owner, const BFont *font);

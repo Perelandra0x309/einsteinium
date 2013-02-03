@@ -1,5 +1,5 @@
 /* SettingsView.h
- * Copyright 2012 Brian Hill
+ * Copyright 2013 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #ifndef EINSTEINIUM_LAUNCHER_SETTINGSVIEW_H
@@ -12,8 +12,10 @@
 #include <LayoutBuilder.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "AppSettings.h"
 #include "launcher_constants.h"
 
+class AppSettings;
 
 class SettingsView : public BView {
 public:
@@ -39,7 +41,7 @@ public:
 			float			GetFontSize();
 			window_look		GetWindowLook();
 //			window_feel		GetFloat();
-			AppSettings		GetAppSettings();
+			void			PopulateAppSettings(AppSettings *settings);
 			void			SetAppSettings(AppSettings* settings);
 //			void			GetSettingsToSave(BMessage*);
 //			void			SetSavedSettings(BMessage*);

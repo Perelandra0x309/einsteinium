@@ -1,31 +1,30 @@
 /* MainView.cpp
- * Copyright 2012 Brian Hill
+ * Copyright 2013 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "MainView.h"
 
-
-MainView::MainView(BRect size, AppSettings settings)
+MainView::MainView(BRect size)
 	:
 	BTabView("MainView", B_WIDTH_FROM_LABEL),
 	fSelectedListView(NULL),
 	fLastRecentDocRef()
 {
-	fCurrentSettings = settings;
+	AppSettings *settings = GetAppSettings();
 	BRect viewRect(Bounds());
 //	viewRect.InsetBy(-2,-2);
 //	viewRect.right-=(B_V_SCROLL_BAR_WIDTH+6);
 //	viewRect.bottom-=(TabHeight()+6);
 	fAppsListView = new AppsListView(viewRect);
-	fAppsListView->SetFontSizeForValue(settings.fontSize);
+	fAppsListView->SetFontSizeForValue(settings->fontSize);
 	fAppsScrollView = new BScrollView("Apps", fAppsListView, /*B_FOLLOW_ALL_SIDES, */0, false, true, B_NO_BORDER);
 
 	fDocsListView = new RecentDocsBListView(viewRect);
-	fDocsListView->SetFontSizeForValue(settings.fontSize);
+	fDocsListView->SetFontSizeForValue(settings->fontSize);
 	fDocsScrollView = new BScrollView("Files", fDocsListView, /*B_FOLLOW_ALL_SIDES, */0, false, true, B_NO_BORDER);
 
 	fFoldersListView = new RecentFoldersBListView(viewRect);
-	fFoldersListView->SetFontSizeForValue(settings.fontSize);
+	fFoldersListView->SetFontSizeForValue(settings->fontSize);
 	fFoldersScrollView = new BScrollView("Folders & Queries", fFoldersListView, /*B_FOLLOW_ALL_SIDES, */0, false, true, B_NO_BORDER);
 
 	fAppsTab = new BTab();
@@ -44,7 +43,6 @@ MainView::AllAttached()
 {
 	BTabView::AllAttached();
 	SelectDefaultTab();
-	be_app->PostMessage(EL_UPDATE_RECENT_LISTS);
 }
 
 /*
@@ -76,14 +74,21 @@ MainView::MessageReceived(BMessage* msg)
 		}
 		case EL_UPDATE_RECENT_LISTS:
 		{
+			_BuildAppsListViewFromRecent();
 			_BuildDocsListView();
 			_BuildFoldersListView();
 			break;
 		}
 		case EL_UPDATE_RECENT_LISTS_FORCE:
 		{
+			_BuildAppsListViewFromRecent(true);
 			_BuildDocsListView(true);
 			_BuildFoldersListView(true);
+			break;
+		}
+		case EL_EXCLUSIONS_CHANGED:
+		{
+			_BuildAppsListViewFromRecent(true);
 			break;
 		}
 		case B_MODIFIERS_CHANGED:
@@ -165,11 +170,15 @@ MainView::SelectDefaultTab()
 
 
 void
-MainView::SettingsChanged(uint32 what, AppSettings settings)
+MainView::SettingsChanged(uint32 what)
 {
-	fCurrentSettings = settings;
 	switch(what)
 	{
+		case EL_APP_COUNT_OPTION_CHANGED:
+		{
+			_BuildAppsListViewFromRecent(true);
+			break;
+		}
 		case EL_DOC_COUNT_OPTION_CHANGED:
 		{
 			_BuildDocsListView(true);
@@ -182,9 +191,9 @@ MainView::SettingsChanged(uint32 what, AppSettings settings)
 			break;
 		}
 		default:
-			fAppsListView->SettingsChanged(what, settings);
-			fDocsListView->SettingsChanged(what, settings);
-			fFoldersListView->SettingsChanged(what, settings);
+			fAppsListView->SettingsChanged(what);
+			fDocsListView->SettingsChanged(what);
+			fFoldersListView->SettingsChanged(what);
 	}
 
 }
@@ -198,6 +207,7 @@ MainView::_UpdateSelectedListView()
 		case 0: {
 			Window()->UpdateIfNeeded();
 			fSelectedListView = fAppsListView;
+			_BuildAppsListViewFromRecent();
 			fAppsListView->SendInfoViewUpdate();
 			break;
 		}
@@ -220,133 +230,33 @@ MainView::_UpdateSelectedListView()
 }
 
 
-status_t
-MainView::_AddAppListItem(BEntry appEntry, int totalCount, int index)
+void
+MainView::BuildAppsListView(BMessage *message)
 {
-	BNode serviceNode;
-	BNodeInfo serviceNodeInfo;
-	char nodeType[B_MIME_TYPE_LENGTH];
-	attr_info info;
-	BString sig;
-	if( (serviceNode.SetTo(&appEntry)) != B_OK)
-		return B_ERROR;
-	if( (serviceNodeInfo.SetTo(&serviceNode)) != B_OK)
-		return B_ERROR;
-	if( (serviceNodeInfo.GetType(nodeType)) != B_OK)
-		return B_ERROR;
-	if( strcmp(nodeType, "application/x-vnd.Be-elfexecutable") != 0 &&
-		strcmp(nodeType, "application/x-vnd.be-elfexecutable") != 0	)
-		return B_ERROR;
-	if(serviceNode.GetAttrInfo("BEOS:APP_SIG", &info) != B_OK)
-		return B_ERROR;
-	serviceNode.ReadAttrString("BEOS:APP_SIG", &sig);
-	AppListItem *newItem = new AppListItem(appEntry, sig.String(), &fCurrentSettings);
-	newItem->SetIconSize(fCurrentSettings.minIconSize, fCurrentSettings.maxIconSize,
-			totalCount, index);
-	status_t initStatus = newItem->InitStatus();
-	if(initStatus == B_OK)
-		fAppsListView->AddItem(newItem);
-	else
-		delete newItem;
-
-	return initStatus;
+	fAppsListView->BuildAppsListView(message);
+	MakeFocus();
 }
 
 
 void
-MainView::BuildAppsListView(BMessage *message)
+MainView::_BuildAppsListViewFromRecent(bool force=false)
 {
-	// Remove existing items
-	Window()->Lock();
-	while(!fAppsListView->IsEmpty())
-	{
-		BListItem *item = fAppsListView->RemoveItem(int32(0));
-		delete item;
-	}
-
-	// Add any refs found
-	int32 subscriptionRefCount = 0;
-	if(message)
-	{
-		type_code typeFound;
-		message->GetInfo("refs", &typeFound, &subscriptionRefCount);
-	//	printf("Found %i refs\n", countFound);
-		entry_ref newref;
-		for(int i=0; i<subscriptionRefCount; i++)
-		{
-
-			message->FindRef("refs", i, &newref);
-	//		printf("Found ref %s\n", newref.name);
-			BEntry newEntry(&newref);
-			if(newEntry.Exists())
-			{
-			/*	if(i==0)
-				{
-					_AddAppListItem(newEntry, subscriptionRefCount, i);
-					fAppsListView->RemoveItem(0l);
-				}*/
-				status_t result = _AddAppListItem(newEntry, subscriptionRefCount, i);
-				if(result != B_OK)
-					printf("Error initializing new list item for %s.\n", newref.name);
-			}
-		}
-		if(!fAppsListView->IsEmpty())
-		{
-			fAppsListView->Select(0);
-
-		}
-	}
+	fAppsListView->BuildAppsListFromRecent(force);
 	MakeFocus();
-
-	// No applications to display- create a helpful message
-	// TODO
-/*	bool showStartEngineItem = false;
-	if(message==NULL || fSubscriptionRefCount==0)
-	{
-		// The engine is not running
-		if(!_IsEngineRunning())
-		{
-			BMenuItem *menuItem1 = new BMenuItem("Warning:", NULL);
-			BMenuItem *menuItem2 = new BMenuItem("Einsteinium Engine is not running.", NULL);
-			BMenuItem *menuItem3 = new BMenuItem("Please start the Engine to populate", NULL);
-			BMenuItem *menuItem4 = new BMenuItem("this menu.", NULL);
-			menuItem1->SetEnabled(false);
-			menuItem2->SetEnabled(false);
-			menuItem3->SetEnabled(false);
-			menuItem4->SetEnabled(false);
-			fMenu->AddItem(menuItem1);
-			fMenu->AddItem(menuItem2);
-			fMenu->AddItem(menuItem3);
-			fMenu->AddItem(menuItem4);
-			showStartEngineItem = true;
-		}
-		// The engine is running but there were no applications in the subscription message
-		else
-		{
-			BMenuItem *menuItem1 = new BMenuItem("There are no applications to list.", NULL);
-			menuItem1->SetEnabled(false);
-			fMenu->AddItem(menuItem1);
-		}
-	}*/
-	Window()->Unlock();
 }
 
 
 void
 MainView::_BuildDocsListView(bool force=false)
 {
-//	Window()->Lock();
-	fDocsListView->BuildList(&fCurrentSettings, force);
+	fDocsListView->BuildList(force);
 	MakeFocus();
-//	Window()->Unlock();
 }
 
 void
 MainView::_BuildFoldersListView(bool force=false)
 {
-//	Window()->Lock();
-	fFoldersListView->BuildList(&fCurrentSettings, force);
+	fFoldersListView->BuildList(force);
 	MakeFocus();
-//	Window()->Unlock();
 }
 

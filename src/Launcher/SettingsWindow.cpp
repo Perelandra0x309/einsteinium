@@ -1,5 +1,5 @@
 /* SettingsWindow.cpp
- * Copyright 2012 Brian Hill
+ * Copyright 2013 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "SettingsWindow.h"
@@ -33,6 +33,7 @@ SettingsWindow::SettingsWindow(AppSettings* settings, ScaleSettings* scales,
 	BSize size = ChildAt(0)->PreferredSize();
 	ResizeTo(size.width, size.height);
 
+	PopulateAppSettings(settings);
 	Unlock();
 }
 
@@ -83,11 +84,17 @@ SettingsWindow::Show(BRect mainWindowFrame)
 	BWindow::Show();
 }
 
-
+/*
 AppSettings
 SettingsWindow::GetAppSettings()
 {
 	return fLayoutView->GetAppSettings();
+}*/
+
+void
+SettingsWindow::PopulateAppSettings(AppSettings *settings)
+{
+	return fLayoutView->PopulateAppSettings(settings);
 }
 
 

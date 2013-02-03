@@ -1,5 +1,5 @@
 /* LauncherExclusionsView.h
- * Copyright 2011 Brian Hill
+ * Copyright 2013 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #ifndef EP_L_EXCLUSIONS_VIEW

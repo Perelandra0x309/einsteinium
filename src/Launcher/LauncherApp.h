@@ -1,11 +1,12 @@
 /* LauncherApp.h
- * Copyright 2012 Brian Hill
+ * Copyright 2013 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #ifndef EINSTEINIUM_LAUNCHER_APP_H
 #define EINSTEINIUM_LAUNCHER_APP_H
 
 #include <Application.h>
+#include <Notification.h>
 #include "launcher_constants.h"
 //#include "ELShelfView.h"
 #include "LauncherSettingsFile.h"
@@ -19,14 +20,20 @@ public:
 	virtual void		ReadyToRun();
 	virtual void		ArgvReceived(int32, char**);
 	virtual void		MessageReceived(BMessage*);
+//	bool				GetIsEngineRunning() { return _IsEngineRunning(); };
+	AppSettings*		GetAppSettings() { return &fAppSettings; };
+
+protected:
+	AppSettings				fAppSettings;
 
 private:
 	bool					fQuitRequested;
 	MainWindow				*fWindow;
-	SettingsWindow			*fSettings;
+	SettingsWindow			*fSettingsWindow;
 	LauncherSettingsFile	*fSettingsFile;
+	void					_CreateExclusionsSignatureList(BMessage *exclusions);
 //	void					_ShowShelfView(bool showShelfView);
-	void					_SaveSettingsToFile(uint32 what, AppSettings settings);
+	void					_SaveSettingsToFile(uint32 what);
 	void					_Subscribe();
 	// virtual functions inherited from the EngineSubscriber class
 	virtual void			_SubscribeFailed();

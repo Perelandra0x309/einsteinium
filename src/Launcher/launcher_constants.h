@@ -1,11 +1,13 @@
 /* launcher_constants.h
- * Copyright 2012 Brian Hill
+ * Copyright 2013 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #ifndef EL_CONSTANTS_H
 #define EL_CONSTANTS_H
 
 #include <Window.h>
+
+//bool IsEngineRunning();
 
 //Main directory for all Einsteinium settings
 #define e_settings_dir "Einsteinium"
@@ -22,20 +24,6 @@ static const char* kQueryType = "application/x-vnd.Be-query";
 static const char* kQueryTemplateType = "application/x-vnd.Be-queryTemplate";
 static const char* kApplicationType = "application/x-vnd.Be-elfexecutable";
 static const char* kDirectoryType = "application/x-vnd.Be-directory";
-
-struct AppSettings {
-//	bool drawTwoLines;
-	int minIconSize, maxIconSize, docIconSize;
-	uint appCount, recentDocCount, recentFolderCount, recentQueryCount;
-	float fontSize;
-	window_look windowLook;
-};
-
-struct ScaleSettings
-{	int		launches_scale, first_launch_scale, last_launch_scale,
-			interval_scale, total_run_time_scale;
-
-};
 
 //XML Text
 #define EL_XMLTEXT_ROOT_NAME "einsteinium_launcher"

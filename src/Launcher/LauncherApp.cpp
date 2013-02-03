@@ -1,8 +1,18 @@
 /* LauncherApp.cpp
- * Copyright 2012 Brian Hill
+ * Copyright 2013 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "LauncherApp.h"
+
+
+/*bool IsEngineRunning(){
+	return ((LauncherApp *)be_app)->GetIsEngineRunning();
+};*/
+
+AppSettings* GetAppSettings()
+{
+	return ((LauncherApp *)be_app)->GetAppSettings();
+};
 
 LauncherApp::LauncherApp()
 	:
@@ -11,13 +21,13 @@ LauncherApp::LauncherApp()
 	fSettingsFile(NULL),
 	fQuitRequested(false)
 {
+	fAppSettings.subscribedToEngine=false;
 	// Get saved settings
 	BPath settingsPath;
 	find_directory(B_USER_SETTINGS_DIRECTORY, &settingsPath);
 	settingsPath.Append(e_settings_dir);
 	settingsPath.Append(el_settings_file);
 
-	AppSettings settings;
 	ScaleSettings scaleSettings;
 	BMessage appExclusions;
 	BRect mainWindowRect;
@@ -27,15 +37,15 @@ LauncherApp::LauncherApp()
 	if(result==B_OK)
 	{
 		// Layout settings
-		settings.appCount = fSettingsFile->GetDeskbarCount();
-		settings.minIconSize = fSettingsFile->GetMinAppIconSize();
-		settings.maxIconSize = fSettingsFile->GetMaxAppIconSize();
-		settings.docIconSize = fSettingsFile->GetDocIconSize();
-		settings.recentDocCount = fSettingsFile->GetDocCount();
-		settings.recentFolderCount = fSettingsFile->GetFolderCount();
-		settings.recentQueryCount = fSettingsFile->GetQueryCount();
-		settings.fontSize = fSettingsFile->GetFontSize();
-		settings.windowLook = fSettingsFile->GetWindowLook();
+		fAppSettings.appCount = fSettingsFile->GetDeskbarCount();
+		fAppSettings.minIconSize = fSettingsFile->GetMinAppIconSize();
+		fAppSettings.maxIconSize = fSettingsFile->GetMaxAppIconSize();
+		fAppSettings.docIconSize = fSettingsFile->GetDocIconSize();
+		fAppSettings.recentDocCount = fSettingsFile->GetDocCount();
+		fAppSettings.recentFolderCount = fSettingsFile->GetFolderCount();
+		fAppSettings.recentQueryCount = fSettingsFile->GetQueryCount();
+		fAppSettings.fontSize = fSettingsFile->GetFontSize();
+		fAppSettings.windowLook = fSettingsFile->GetWindowLook();
 		mainWindowRect = fSettingsFile->GetWindowFrame();
 		if(mainWindowRect.IsValid() && mainWindowRect.Width()!=0 && mainWindowRect.Height()!=0)
 			frameResult=B_OK;
@@ -47,15 +57,15 @@ LauncherApp::LauncherApp()
 
 		// App exclusion settings
 		appExclusions = fSettingsFile->GetExclusionsList();
+		_CreateExclusionsSignatureList(&appExclusions);
 	}
 
 	// Create Windows
-	fSettings = new SettingsWindow(&settings, &scaleSettings, &appExclusions);
-	settings = fSettings->GetAppSettings();
-	fWindow = new MainWindow(mainWindowRect, settings);
+	fSettingsWindow = new SettingsWindow(&fAppSettings, &scaleSettings, &appExclusions);
+	fWindow = new MainWindow(mainWindowRect, fAppSettings.windowLook);
 	// Set feel outside of constructor- setting a feel of B_MODAL_ALL_WINDOW_FEEL
 	// inside constructor causes CTRL-Q and CTRL-W to not work.
-//	fWindow->SetFeel(B_MODAL_ALL_WINDOW_FEEL);
+//	fWindow->SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
 	if(frameResult != B_OK)
 		fWindow->CenterOnScreen();
 	fWindow->Show();
@@ -67,16 +77,11 @@ LauncherApp::QuitRequested()
 {
 	// Unsubscribe from the Einsteinium Engine
 	_UnsubscribeFromEngine();
-
-//	_SaveSettingsToFile();
 	delete fSettingsFile;
 	fSettingsFile = NULL;
-
 //	_ShowShelfView(false);
 
-
-
-	return true;//BApplication::QuitRequested();
+	return true;
 }
 
 void
@@ -88,18 +93,22 @@ LauncherApp::ReadyToRun()
 	//Quit since the deskbar now controls the ELShelfView object
 //	be_app->PostMessage(B_QUIT_REQUESTED);
 
-	//Initialize the settings file object and check to see if it instatiated correctly
-/*	fSettingsFile = new LauncherSettingsFile(this);
-	status_t result = fSettingsFile->CheckStatus();
-	if(result!=B_OK){
-		printf("Error creating Einsteinium Launcher settings file.  Cannot continue.\n");
-//		_Quit();
-			// TODO Can we do anything w/o settings?
-		return;
-	}*/
-
-	_Subscribe();
-//	be_app->PostMessage(EL_UPDATE_RECENT_LISTS);
+	if(_IsEngineRunning())
+		_Subscribe();
+	else
+	{
+/*		BNotification notify(B_INFORMATION_NOTIFICATION);
+		notify.SetGroup("Einsteinium Launcher");
+//		notify.SetTitle("Einsteinium Engine not running");
+		notify.SetContent("The Apps list will be populated from Haiku's recent applications list.  Please start the Engine if you wish to use the Engine's app statitistics.");
+		notify.Send(10000000);*/
+		BString alertS("The Einsteinium Engine is not running.  Without the Engine the Launcher's Apps list will be populated from Haiku's recent applications list.  Do you wish to start the Engine now?");
+		BAlert *engineAlert = new BAlert("StartEngine",alertS.String(), "No",
+					"Yes", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		engineAlert->SetFeel(B_FLOATING_APP_WINDOW_FEEL);
+		BMessage *runMessage = new BMessage(EL_START_ENGINE_ALERT);
+		engineAlert->Go(new BInvoker(runMessage, this));
+	}
 }
 
 
@@ -134,9 +143,9 @@ LauncherApp::MessageReceived(BMessage* msg)
 		}*/
 		case EL_APP_COUNT_OPTION_CHANGED:
 		{
-			AppSettings settings = fSettings->GetAppSettings();
-			fWindow->SettingsChanged(msg->what, settings);
-			_SaveSettingsToFile(msg->what, settings);
+			fSettingsWindow->PopulateAppSettings(&fAppSettings);
+			fWindow->SettingsChanged(msg->what);
+			_SaveSettingsToFile(msg->what);
 			_Subscribe();
 			break;
 		}
@@ -146,18 +155,17 @@ LauncherApp::MessageReceived(BMessage* msg)
 		case EL_FOLDER_COUNT_OPTION_CHANGED:
 		case EL_QUERY_COUNT_OPTION_CHANGED:
 		case EL_FONT_OPTION_CHANGED: {
-			AppSettings settings = fSettings->GetAppSettings();
-			fWindow->SettingsChanged(msg->what, settings);
-			_SaveSettingsToFile(msg->what, settings);
+			fSettingsWindow->PopulateAppSettings(&fAppSettings);
+			fWindow->SettingsChanged(msg->what);
+			_SaveSettingsToFile(msg->what);
 			break;
 		}
 		case EL_LOOK_OPTION_CHANGED: {
-		//	window_look look = fSettings->GetWindowLook();
-			AppSettings settings = fSettings->GetAppSettings();
+			fSettingsWindow->PopulateAppSettings(&fAppSettings);
 			fWindow->Lock();
-			fWindow->SetLook(settings.windowLook);
+			fWindow->SetLook(fAppSettings.windowLook);
 			fWindow->Unlock();
-			_SaveSettingsToFile(EL_LOOK_OPTION_CHANGED, settings);
+			_SaveSettingsToFile(EL_LOOK_OPTION_CHANGED);
 			break;
 		}
 	/*	case FLOAT_OPTION_CHANGED: {
@@ -171,7 +179,7 @@ LauncherApp::MessageReceived(BMessage* msg)
 		case EL_SAVE_RANKING:
 		{
 			// Save to file
-			ScaleSettings newSettings = fSettings->GetScaleSettings();
+			ScaleSettings newSettings = fSettingsWindow->GetScaleSettings();
 			fSettingsFile->SaveScales(newSettings);
 			// Resubscribe with new settings
 			_Subscribe();
@@ -180,17 +188,20 @@ LauncherApp::MessageReceived(BMessage* msg)
 		case EL_EXCLUSIONS_CHANGED:
 		{
 			// Save to file
-			BMessage newExclusionsList = fSettings->GetAppExclusions();
+			BMessage newExclusionsList = fSettingsWindow->GetAppExclusions();
 			fSettingsFile->SaveExclusionsList(newExclusionsList);
+			// Update the apps list from recent items
+			_CreateExclusionsSignatureList(&newExclusionsList);
+			fWindow->PostMessage(EL_EXCLUSIONS_CHANGED);
 			// Resubscribe with new settings
 			_Subscribe();
 			break;
 		}
 		case EL_SHOW_SETTINGS:
 		{
-			if(fSettings->IsHidden())
-				fSettings->Show(fWindow->Frame());
-			fSettings->Activate();
+			if(fSettingsWindow->IsHidden())
+				fSettingsWindow->Show(fWindow->Frame());
+			fSettingsWindow->Activate();
 			break;
 		}
 		case EL_SHOW_WINDOW:
@@ -214,8 +225,8 @@ LauncherApp::MessageReceived(BMessage* msg)
 		}
 		case EL_HIDE_APP:
 		{
-			if(!fSettings->IsHidden())
-				fSettings->Hide();
+			if(!fSettingsWindow->IsHidden())
+				fSettingsWindow->Hide();
 			fWindow->Hide();
 			break;
 		}
@@ -240,8 +251,22 @@ LauncherApp::MessageReceived(BMessage* msg)
 			// Add app to exclusion list and resubscribe
 			fSettingsFile->AddToExclusionsList(msg);
 			BMessage exclusionsList = fSettingsFile->GetExclusionsList();
-			fSettings->SetAppExclusions(&exclusionsList);
+			fSettingsWindow->SetAppExclusions(&exclusionsList);
+			_CreateExclusionsSignatureList(&exclusionsList);
+			fWindow->PostMessage(EL_EXCLUSIONS_CHANGED);
 			_Subscribe();
+			break;
+		}
+		case EL_START_ENGINE_ALERT:
+		{
+			int32 selection;
+			msg->FindInt32("which", &selection);
+			// If the Yes button was selected, launch the Engine
+			if(selection){
+				status_t result = _LaunchEngine();
+				if(result==B_OK)
+					_Subscribe();
+			}
 			break;
 		}
 		default:
@@ -249,6 +274,25 @@ LauncherApp::MessageReceived(BMessage* msg)
 			break;
 	}
 }
+
+
+void
+LauncherApp::_CreateExclusionsSignatureList(BMessage *exclusions)
+{
+	fAppSettings.exclusionsSignatureList.MakeEmpty();
+	type_code typeFound;
+	int32 signatureCount = 0;
+	status_t result = exclusions->GetInfo(EL_EXCLUDE_SIGNATURE, &typeFound, &signatureCount);
+	BString sig;
+	for(int i=0; i<signatureCount; i++)
+	{
+		sig.SetTo("");
+		exclusions->FindString(EL_EXCLUDE_SIGNATURE, i, &sig);
+		if(sig.Length()>0)
+			fAppSettings.exclusionsSignatureList.Add(sig);
+	}
+}
+
 
 /*
 void
@@ -271,48 +315,48 @@ LauncherApp::_ShowShelfView(bool showShelfView)
 
 
 void
-LauncherApp::_SaveSettingsToFile(uint32 what, AppSettings settings)
+LauncherApp::_SaveSettingsToFile(uint32 what)
 {
 	switch(what)
 	{
 		case EL_APP_COUNT_OPTION_CHANGED:
 		{
-			fSettingsFile->SaveDeskbarCount(settings.appCount);
+			fSettingsFile->SaveDeskbarCount(fAppSettings.appCount);
 			break;
 		}
 		case EL_APP_ICON_OPTION_CHANGED:
 		{
-			fSettingsFile->SaveAppIconSize(settings.minIconSize, settings.maxIconSize);
+			fSettingsFile->SaveAppIconSize(fAppSettings.minIconSize, fAppSettings.maxIconSize);
 			break;
 		}
 		case EL_DOC_ICON_OPTION_CHANGED:
 		{
-			fSettingsFile->SaveDocIconSize(settings.docIconSize);
+			fSettingsFile->SaveDocIconSize(fAppSettings.docIconSize);
 			break;
 		}
 		case EL_DOC_COUNT_OPTION_CHANGED:
 		{
-			fSettingsFile->SaveDocCount(settings.recentDocCount);
+			fSettingsFile->SaveDocCount(fAppSettings.recentDocCount);
 			break;
 		}
 		case EL_FOLDER_COUNT_OPTION_CHANGED:
 		{
-			fSettingsFile->SaveFolderCount(settings.recentFolderCount);
+			fSettingsFile->SaveFolderCount(fAppSettings.recentFolderCount);
 			break;
 		}
 		case EL_QUERY_COUNT_OPTION_CHANGED:
 		{
-			fSettingsFile->SaveQueryCount(settings.recentQueryCount);
+			fSettingsFile->SaveQueryCount(fAppSettings.recentQueryCount);
 			break;
 		}
 		case EL_FONT_OPTION_CHANGED:
 		{
-			fSettingsFile->SaveFontSize(settings.fontSize);
+			fSettingsFile->SaveFontSize(fAppSettings.fontSize);
 			break;
 		}
 		case EL_LOOK_OPTION_CHANGED:
 		{
-			fSettingsFile->SaveWindowLook(settings.windowLook);
+			fSettingsFile->SaveWindowLook(fAppSettings.windowLook);
 			break;
 		}
 	/*	case FLOAT_OPTION_CHANGED:
@@ -327,6 +371,13 @@ LauncherApp::_SaveSettingsToFile(uint32 what, AppSettings settings)
 void
 LauncherApp::_Subscribe()
 {
+	// No point in trying to subscribe if Engine is not running
+	if(!_IsEngineRunning())
+	{
+		fAppSettings.subscribedToEngine=false;
+		return;
+	}
+
 	// Get values from the settings file
 	// TODO change to get from settings window
 	int itemCount = fSettingsFile->GetDeskbarCount();
@@ -350,12 +401,13 @@ LauncherApp::_Subscribe()
 void
 LauncherApp::_SubscribeFailed()
 {
+	fAppSettings.subscribedToEngine=false;
 	// Show error message
 	BAlert *subscriptioneAlert = new BAlert("Subscription",
 			"The Einsteinium Launcher sent an invalid subscription to the Engine.  Please check your Launcher settings.",
 			"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 	// Set the feel to FLOATING so that the alert does not block use of the Deskbar while showing
-	subscriptioneAlert->SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
+	subscriptioneAlert->SetFeel(B_FLOATING_APP_WINDOW_FEEL);
 	subscriptioneAlert->Go(NULL);
 }
 
@@ -363,7 +415,7 @@ LauncherApp::_SubscribeFailed()
 void
 LauncherApp::_SubscribeConfirmed()
 {
-	// Don't need to do anything- just wait for an updated subscription message
+	fAppSettings.subscribedToEngine=true;
 //	printf("Subscription confirmed.\n");
 
 }

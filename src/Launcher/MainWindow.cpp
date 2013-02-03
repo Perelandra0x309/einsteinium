@@ -1,19 +1,19 @@
 /* MainWindow.cpp
- * Copyright 2012 Brian Hill
+ * Copyright 2013 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "MainWindow.h"
 
-MainWindow::MainWindow(BRect size, AppSettings settings)
+MainWindow::MainWindow(BRect size, window_look look)
 	:
-	BWindow(size, "Einsteinium Launcher", settings.windowLook, B_NORMAL_WINDOW_FEEL, B_NOT_ZOOMABLE, B_ALL_WORKSPACES)
+	BWindow(size, "Einsteinium Launcher", look, B_NORMAL_WINDOW_FEEL, B_NOT_ZOOMABLE, B_ALL_WORKSPACES)
 {
 	Lock();
 	const int inset = 0;
 	BRect frameRect(Bounds());
 //	frameRect.InsetBy(-1,0);
 	frameRect.bottom-=25;
-	fView = new MainView(frameRect, settings);
+	fView = new MainView(frameRect);
 	fInfoView = new BStringView("InfoView","");
 //	fInfoView->SetExplicitMaxSize(BSize(100, 20));
 /*	fAboutTextView = new BTextView(BRect(-10,0,0,1), "About text", BRect(0,0,0,0), B_FOLLOW_NONE);
@@ -28,15 +28,7 @@ MainWindow::MainWindow(BRect size, AppSettings settings)
 
 	SetLayout(new BGroupLayout(B_VERTICAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL)
-		//.Add(BGroupLayoutBuilder(B_HORIZONTAL)
-			.Add(fView)
-		//	.AddGlue()
-		//)
-		// TODO info view layout bug- long paths
-		//.Add(BGroupLayoutBuilder(B_HORIZONTAL)
-		//	.Add(fInfoView)
-		//	.AddGlue()
-		//)
+		.Add(fView)
 		.Add(fInfoView)
 	//	.Add(fAboutTextView)
 		.SetInsets(inset, inset, inset, inset)
@@ -74,10 +66,9 @@ MainWindow::MessageReceived(BMessage* msg)
 		case B_MOUSE_WHEEL_CHANGED:
 		case EL_UPDATE_RECENT_LISTS:
 		case EL_UPDATE_RECENT_LISTS_FORCE:
+		case EL_EXCLUSIONS_CHANGED:
 		{
-		//	Lock();
 			fView->MessageReceived(msg);
-		//	Unlock();
 			break;
 		}
 		case EL_UPDATE_INFOVIEW:
@@ -112,9 +103,9 @@ MainWindow::FrameResized(float new_width, float new_height)
 
 
 void
-MainWindow::SettingsChanged(uint32 what, AppSettings settings)
+MainWindow::SettingsChanged(uint32 what)
 {
-	fView->SettingsChanged(what, settings);
+	fView->SettingsChanged(what);
 }
 
 

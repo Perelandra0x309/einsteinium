@@ -1,17 +1,17 @@
 /* SuperTypeListItem.cpp
- * Copyright 2012 Brian Hill
+ * Copyright 2013 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "SuperTypeListItem.h"
 
 
-SuperTypeListItem::SuperTypeListItem(BMimeType *type, AppSettings *settings)
+SuperTypeListItem::SuperTypeListItem(BMimeType *type, int docIconSize)
 	:
 	BListItem(),
 	fInitStatus(B_ERROR)
 {
 	// Draw Settings
-	fIconSize = settings->docIconSize;
+	fIconSize = docIconSize;
 	fIcon = NULL;
 	fShadowIcon = NULL;
 

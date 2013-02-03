@@ -1,5 +1,5 @@
 /* RecentFoldersBListView.cpp
- * Copyright 2012 Brian Hill
+ * Copyright 2013 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "RecentFoldersBListView.h"
@@ -15,28 +15,29 @@ RecentFoldersBListView::RecentFoldersBListView(BRect size)
 }
 
 void
-RecentFoldersBListView::SettingsChanged(uint32 what, AppSettings settings)
+RecentFoldersBListView::SettingsChanged(uint32 what)
 {
 	Window()->Lock();
 	int32 currentSelection = CurrentSelection();
+	AppSettings* settings = GetAppSettings();
 	switch(what)
 	{
 		case EL_DOC_ICON_OPTION_CHANGED:
 		{
 			// Update super type items icon size
 			if(fFolderSuperListItem)
-				((SuperTypeListItem*)fFolderSuperListItem)->SetIconSize(settings.docIconSize);
+				((SuperTypeListItem*)fFolderSuperListItem)->SetIconSize(settings->docIconSize);
 			if(fQuerySuperListItem)
-				((SuperTypeListItem*)fQuerySuperListItem)->SetIconSize(settings.docIconSize);
-			BuildList(&settings, true);
+				((SuperTypeListItem*)fQuerySuperListItem)->SetIconSize(settings->docIconSize);
+			BuildList(true);
 			Select(currentSelection);
 			ScrollToSelection();
 			break;
 		}
 		case EL_FONT_OPTION_CHANGED:
 		{
-			SetFontSizeForValue(settings.fontSize);
-			BuildList(&settings, true);
+			SetFontSizeForValue(settings->fontSize);
+			BuildList(true);
 			Select(currentSelection);
 			ScrollToSelection();
 			break;
@@ -47,7 +48,7 @@ RecentFoldersBListView::SettingsChanged(uint32 what, AppSettings settings)
 
 
 void
-RecentFoldersBListView::BuildList(AppSettings *settings, bool force=false)
+RecentFoldersBListView::BuildList(bool force=false)
 {
 	if(!fWindow)
 	{
@@ -69,6 +70,8 @@ RecentFoldersBListView::BuildList(AppSettings *settings, bool force=false)
 		refList.MakeEmpty();
 	}
 
+	AppSettings* settings = GetAppSettings();
+
 	// Remove existing items
 	fWindow->Lock();
 	int fullCount = FullListCountItems();
@@ -87,7 +90,7 @@ RecentFoldersBListView::BuildList(AppSettings *settings, bool force=false)
 		BMimeType folderSuperType(kDirectoryType);
 		if(folderSuperType.IsValid())
 		{
-			fFolderSuperListItem = new SuperTypeListItem(&folderSuperType, settings);
+			fFolderSuperListItem = new SuperTypeListItem(&folderSuperType, settings->docIconSize);
 			if(fFolderSuperListItem->InitStatus()==B_OK)
 				fFolderSuperListItem->SetName("Folders");
 			else
@@ -101,7 +104,7 @@ RecentFoldersBListView::BuildList(AppSettings *settings, bool force=false)
 		BMimeType querySuperType(kQueryType);
 		if(querySuperType.IsValid())
 		{
-			fQuerySuperListItem = new SuperTypeListItem(&querySuperType, settings);
+			fQuerySuperListItem = new SuperTypeListItem(&querySuperType, settings->docIconSize);
 			if(fQuerySuperListItem->InitStatus()==B_OK)
 				fQuerySuperListItem->SetName("Queries");
 			else

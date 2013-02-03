@@ -1,12 +1,14 @@
 NAME := Einsteinium_Launcher
 TYPE := APP
 SRCS := ../Engine/EngineSubscriber.cpp \
+	main.cpp \
+	LauncherApp.cpp \
+	MainWindow.cpp \
+	MainView.cpp \
 	LPopUpMenu.cpp \
 	AppsListView.cpp \
 	RecentDocsBListView.cpp \
 	RecentFoldersBListView.cpp \
-	MainView.cpp \
-	MainWindow.cpp \
 	SettingsView.cpp \
 	AppRefFilter.cpp \
 	LauncherRankingsView.cpp \
@@ -17,9 +19,7 @@ SRCS := ../Engine/EngineSubscriber.cpp \
 	SuperTypeListItem.cpp \
 	LauncherSettingsFile.cpp \
 	ModifierMenuItem.cpp \
-	ModifierMenu.cpp \
-	LauncherApp.cpp \
-	main.cpp
+	ModifierMenu.cpp
 LIBS := be tracker stdc++.r4 xml2
 OPTIMIZE := FULL
 RSRCS := einsteinium_launcher.rsrc
