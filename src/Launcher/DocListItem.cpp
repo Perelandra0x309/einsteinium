@@ -27,6 +27,7 @@ DocListItem::DocListItem(entry_ref *entry, AppSettings *settings, int level=0)
 	entry.GetRef(&fEntryRef);*/
 	fEntryRef = *entry;
 	fName.SetTo(entry->name);
+	fNameFirstChar = BString(fName).Truncate(1).ToLower()[0];
 
 	// Get super type
 	BNode node;
@@ -143,6 +144,13 @@ DocListItem::GetPath()
 	BPath docPath(&fEntryRef);
 	BString pathStr(docPath.Path());
 	return pathStr;
+}
+
+
+bool
+DocListItem::BeginsWith(char letter)
+{
+	return (fNameFirstChar==letter);
 }
 
 

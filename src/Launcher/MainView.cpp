@@ -37,13 +37,13 @@ MainView::MainView(BRect size)
 	fTabCount = CountTabs();
 }
 
-
+/*
 void
 MainView::AllAttached()
 {
 	BTabView::AllAttached();
-	SelectDefaultTab();
-}
+//	SelectDefaultTab();
+}*/
 
 /*
 void
@@ -141,6 +141,10 @@ MainView::KeyDown(const char* bytes, int32 numbytes)
 				//	printf("Key: %c\n", bytes[0]);
 					if(fSelectedListView==fAppsListView)
 						fAppsListView->ScrollToNextAppBeginningWith(bytes[0]);
+					else if(fSelectedListView==fDocsListView)
+						fDocsListView->ScrollToNextDocBeginningWith(bytes[0]);
+					else if(fSelectedListView==fFoldersListView)
+						fFoldersListView->ScrollToNextDocBeginningWith(bytes[0]);
 				}
 				else
 					BTabView::KeyDown(bytes, numbytes);

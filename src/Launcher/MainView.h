@@ -21,7 +21,7 @@
 class MainView : public BTabView {
 public:
 						MainView(BRect size);
-	virtual void		AllAttached();
+//	virtual void		AllAttached();
 //	virtual void		AttachedToWindow();
 	virtual void		MessageReceived(BMessage*);
 	virtual void		KeyDown(const char* bytes, int32 numbytes);

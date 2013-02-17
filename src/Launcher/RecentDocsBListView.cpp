@@ -282,6 +282,48 @@ RecentDocsBListView::SetFontSizeForValue(float fontSize)
 
 
 void
+RecentDocsBListView::ScrollToNextDocBeginningWith(char letter)
+{
+	int32 selectedIndex = CurrentSelection();
+	// If no item is selected start at beginning
+	if(selectedIndex<0)
+		selectedIndex=-1;
+	letter = BString(&letter).Truncate(1).ToLower()[0];
+	int totalCount = CountItems();
+	for(int i=selectedIndex+1; i<totalCount; i++)
+	{
+		BListItem *selectedItem = ItemAt(i);
+		if(selectedItem->OutlineLevel()==0)
+			continue;
+		DocListItem* item = (DocListItem*)selectedItem;
+		bool match = item->BeginsWith(letter);
+		if(match)
+		{
+			Select(i);
+			ScrollToSelection();
+			return;
+		}
+	}
+	// If we are here, we reached the end of the list without finding
+	// a match.  Now start at the beginning of the list
+	for(int i=0; i<selectedIndex; i++)
+	{
+		BListItem *selectedItem = ItemAt(i);
+		if(selectedItem->OutlineLevel()==0)
+			continue;
+		DocListItem* item = (DocListItem*)selectedItem;
+		bool match = item->BeginsWith(letter);
+		if(match)
+		{
+			Select(i);
+			ScrollToSelection();
+			return;
+		}
+	}
+}
+
+
+void
 RecentDocsBListView::BuildList(bool force=false)
 {
 	if(!fWindow)

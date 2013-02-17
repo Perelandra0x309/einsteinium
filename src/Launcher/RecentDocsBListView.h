@@ -26,6 +26,7 @@ public:
 			void		SetShowing(bool showing) { isShowing = showing; };
 			void		SettingsChanged(uint32 what);
 			void		SetFontSizeForValue(float fontSize);
+			void		ScrollToNextDocBeginningWith(char letter);
 			void		BuildList(bool force=false);
 protected:
 	BWindow				*fWindow;

@@ -282,6 +282,7 @@ AppsListView::ScrollToNextAppBeginningWith(char letter)
 		if(match)
 		{
 			Select(i);
+			ScrollToSelection();
 			return;
 		}
 	}
@@ -294,6 +295,7 @@ AppsListView::ScrollToNextAppBeginningWith(char letter)
 		if(match)
 		{
 			Select(i);
+			ScrollToSelection();
 			return;
 		}
 	}
@@ -403,7 +405,6 @@ AppsListView::BuildAppsListFromRecent(bool force=false)
 			BAppFileInfo appInfo(&appFile);
 			if(appInfo.GetSignature(appSignature)==B_OK)
 			{
-			//	BString sigString(appSignature);
 				if(!(settings->exclusionsSignatureList.HasString(appSignature)))
 				{
 					BEntry *newEntry = new BEntry(&newref);

@@ -97,6 +97,9 @@ LauncherApp::ReadyToRun()
 		_Subscribe();
 	else
 	{
+		// Force an update to the Apps list
+		fWindow->SelectDefaultTab();
+
 /*		BNotification notify(B_INFORMATION_NOTIFICATION);
 		notify.SetGroup("Einsteinium Launcher");
 //		notify.SetTitle("Einsteinium Engine not running");
@@ -108,6 +111,7 @@ LauncherApp::ReadyToRun()
 		engineAlert->SetFeel(B_FLOATING_APP_WINDOW_FEEL);
 		BMessage *runMessage = new BMessage(EL_START_ENGINE_ALERT);
 		engineAlert->Go(new BInvoker(runMessage, this));
+
 	}
 }
 
