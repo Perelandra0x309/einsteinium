@@ -87,11 +87,12 @@ LauncherApp::QuitRequested()
 void
 LauncherApp::ReadyToRun()
 {
-	// Add the shelf view
-//	_ShowShelfView(!fQuitRequested);
-
-	//Quit since the deskbar now controls the ELShelfView object
-//	be_app->PostMessage(B_QUIT_REQUESTED);
+	//Were we sent a quit arguement?
+	if(fQuitRequested)
+	{
+		be_app->PostMessage(B_QUIT_REQUESTED);
+		return;
+	}
 
 	if(_IsEngineRunning())
 		_Subscribe();
@@ -125,7 +126,9 @@ LauncherApp::ArgvReceived(int32 argc, char** argv)
 	{
 		//option to quit
 		if(strcmp(argv[1],"-q")==0 || strcmp(argv[1],"--quit")==0)
-		{	fQuitRequested=true; }
+		{	fQuitRequested=true;
+		//	be_app->PostMessage(B_QUIT_REQUESTED);
+		}
 		//option is not recognized
 		else
 		{	printf("Unknown option.\n"); }

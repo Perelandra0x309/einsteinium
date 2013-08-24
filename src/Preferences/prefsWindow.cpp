@@ -60,12 +60,12 @@ prefsWindow::prefsWindow(BRect size)
 		" automatically restarting applications and system services that quit or crash,"
 		" and gathering statistics on application usage to provide customizable ranked"
 		" lists of applications.\n\n"
-		"This preferences application is used to set options for the Einsteinium Daemon,"
-		" Engine and Launcher.  See each application's main section to get more details.");
+		"This preferences application is used to set options for the Einsteinium Daemon"
+		" and Engine.  See each application's main section to get more details.");
 	fAboutTextView->MakeSelectable(false);
 	fAboutTextView->MakeEditable(false);
 	fAboutTextView->SetViewColor(fMainView->ViewColor());
-	fCopyrightStringView = new BStringView("Copyright", "Einsteinium Copyright 2011 by Brian Hill");
+	fCopyrightStringView = new BStringView("Copyright", "Einsteinium Copyright 2013 by Brian Hill");
 	BGroupLayout *boxLayout = new BGroupLayout(B_VERTICAL, 5);
 	fAboutBox->SetLayout(boxLayout);
 	BLayoutBuilder::Group<>(boxLayout)

@@ -20,7 +20,7 @@ if [ $? -eq 0 ]; then
 fi
 
 # Quit any running instances of Einsteinium
-$currDir/Einsteinium_Launcher -q
+# $currDir/Einsteinium_Launcher -q
 einsteinium_daemon -q
 einsteinium_engine -q
 

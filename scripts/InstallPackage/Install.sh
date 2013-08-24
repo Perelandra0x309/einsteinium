@@ -37,14 +37,13 @@ if [ $? -eq 1 ]; then
     #Create boot launch links for Einsteinium
     ln -s -f $appDir/einsteinium_engine -t $launchDir
     ln -s -f $appDir/einsteinium_daemon -t $launchDir
-    ln -s -f $appDir/Einsteinium_Launcher -t $launchDir
 fi
 
 # Start Einsteinium now
 $appDir/einsteinium_engine &
 sleep 1
 $appDir/einsteinium_daemon &
-$appDir/Einsteinium_Launcher &
+open $appDir
 open $appDir/ReadMe
 
 # Notification to user
