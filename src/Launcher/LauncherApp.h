@@ -18,6 +18,7 @@ public:
 						LauncherApp();
 	virtual bool		QuitRequested();
 	virtual void		ReadyToRun();
+//	virtual void		AppActivated(bool active);
 	virtual void		ArgvReceived(int32, char**);
 	virtual void		MessageReceived(BMessage*);
 //	bool				GetIsEngineRunning() { return _IsEngineRunning(); };

@@ -28,6 +28,7 @@ int main()
 	{
 		LauncherApp myApp;
 		myApp.Run();
+	//	myApp.PostMessage(EL_SHOW_WINDOW);
 	}
 	return 0;
 }

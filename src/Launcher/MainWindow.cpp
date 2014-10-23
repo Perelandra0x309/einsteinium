@@ -54,7 +54,7 @@ bool
 MainWindow::QuitRequested()
 {
 	be_app->PostMessage(EL_HIDE_APP);
-	return false;
+	return false			;
 }
 
 

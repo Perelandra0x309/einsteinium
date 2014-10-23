@@ -136,6 +136,16 @@ LauncherApp::ArgvReceived(int32 argc, char** argv)
 }
 
 
+/*void
+LauncherApp::AppActivated(bool active)
+{
+	if(active)
+	{
+		be_app->PostMessage(EL_SHOW_WINDOW);
+	}
+}*/
+
+
 void
 LauncherApp::MessageReceived(BMessage* msg)
 {
@@ -213,7 +223,7 @@ LauncherApp::MessageReceived(BMessage* msg)
 		}
 		case EL_SHOW_WINDOW:
 		{
-			fWindow->SelectDefaultTab();
+			//fWindow->SelectDefaultTab();
 			if(fWindow->IsHidden())
 			{
 				fWindow->Show();
