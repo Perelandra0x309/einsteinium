@@ -24,7 +24,7 @@ LIBPATHS :=
 #       additional paths to look for system headers
 #       these use the form: #include <header.h>
 #       source file directories are NOT auto-included here
-SYSTEM_INCLUDE_PATHS := /boot/common/include/libxml2 /boot/common/include
+SYSTEM_INCLUDE_PATHS := /boot/system/develop/headers/libxml2 /boot/common/include
 
 #       additional paths to look for local headers
 #       thes use the form: #include "header.h"
@@ -122,4 +122,4 @@ EXTRA_BUILD_STEPS :=
 #       project that may get rebuilt, specify the full path to them here.
 EXTRA_DEPS :=
 
-include /boot/develop/etc/makefile-engine
+include /boot/system/develop/etc/makefile-engine
