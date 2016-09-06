@@ -6,6 +6,7 @@
 #define ED_REMEMBERALERT_H
 
 #include <InterfaceKit.h>
+#include <LayoutBuilder.h>
 #include "daemon_constants.h"
 
 

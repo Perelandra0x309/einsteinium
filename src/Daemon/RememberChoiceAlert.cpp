@@ -13,18 +13,15 @@ RememberChoiceAlert::RememberChoiceAlert(const char* title, const char* text,
 	BAlert(title, text, button0Label, button1Label, button2Label, widthStyle, type)
 {
 	fInvoker = NULL;
-//	SetFlags(B_NOT_CLOSABLE | /*B_NOT_RESIZABLE | */B_ASYNCHRONOUS_CONTROLS);
+	// Use the text view to add a check box to the alert
 	fRememberCB = new BCheckBox("Save Settings", "Always use the following choice:", NULL);
-	// Add the checkbox to the BAlert view
-	BView *view = ChildAt(0);
-	view->AddChild(fRememberCB);
-	// Find the first button and the text view
-	BButton *buttonView = ButtonAt(0);
 	BTextView *textView = TextView();
-	// Move the checkbox to the correct spot and resize the window
-	fRememberCB->MoveTo(textView->Frame().left, buttonView->Frame().top);
-	fRememberCB->ResizeToPreferred();
-	ResizeBy(0, 10 + fRememberCB->Frame().Height());
+	BLayoutBuilder::Group<>(textView, B_VERTICAL, 0)
+		.AddGlue()
+		.Add(fRememberCB);
+	BSize viewSize=textView->MinSize();
+	viewSize.height+=75;
+	textView->SetExplicitMinSize(viewSize);
 }
 
 
