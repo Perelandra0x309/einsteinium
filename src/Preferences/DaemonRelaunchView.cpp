@@ -14,13 +14,9 @@ DaemonRelaunchView::DaemonRelaunchView(BRect size)
 	fSelectedItem(NULL)
 {
 	SetViewColor(bg_color);
-	BRect viewRect;
 
-	fAddAppB = new BButton(viewRect, "Add", "Add" B_UTF8_ELLIPSIS,
-						new BMessage(ED_ADD_APPITEM), B_FOLLOW_RIGHT);
-	fAddAppB->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
-	fRemoveAppB = new BButton(viewRect, "Remove", "Remove",
-						new BMessage(ED_REMOVE_APPITEM), B_FOLLOW_RIGHT);
+	fAddAppB = new BButton("Add", "Add" B_UTF8_ELLIPSIS, new BMessage(ED_ADD_APPITEM));
+	fRemoveAppB = new BButton("Remove", "Remove", new BMessage(ED_REMOVE_APPITEM));
 	fRemoveAppB->SetEnabled(false);
 	fRelaunchBox = new BBox("Application Relaunch Behavior");
 	fRelaunchBox->SetLabel("Application Relaunch Settings");
@@ -35,11 +31,9 @@ DaemonRelaunchView::DaemonRelaunchView(BRect size)
 						"Do not relaunch this application when it quits",
 						new BMessage(ED_AUTO_RELAUNCH_CHANGED));
 
-	fAppsLView = new BListView(viewRect, "App List View", B_SINGLE_SELECTION_LIST,
-								B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS);
+	fAppsLView = new BListView("App List View", B_SINGLE_SELECTION_LIST);
 	fAppsLView->SetSelectionMessage(new BMessage(ED_RELAPP_SELECTION_CHANGED));
-	fAppsSView = new BScrollView("Apps List Scroll View", fAppsLView, B_FOLLOW_ALL_SIDES, 0,
-								false, true);
+	fAppsSView = new BScrollView("Apps List Scroll View", fAppsLView, 0, false, true);
 	fAppsSView->SetToolTip("Use this list to specify what actions you want the Einsteinium Daemon to take\n"
 							"when an application quits.  The \"Default setting\" item specifies the action\n"
 							"to take for any apps that are not in this list.  Add specific apps to this list\n"
@@ -47,23 +41,23 @@ DaemonRelaunchView::DaemonRelaunchView(BRect size)
 							"be color coded based on the action specified, so you can quickly view all your\n"
 							"app settings.");
 
-	BGridLayout *boxLayout = new BGridLayout(5, 5);
-	fRelaunchBox->SetLayout(boxLayout);
-	BLayoutBuilder::Grid<>(boxLayout)
-		.Add(fAppsSView, 0, 0, 1, 3)
-		.Add(fAddAppB, 1, 0)
-		.Add(fRemoveAppB, 1, 1)
-		.Add(fAutoRelaunchRB, 0, 3, 2, 1)
-		.Add(fPromptRelaunchRB, 0, 4, 2, 1)
-		.Add(fDontRelaunchRB, 0, 5, 2, 1)
-		.SetInsets(10, 20, 10, 10)
-	;
+	BGroupLayout *boxLayout = BLayoutBuilder::Group<>(B_VERTICAL)
+		.Add(fAppsSView)
+		.AddGroup(B_HORIZONTAL)
+			.AddGlue()
+			.Add(fAddAppB)
+			.Add(fRemoveAppB)
+		.End()
+		.Add(fAutoRelaunchRB)
+		.Add(fPromptRelaunchRB)
+		.Add(fDontRelaunchRB)
+		.SetInsets(10, 10, 10, 10);
+	fRelaunchBox->AddChild(boxLayout->View());
 
 	BGroupLayout *layout = new BGroupLayout(B_VERTICAL);
 	SetLayout(layout);
 	BLayoutBuilder::Group<>(layout)
-		.Add(fRelaunchBox)
-	;
+		.Add(fRelaunchBox);
 
 	//File Panel
 	fAppFilter = new AppRefFilter();

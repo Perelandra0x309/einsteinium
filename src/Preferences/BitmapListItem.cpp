@@ -96,6 +96,7 @@ BitmapListItem::DrawItem(BView *owner, BRect item_rect, bool complete)
 	{
 		owner->SetHighColor(selected_color);
 		owner->FillRect(item_rect);
+		owner->SetHighColor(enabled_color);
 	}
 
 	// draw icon with the same offset for width and height
@@ -111,16 +112,9 @@ BitmapListItem::DrawItem(BView *owner, BRect item_rect, bool complete)
 			offset_height += floor( (iconSpacing - fTextHeight)/2 );
 	}
 
+	// Draw text next to the icon
 	BRect textRect(item_rect);
 	textRect.left += offset_width;
-
-	// If the text height is smaller than the icon, need to color background for selected items
-	// before calling BStringItem::DrawItem
-/*	if(IsSelected() && offset_height) {
-		owner->SetHighColor(selected_color);
-		owner->FillRect(textRect);
-	}*/
-
 	textRect.top += offset_height;
 	BStringItem::DrawItem(owner, textRect, complete);
 }

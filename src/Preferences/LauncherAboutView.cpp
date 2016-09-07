@@ -19,27 +19,19 @@ LauncherAboutView::LauncherAboutView(BRect size)
 		" started by clicking on that menu item.");
 	fAboutTextView->MakeSelectable(false);
 	fAboutTextView->MakeEditable(false);
-
-	BGroupLayout *boxLayout = new BGroupLayout(B_VERTICAL);
-	fAboutBox->SetLayout(boxLayout);
-	BLayoutBuilder::Group<>(boxLayout)
+	BGroupLayout *boxLayout = BLayoutBuilder::Group<>(B_VERTICAL)
 		.Add(fAboutTextView)
 		.SetInsets(10, 20, 10, 10)
 	;
+	fAboutBox->AddChild(boxLayout->View());
 
 	// Layout
-	fAboutBox->SetExplicitMinSize(BSize(0,120));
 	BGroupLayout *layout = new BGroupLayout(B_VERTICAL);
 	SetLayout(layout);
 	BLayoutBuilder::Group<>(layout)
 		.Add(fAboutBox, 0)
 		.AddGlue()
 	;
-
-	// TODO this isn't quite right, need to calculate based on TextView preferred size?
-//	BSize minSize(PreferredSize());
-//	minSize.height += 565;
-//	fAboutBox->SetExplicitMinSize(minSize);
 }
 
 
