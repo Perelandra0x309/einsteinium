@@ -232,7 +232,7 @@ LauncherApp::MessageReceived(BMessage* msg)
 			else
 				be_roster->ActivateApp(Team());
 
-			be_app->PostMessage(EL_UPDATE_RECENT_LISTS);
+		//	be_app->PostMessage(EL_UPDATE_RECENT_LISTS);
 			break;
 		}
 		case EL_WINDOW_MOVED:
