@@ -1,0 +1,19 @@
+target desktop {
+	service x-vnd.Einsteinium_Daemon {
+		launch /system/bin/einsteinium_daemon
+		no_safemode
+		legacy
+		on {
+			initial_volumes_mounted
+		}
+	}
+	service x-vnd.Einsteinium_Engine {
+		launch /system/bin/einsteinium_engine
+		no_safemode
+		legacy
+		on {
+			initial_volumes_mounted
+		}
+	}
+}
+
