@@ -85,10 +85,7 @@ SuperTypeListItem::_GetIcon()
 	}*/
 	BRect iconRect(0, 0, fIconSize - 1, fIconSize - 1);
 	fIcon = new BBitmap(iconRect, 0, B_RGBA32);
-	uint8* data;
-	size_t size;
-	fMimeType.GetIcon(&data, &size);
-	result = BIconUtils::GetVectorIcon(data, size, fIcon);
+	result = fMimeType.GetIcon(fIcon, icon_size(fIconSize));
 
 	if(result!=B_OK)
 	{

@@ -175,14 +175,11 @@ DocListItem::_GetIcon()
 		{
 			// Get icon from mime type
 			char mimeString[B_MIME_TYPE_LENGTH];
-			uint8* data;
-			size_t size;
 			BMimeType nodeType;
 			if(nodeInfo.GetType(mimeString) == B_OK)
 			{
 				nodeType.SetTo(mimeString);
-				nodeType.GetIcon(&data, &size);
-				result = BIconUtils::GetVectorIcon(data, size, fIcon);
+				result = nodeType.GetIcon(fIcon, icon_size(fIconSize));
 			}
 			// Get super type icon
 			if(result!=B_OK)
@@ -190,8 +187,7 @@ DocListItem::_GetIcon()
 				BMimeType superType;
 				if(nodeType.GetSupertype(&superType)==B_OK)
 				{
-					superType.GetIcon(&data, &size);
-					result = BIconUtils::GetVectorIcon(data, size, fIcon);
+					result = superType.GetIcon(fIcon, icon_size(fIconSize));
 				}
 
 			}
