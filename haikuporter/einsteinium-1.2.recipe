@@ -7,8 +7,9 @@ HOMEPAGE="https://sourceforge.net/projects/esforhaiku/"
 COPYRIGHT="2010-2016 Brian Hill"
 LICENSE="BSD (3-clause)"
 REVISION="1"
-SOURCE_URI="svn://svn.code.sf.net/p/esforhaiku/code/trunk"
-SOURCE_DIR="src"
+SOURCE_URI="https://sourceforge.net/projects/esforhaiku/files/Einsteinium-1.2_source.zip/download"
+CHECKSUM_SHA256="c5324e53d13e3b34a44bcfdc47e3a21e0dbea4295fa17b4547a9bcf3d73f0341"
+SOURCE_DIR="Einsteinium-1.2_source"
 
 ARCHITECTURES="x86_gcc2 !x86"
 
@@ -56,9 +57,9 @@ BUILD()
 
 INSTALL()
 {
-	mkdir -p $appsDir/Einsteinium
 	mkdir -p $appsDir/Einsteinium/EngineSubscriberKit
 	mkdir -p $binDir
+	mkdir -p $dataDir/Einsteinium
 	mkdir -p $dataDir/user_launch
 	mkdir -p $preferencesDir
 	mkdir -p $postInstallDir
@@ -69,7 +70,10 @@ INSTALL()
 
 	# post install script
 	cp -af scripts/einsteinium_hpkg_postinstall.sh $postInstallDir
-	cp -af src/Icons/notify_icon $appsDir/Einsteinium
+	cp -af src/Icons/notify_icon $dataDir/Einsteinium
+
+	# launch settings
+	cp -af scripts/einsteinium_userlaunch $dataDir/user_launch/Einsteinium
 
 	# copy executables
 	cd src
@@ -78,31 +82,12 @@ INSTALL()
 	cp -af Launcher/Einsteinium_Launcher $appsDir/Einsteinium/Einsteinium\ Launcher
 
 	# create the Subscriber Example Kit
-	cp -af Engine/SubscriberExample/makefile Engine/SubscriberExample/subscriber_example Engine/SubscriberExample/subscriber_example.rsrc Engine/SubscriberExample/SubscriberExample.cpp Engine/EngineSubscriber.cpp Engine/EngineSubscriber.h $appsDir/Einsteinium/EngineSubscriberKit
+	cp -af Engine/SubscriberExample/makefile Engine/SubscriberExample/subscriber_example \
+Engine/SubscriberExample/subscriber_example.rsrc Engine/SubscriberExample/SubscriberExample.cpp \
+Engine/EngineSubscriber.cpp Engine/EngineSubscriber.h $appsDir/Einsteinium/EngineSubscriberKit
 
 	# deskbar links
 	addPreferencesDeskbarSymlink $preferencesDir/Einsteinium
 	addAppDeskbarSymlink $appsDir/Einsteinium/Einsteinium\ Launcher
-
-	# run daemon and engine as services
-	echo "target desktop {
-	service x-vnd.Einsteinium_Daemon {
-		launch /system/bin/einsteinium_daemon
-		no_safemode
-		legacy
-		on {
-			initial_volumes_mounted
-		}
-	}
-	service x-vnd.Einsteinium_Engine {
-		launch /system/bin/einsteinium_engine
-		no_safemode
-		legacy
-		on {
-			initial_volumes_mounted
-		}
-	}
-}
-" > $dataDir/user_launch/Einsteinium
 
 }
