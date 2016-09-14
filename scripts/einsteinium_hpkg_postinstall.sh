@@ -2,7 +2,7 @@
 
 # Start Einsteinium now
 open application/x-vnd.Einsteinium_Engine &
-sleep 1
+waitfor -m application/x-vnd.Einsteinium_Engine
 open application/x-vnd.Einsteinium_Daemon &
 
 #find app and data paths
