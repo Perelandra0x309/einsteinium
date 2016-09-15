@@ -79,8 +79,13 @@ AppListItem::SetIconSize(int value)
 void
 AppListItem::SetIconSize(int minIconSize, int maxIconSize, int totalCount, int index)
 {
-	int iconSize = int( maxIconSize - (index*(maxIconSize-minIconSize)/(totalCount-1)) );
-	SetIconSize(iconSize);
+	if(totalCount < 2) {
+		SetIconSize(maxIconSize);
+	}
+	else {
+		int iconSize = int( maxIconSize - (index*(maxIconSize-minIconSize)/(totalCount-1)) );
+		SetIconSize(iconSize);
+	}
 }
 
 
