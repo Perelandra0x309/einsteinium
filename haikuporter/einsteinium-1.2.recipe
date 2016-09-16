@@ -7,9 +7,9 @@ HOMEPAGE="https://sourceforge.net/projects/esforhaiku/"
 COPYRIGHT="2010-2016 Brian Hill"
 LICENSE="BSD (3-clause)"
 REVISION="1"
-SOURCE_URI="https://sourceforge.net/projects/esforhaiku/files/Einsteinium-1.2_source.zip/download"
-CHECKSUM_SHA256="c5324e53d13e3b34a44bcfdc47e3a21e0dbea4295fa17b4547a9bcf3d73f0341"
-SOURCE_DIR="Einsteinium-1.2_source"
+SOURCE_URI="https://downloads.sourceforge.net/esforhaiku/Einsteinium-${portVersion}_source.zip"
+CHECKSUM_SHA256="0e34e56f49d89bfa219e79ab61d3a8ab113b131cad70a44c59d6a922c6c57f99"
+SOURCE_DIR="Einsteinium-${portVersion}_source"
 
 ARCHITECTURES="x86_gcc2 !x86"
 
@@ -70,6 +70,7 @@ INSTALL()
 
 	# post install script
 	cp -af scripts/einsteinium_hpkg_postinstall.sh $postInstallDir
+	chmod +x $postInstallDir/einsteinium_hpkg_postinstall.sh
 	cp -af src/Icons/notify_icon $dataDir/Einsteinium
 
 	# launch settings
@@ -82,12 +83,15 @@ INSTALL()
 	cp -af Launcher/Einsteinium_Launcher $appsDir/Einsteinium/Einsteinium\ Launcher
 
 	# create the Subscriber Example Kit
-	cp -af Engine/SubscriberExample/makefile Engine/SubscriberExample/subscriber_example \
-Engine/SubscriberExample/subscriber_example.rsrc Engine/SubscriberExample/SubscriberExample.cpp \
-Engine/EngineSubscriber.cpp Engine/EngineSubscriber.h $appsDir/Einsteinium/EngineSubscriberKit
+	cp -af Engine/SubscriberExample/makefile \
+		Engine/SubscriberExample/subscriber_example \
+		Engine/SubscriberExample/subscriber_example.rsrc \
+		Engine/SubscriberExample/SubscriberExample.cpp \
+		Engine/EngineSubscriber.cpp \
+		Engine/EngineSubscriber.h \
+		$appsDir/Einsteinium/EngineSubscriberKit
 
 	# deskbar links
 	addPreferencesDeskbarSymlink $preferencesDir/Einsteinium
 	addAppDeskbarSymlink $appsDir/Einsteinium/Einsteinium\ Launcher
-
 }
