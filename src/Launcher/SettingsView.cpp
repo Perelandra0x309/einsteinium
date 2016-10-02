@@ -119,6 +119,8 @@ SettingsView::SettingsView(BRect size, AppSettings* settings)
 	fWindowLookMenu->AddItem(new BMenuItem("No Border", new BMessage(EL_LOOK_OPTION_CHANGED)));
 	fWindowLookMF = new BMenuField("Window Look Field", "Window look:", fWindowLookMenu);
 
+	fDeskbarShowCB = new BCheckBox("Show Deskbar Menu", new BMessage(EL_DESKBAR_OPTION_CHANGED));
+
 //	fFloatCB = new BCheckBox("Float above all windows", new BMessage(FLOAT_OPTION_CHANGED));
 
 //	fAboutB = new BButton("About", "About" B_UTF8_ELLIPSIS, new BMessage(B_ABOUT_REQUESTED));
@@ -171,6 +173,7 @@ SettingsView::SettingsView(BRect size, AppSettings* settings)
 			.Add(fWindowLookMF)
 			.AddGlue()
 		)
+		.Add(fDeskbarShowCB)
 		.SetInsets(8,20,8,8)
 	;
 
@@ -213,6 +216,11 @@ SettingsView::MessageReceived(BMessage* msg)
 			if(count<2)
 				SetAppCount(2);
 			be_app->PostMessage(EL_APP_COUNT_OPTION_CHANGED);
+			break;
+		}
+		case EL_DESKBAR_OPTION_CHANGED:
+		{
+			be_app->PostMessage(EL_DESKBAR_OPTION_CHANGED);
 			break;
 		}
 		case EL_APP_ICON_OPTION_DRAG:
@@ -467,6 +475,20 @@ SettingsView::_SetWindowLook(window_look look)
 	}
 }
 
+
+bool
+SettingsView::GetShowDeskbarMenu()
+{
+	return fDeskbarShowCB->Value();
+}
+
+
+void
+SettingsView::SetShowDeskbarMenu(bool value)
+{
+	fDeskbarShowCB->SetValue(value);
+}
+
 /*
 window_feel
 SettingsView::GetFloat()
@@ -491,6 +513,7 @@ SettingsView::PopulateAppSettings(AppSettings *settings)
 	settings->recentQueryCount = GetRecentQueryCount();
 	settings->fontSize = GetFontSize();
 	settings->windowLook = GetWindowLook();
+	settings->showDeskbarMenu = GetShowDeskbarMenu();
 }
 
 
@@ -506,6 +529,7 @@ SettingsView::SetAppSettings(AppSettings* settings)
 	SetRecentQueryCount(settings->recentQueryCount);
 	_SetFontSize(settings->fontSize);
 	_SetWindowLook(settings->windowLook);
+	SetShowDeskbarMenu(settings->showDeskbarMenu);
 }
 
 

@@ -8,7 +8,7 @@
 #include <Application.h>
 #include <Notification.h>
 #include "launcher_constants.h"
-//#include "ELShelfView.h"
+#include "ELShelfView.h"
 #include "LauncherSettingsFile.h"
 #include "MainWindow.h"
 #include "SettingsWindow.h"
@@ -33,7 +33,7 @@ private:
 	SettingsWindow			*fSettingsWindow;
 	LauncherSettingsFile	*fSettingsFile;
 	void					_CreateExclusionsSignatureList(BMessage *exclusions);
-//	void					_ShowShelfView(bool showShelfView);
+	void					_ShowShelfView(bool showShelfView);
 	void					_SaveSettingsToFile(uint32 what);
 	void					_Subscribe();
 	// virtual functions inherited from the EngineSubscriber class

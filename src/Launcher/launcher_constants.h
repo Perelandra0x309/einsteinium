@@ -82,6 +82,7 @@ static const char* kDirectoryType = "application/x-vnd.Be-directory";
 #define DEFAULT_VALUE_RUNTIME_SCALE 0
 #define DEFAULT_LAUNCH_ENGINE_ON_START true
 #define DEFAULT_VALUE_RECENT_COUNT 25
+#define DEFAULT_VALUE_SHOW_DESKBAR_MENU true
 
 // Preferences
 /*#define NAME_LINES_OPTION "linesOption"
@@ -136,6 +137,7 @@ enum launcher_messages
 	EL_UPDATE_RECENT_LISTS_FORCE,
 	EL_WINDOW_MOVED,
 	EL_APP_COUNT_OPTION_CHANGED,
+	EL_DESKBAR_OPTION_CHANGED,
 	//Launcher settings messages
 	EL_LAUNCHES_SL_CHANGED,
 	EL_FIRST_SL_CHANGED,

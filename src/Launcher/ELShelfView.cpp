@@ -232,8 +232,19 @@ ELShelfView::MessageReceived(BMessage* msg)
 			break;
 		}
 		case EL_SHELFVIEW_OPENPREFS: {
-			BMessage goToMessage(EL_GOTO_LAUNCHER_SETTINGS);
-			be_roster->Launch("application/x-vnd.Einsteinium_Preferences", &goToMessage);
+			if(be_roster->IsRunning(e_launcher_sig))
+			{
+				status_t rc = B_ERROR;
+				BMessenger appMessenger(e_launcher_sig, -1, &rc);
+				if(!appMessenger.IsValid())
+					break;
+				appMessenger.SendMessage(EL_SHOW_SETTINGS);
+			}
+			else
+			{
+				BMessage goToMessage(EL_SHOW_SETTINGS);
+				be_roster->Launch(e_launcher_sig, &goToMessage);
+			}
 			break;
 		}
 		case EL_SHELFVIEW_MENUITEM_INVOKED: {
@@ -294,14 +305,15 @@ void
 ELShelfView::_BuildMenu(BMessage *message)
 {
 	delete fMenu;
-	//fMenu = new BPopUpMenu(B_EMPTY_STRING, false, false);
-	fMenu = new ModifierMenu(B_EMPTY_STRING, false, false);
+	fMenu = new BPopUpMenu(B_EMPTY_STRING, false, false);
+	//fMenu = new ModifierMenu(B_EMPTY_STRING, false, false);
 	fMenu->SetFont(be_plain_font);
 
 	// Add any refs found
 	int32 fSubscriptionRefCount = 0;
 	if(message)
 	{
+		BList itemList;
 		type_code typeFound;
 		message->GetInfo("refs", &typeFound, &fSubscriptionRefCount);
 	//	printf("Found %i refs\n", countFound);
@@ -309,16 +321,19 @@ ELShelfView::_BuildMenu(BMessage *message)
 		for(int i=0; i<fSubscriptionRefCount; i++)
 		{
 			message->FindRef("refs", i, &newref);
-	//		printf("Found ref %s\n", newref.name);
+		//	printf("Found ref %s\n", newref.name);
 			BNode refNode(&newref);
 			BNodeInfo refNodeInfo(&refNode);
 			BMessage *newMsg = new BMessage(EL_SHELFVIEW_MENUITEM_INVOKED);
 			newMsg->AddRef("refs", &newref);
+			itemList.AddItem(new IconMenuItem(newref.name, newMsg, &refNodeInfo, B_MINI_ICON));
 			//fMenu->AddItem(new IconMenuItem(newref.name, newMsg, &refNodeInfo, B_MINI_ICON));
-			fMenu->AddItem(new ModifierMenuItem(newref.name, newMsg, &refNodeInfo, B_MINI_ICON));
+			//fMenu->AddItem(new ModifierMenuItem(newref.name, newMsg, &refNodeInfo, B_MINI_ICON));
 		}
+		itemList.SortItems(MenuItemSortLabel);
+		fMenu->AddList(&itemList,0);
 	}
-	fMenu->SetRefCount(fSubscriptionRefCount);
+//	fMenu->SetRefCount(fSubscriptionRefCount);
 
 	// No applications to display- create a helpful message
 	bool showStartEngineItem = false;
@@ -360,7 +375,7 @@ ELShelfView::_BuildMenu(BMessage *message)
 	}
 	fMenu->AddItem(new BMenuItem("Preferences"B_UTF8_ELLIPSIS,
 		new BMessage(EL_SHELFVIEW_OPENPREFS)));
-	fMenu->AddItem(new BMenuItem("Close Launcher", new BMessage(EL_SHELFVIEW_MENU_QUIT)));
+	fMenu->AddItem(new BMenuItem("Close Deskbar Menu", new BMessage(EL_SHELFVIEW_MENU_QUIT)));
 
 	BMenuItem* item;
 	BMessage* msg;
@@ -461,4 +476,15 @@ ELShelfView::_UpdateReceived(BMessage *message)
 {
 	// Rebuild the application launch menu with the list received from the Engine
 	_BuildMenu(message);
+}
+
+
+//Sort menu items by their label
+int MenuItemSortLabel(const void* item1, const void* item2)
+{
+	BString label1((*(IconMenuItem**)item1)->Label());//get first label
+	BString label2((*(IconMenuItem**)item2)->Label());//get second label
+	if(label1 < label2) return -1;//object1 should be after object2
+	else if(label1 > label2) return 1;//object1 should be before object2
+	else return 0;//both objects have the same value
 }

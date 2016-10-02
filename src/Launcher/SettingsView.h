@@ -40,6 +40,8 @@ public:
 			void			SetRecentQueryCount(int value);
 			float			GetFontSize();
 			window_look		GetWindowLook();
+			bool			GetShowDeskbarMenu();
+			void			SetShowDeskbarMenu(bool value);
 //			window_feel		GetFloat();
 			void			PopulateAppSettings(AppSettings *settings);
 			void			SetAppSettings(AppSettings* settings);
@@ -51,6 +53,7 @@ private:
 	BPopUpMenu				*fFontSizeMenu, *fWindowLookMenu;
 	BMenuField				*fFontSizeMF, *fWindowLookMF;
 	BTextControl			*fAppsCountTC, *fRecentFilesCountTC, *fRecentFoldersCountTC, *fRecentQueriesCountTC;
+	BCheckBox				*fDeskbarShowCB;
 //	BCheckBox				*fFloatCB;
 //	BButton					*fAboutB;
 	void					_SetFontSize(float size);

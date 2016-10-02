@@ -15,6 +15,7 @@ LauncherSettingsFile::LauncherSettingsFile(BHandler *messageHandler=NULL)
 	fLastScale(DEFAULT_VALUE_LAST_SCALE),
 	fIntervalScale(DEFAULT_VALUE_INTERVAL_SCALE),
 	fRuntimeScale(DEFAULT_VALUE_RUNTIME_SCALE),
+	fShowDeskbarMenu(DEFAULT_VALUE_SHOW_DESKBAR_MENU),
 	fAppCount(DEFAULT_VALUE_RECENT_COUNT),
 	fExclusionsList(EL_MESSAGE_WHAT_EXCLUDED_APPS),
 	fLaunchEngineOnStart(DEFAULT_LAUNCH_ENGINE_ON_START),
@@ -173,8 +174,10 @@ LauncherSettingsFile::_ReadSettingsFromFile(BPath file)
 		// deskbar settings
 		if (!xmlStrcmp(cur->name, (const xmlChar *) EL_XMLTEXT_CHILD_NAME_DESKBAR))
 		{
-//			xmlChar *value = xmlGetProp(cur, (const xmlChar *) EL_XMLTEXT_PROPERTY_SHOW);
-//			fShowDeskbarMenu = strcmp("true", (char *)value)==0;
+			xmlChar *value = xmlGetProp(cur, (const xmlChar *) EL_XMLTEXT_PROPERTY_SHOW);
+			if(value){
+				fShowDeskbarMenu = strcmp("true", (char *)value)==0;
+			}
 			fAppCount = _XmlGetIntProp(cur, EL_XMLTEXT_PROPERTY_COUNT);
 		}
 		// layout settings
@@ -331,6 +334,11 @@ LauncherSettingsFile::_WriteSettingsToFile()
 	else
 		autoLaunchValue.SetTo("false");
 
+	BString showDeskbar;
+	if(fShowDeskbarMenu)
+		showDeskbar.SetTo("true");
+	else
+		showDeskbar.SetTo("false");
 	BString countChar;
 	countChar << fAppCount;
 
@@ -365,8 +373,8 @@ LauncherSettingsFile::_WriteSettingsToFile()
 
 	// write deskbar settings
 	child1node = xmlNewChild(root_node, NULL, BAD_CAST EL_XMLTEXT_CHILD_NAME_DESKBAR, NULL);
-//	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_SHOW,
-//				BAD_CAST showDeskbar.String() );
+	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_SHOW,
+				BAD_CAST showDeskbar.String() );
 	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_COUNT,
 				BAD_CAST countChar.String() );
 
@@ -551,12 +559,21 @@ LauncherSettingsFile::SaveDeskbarCount(int count)
 
 
 void
+LauncherSettingsFile::SaveShowDeskbarMenu(bool show)
+{
+	fShowDeskbarMenu = show;
+	_WriteSettingsToFile();
+}
+
+
+void
 LauncherSettingsFile::SaveExclusionsList(BMessage &exclusionsList)
 {
 	fExclusionsList.MakeEmpty();
 	fExclusionsList = exclusionsList;
 	_WriteSettingsToFile();
 }
+
 
 void
 LauncherSettingsFile::AddToExclusionsList(const char *signature, const char *name)

@@ -58,6 +58,9 @@ LauncherApp::LauncherApp()
 		// App exclusion settings
 		appExclusions = fSettingsFile->GetExclusionsList();
 		_CreateExclusionsSignatureList(&appExclusions);
+
+		//Deskbar menu
+		fAppSettings.showDeskbarMenu = fSettingsFile->GetShowDeskbarMenu();
 	}
 
 	// Create Windows
@@ -79,7 +82,6 @@ LauncherApp::QuitRequested()
 	_UnsubscribeFromEngine();
 	delete fSettingsFile;
 	fSettingsFile = NULL;
-//	_ShowShelfView(false);
 
 	return true;
 }
@@ -114,6 +116,9 @@ LauncherApp::ReadyToRun()
 		engineAlert->Go(new BInvoker(runMessage, this));
 
 	}
+
+	// Create shelf view
+	_ShowShelfView(fAppSettings.showDeskbarMenu);
 }
 
 
@@ -183,6 +188,12 @@ LauncherApp::MessageReceived(BMessage* msg)
 			fWindow->SetLook(fAppSettings.windowLook);
 			fWindow->Unlock();
 			_SaveSettingsToFile(EL_LOOK_OPTION_CHANGED);
+			break;
+		}
+		case EL_DESKBAR_OPTION_CHANGED: {
+			fSettingsWindow->PopulateAppSettings(&fAppSettings);
+			_SaveSettingsToFile(msg->what);
+			_ShowShelfView(fAppSettings.showDeskbarMenu);
 			break;
 		}
 	/*	case FLOAT_OPTION_CHANGED: {
@@ -311,7 +322,7 @@ LauncherApp::_CreateExclusionsSignatureList(BMessage *exclusions)
 }
 
 
-/*
+
 void
 LauncherApp::_ShowShelfView(bool showShelfView)
 {
@@ -328,7 +339,7 @@ LauncherApp::_ShowShelfView(bool showShelfView)
 	{
 		deskbar.RemoveItem(EL_SHELFVIEW_NAME);
 	}
-}*/
+}
 
 
 void
@@ -374,6 +385,11 @@ LauncherApp::_SaveSettingsToFile(uint32 what)
 		case EL_LOOK_OPTION_CHANGED:
 		{
 			fSettingsFile->SaveWindowLook(fAppSettings.windowLook);
+			break;
+		}
+		case EL_DESKBAR_OPTION_CHANGED:
+		{
+			fSettingsFile->SaveShowDeskbarMenu(fAppSettings.showDeskbarMenu);
 			break;
 		}
 	/*	case FLOAT_OPTION_CHANGED:

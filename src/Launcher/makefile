@@ -3,6 +3,7 @@ TYPE := APP
 SRCS := ../Engine/EngineSubscriber.cpp \
 	main.cpp \
 	LauncherApp.cpp \
+	ELShelfView.cpp \
 	MainWindow.cpp \
 	MainView.cpp \
 	LPopUpMenu.cpp \

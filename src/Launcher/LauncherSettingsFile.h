@@ -35,6 +35,8 @@ public:
 //	void					SaveLinkInclusionDefaultValue(const char*);
 	int						GetDeskbarCount() { return fAppCount; }
 	void					SaveDeskbarCount(int count);
+	bool					GetShowDeskbarMenu() { return fShowDeskbarMenu; }
+	void					SaveShowDeskbarMenu(bool show);
 	BMessage				GetExclusionsList() { return fExclusionsList; }
 	void					SaveExclusionsList(BMessage &exclusionsList);
 	void					AddToExclusionsList(const char *signature, const char *name);
@@ -76,7 +78,7 @@ private:
 	BRect					fWindowFrame;
 //	BString					fInclusionDefault;
 	int						fAppCount;
-	bool					fLaunchEngineOnStart;
+	bool					fLaunchEngineOnStart, fShowDeskbarMenu;
 
 	void					_StartWatching();
 	void					_StopWatching();

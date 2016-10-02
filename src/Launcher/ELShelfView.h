@@ -22,6 +22,9 @@
 #include "LauncherSettingsFile.h"
 #include "launcher_constants.h"
 
+
+int	MenuItemSortLabel(const void* item1, const void* item2);
+
 class _EXPORT ELShelfView : public BView, public EngineSubscriber {
 public:
 							ELShelfView();
@@ -38,8 +41,8 @@ public:
 
 private:
 	BBitmap					*fIcon;
-	//BPopUpMenu				*fMenu;
-	ModifierMenu			*fMenu;
+	BPopUpMenu				*fMenu;
+	//ModifierMenu			*fMenu;
 	int						fItemCount;
 	LauncherSettingsFile	*fSettingsFile;
 	BAlert					*fEngineAlert;
