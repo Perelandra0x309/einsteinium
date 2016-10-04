@@ -8,7 +8,8 @@
 //Main directory for all Einsteinium settings
 #define e_settings_dir "Einsteinium"
 //Settings file name
-#define ed_settings_file "daemon_settings"
+#define ed_settings_file "daemon"
+#define ed_legacy_settings_file "daemon_settings"
 
 //Enumerations for messages
 enum {
@@ -24,7 +25,12 @@ enum {
 	ACTION_DEFAULT = ACTION_PROMPT
 };
 
-//Text
+//Flattened message settings
+#define ED_HMFL_PROPERTY_DEFAULT_RELAUNCH "default_relaunch"
+#define ED_HMFL_PROPERTY_SIGNATURE "sig"
+#define ED_HMFL_PROPERTY_RELAUNCH "relaunch"
+
+//Legacy Text settings
 #define ED_XMLTEXT_ROOT_NAME "einsteinium_daemon"
 #define ED_XMLTEXT_CHILD1_NAME "relaunch"
 #define ED_XMLTEXT_CHILD2_NAME "app"
@@ -34,6 +40,8 @@ enum {
 #define ED_XMLTEXT_VALUE_IGNORE "ignore"
 #define ED_XMLTEXT_VALUE_PROMPT "prompt"
 #define ED_XMLTEXT_VALUE_AUTO "auto"
+
+//Alert message
 #define ED_ALERT_REMEMBER "remember"
 
 //Paths of executables to ignore by default

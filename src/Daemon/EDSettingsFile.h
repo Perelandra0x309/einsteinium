@@ -37,10 +37,11 @@ private:
 	status_t				fInitStatus;
 	void					_StartWatching();
 	void					_StopWatching();
-	status_t				_ReadSettingsFromFile(BPath file);
+	status_t				_ReadSettingsFromFile(BPath settingsPath);
+	status_t				_ReadLegacyXMLSettingsFromFile(BPath settingsPath);
 	void					_ParseSettings(xmlDocPtr doc, xmlNodePtr cur);
 	int						_TranslateRelaunchXML(xmlChar *value);
-	status_t				_WriteSettingsToFile(BPath file);
+	status_t				_WriteSettingsToFile(BPath settingsPath);
 };
 
 

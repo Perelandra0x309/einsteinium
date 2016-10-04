@@ -12,7 +12,8 @@
 //Main directory for all Einsteinium settings
 #define e_settings_dir "Einsteinium"
 //Settings file name
-#define el_settings_file "launcher_settings"
+#define el_settings_file "launcher"
+#define el_legacy_settings_file "launcher_settings"
 
 //static const char* settings_filename = "Launcher_settings";
 const int32 kIconDefaultSize = 32;
@@ -25,7 +26,30 @@ static const char* kQueryTemplateType = "application/x-vnd.Be-queryTemplate";
 static const char* kApplicationType = "application/x-vnd.Be-elfexecutable";
 static const char* kDirectoryType = "application/x-vnd.Be-directory";
 
-//XML Text
+//Settings flat BMessage text
+#define EL_HMFL_PROPERTY_AUTOLAUNCH "auto_launch"
+#define EL_HMFL_PROPERTY_LAUNCHES "launches"
+#define EL_HMFL_PROPERTY_FIRSTLAUNCH "first_launch"
+#define EL_HMFL_PROPERTY_LASTLAUNCH "last_launch"
+#define EL_HMFL_PROPERTY_INTERVAL "interval"
+#define EL_HMFL_PROPERTY_RUNTIME "run_time"
+#define EL_HMFL_PROPERTY_SHOWDESKBAR "show_deskbar"
+#define EL_HMFL_PROPERTY_APPCOUNT "app_count"
+#define EL_HMFL_PROPERTY_MAXAPP "max_app_icon"
+#define EL_HMFL_PROPERTY_MINAPP "min_app_icon"
+#define EL_HMFL_PROPERTY_DOCICON	"doc_icon"
+#define EL_HMFL_PROPERTY_DOCCOUNT "doc_count"
+#define EL_HMFL_PROPERTY_FOLDERCOUNT "folder_count"
+#define EL_HMFL_PROPERTY_QUERYCOUNT "query_count"
+#define EL_HMFL_PROPERTY_FONTSIZE "font_size"
+#define EL_HMFL_PROPERTY_WINDOWLOOK "window_look"
+#define EL_HMFL_PROPERTY_WINDOWFRAMELEFT "frame_left"
+#define EL_HMFL_PROPERTY_WINDOWFRAMETOP "frame_top"
+#define EL_HMFL_PROPERTY_WINDOWFRAMERIGHT "frame_right"
+#define EL_HMFL_PROPERTY_WINDOWFRAMEBOTTOM "frame_bottom"
+#define EL_HMFL_PROPERTY_APP_EXCLUSIONS "app_exclusions"
+
+//XML Text (legacy settings file)
 #define EL_XMLTEXT_ROOT_NAME "einsteinium_launcher"
 #define EL_XMLTEXT_CHILD_NAME_INCLUSION "list_inclusion"
 #define EL_XMLTEXT_PROPERTY_INCLUSION_DEFAULT "default"

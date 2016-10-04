@@ -47,10 +47,10 @@ LauncherApp::LauncherApp()
 		fAppSettings.fontSize = fSettingsFile->GetFontSize();
 		fAppSettings.windowLook = fSettingsFile->GetWindowLook();
 		mainWindowRect = fSettingsFile->GetWindowFrame();
-		if(mainWindowRect.IsValid() && mainWindowRect.Width()!=0 && mainWindowRect.Height()!=0)
+	//	if(mainWindowRect.IsValid() && mainWindowRect.Width()!=0 && mainWindowRect.Height()!=0)
 			frameResult=B_OK;
-		else
-			mainWindowRect.Set(0,0,200,400);
+	//	else
+	//		mainWindowRect.Set(0,0,200,400);
 
 		// App rank scales settings
 		fSettingsFile->GetScales(&scaleSettings);
@@ -78,6 +78,7 @@ LauncherApp::LauncherApp()
 bool
 LauncherApp::QuitRequested()
 {
+	fSettingsFile->SaveWindowFrame(fWindow->Frame());
 	// Unsubscribe from the Einsteinium Engine
 	_UnsubscribeFromEngine();
 	delete fSettingsFile;
@@ -246,11 +247,11 @@ LauncherApp::MessageReceived(BMessage* msg)
 			be_app->PostMessage(EL_UPDATE_RECENT_LISTS);
 			break;
 		}
-		case EL_WINDOW_MOVED:
+/*		case EL_WINDOW_MOVED:
 		{
 			fSettingsFile->SaveWindowFrame(fWindow->Frame());
 			break;
-		}
+		}*/
 		case EL_HIDE_APP:
 		{
 			if(!fSettingsWindow->IsHidden())
