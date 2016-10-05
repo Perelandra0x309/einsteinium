@@ -102,6 +102,8 @@ EDSettingsFile::_StopWatching()
 status_t
 EDSettingsFile::_ReadSettingsFromFile(BPath settingsPath)
 {
+	fInitStatus = B_ERROR;
+
 	//Read flattened BMessage
 	BFile settingsFile;
 	BMessage settings;
@@ -140,7 +142,8 @@ EDSettingsFile::_ReadSettingsFromFile(BPath settingsPath)
 		}
 	}
 
-	return B_OK;
+	fInitStatus = B_OK;
+	return fInitStatus;
 }
 
 

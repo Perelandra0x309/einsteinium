@@ -40,6 +40,27 @@ einsteinium_engine::einsteinium_engine()//Einsteinium Engine Constructor
 			return;
 		}
 	}
+
+	//Get paths to ignore
+	BPath tempPath;
+	if( find_directory(B_SYSTEM_ADDONS_DIRECTORY, &tempPath) == B_OK)
+		kSysAddonsPath = tempPath.Path();
+	if( find_directory(B_SYSTEM_BIN_DIRECTORY, &tempPath) == B_OK)
+		kSysBinPath = tempPath.Path();
+	if( find_directory(B_SYSTEM_SERVERS_DIRECTORY, &tempPath) == B_OK)
+		kSysServersPath = tempPath.Path();
+	if( find_directory(B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY, &tempPath) == B_OK)
+		kSysNonPackagedAddonsPath = tempPath.Path();
+	if( find_directory(B_SYSTEM_NONPACKAGED_BIN_DIRECTORY, &tempPath) == B_OK)
+		kSysNonPackagedBinPath = tempPath.Path();
+	if( find_directory(B_USER_ADDONS_DIRECTORY, &tempPath) == B_OK)
+		kUserAddonsPath = tempPath.Path();
+	if( find_directory(B_USER_BIN_DIRECTORY, &tempPath) == B_OK)
+		kUserBinPath = tempPath.Path();
+	if( find_directory(B_USER_NONPACKAGED_ADDONS_DIRECTORY, &tempPath) == B_OK)
+		kUserNonPackagedAddonsPath = tempPath.Path();
+	if( find_directory(B_USER_NONPACKAGED_BIN_DIRECTORY, &tempPath) == B_OK)
+		kUserNonPackagedBinPath = tempPath.Path();
 }
 
 /*
@@ -184,13 +205,14 @@ einsteinium_engine::MessageReceived(BMessage *msg)
 				// Automatically ignore binary commands, tracker addons and system servers
 				BPath appPath(&appEntry);
 				BString pathString(appPath.Path());
-				if(pathString.FindFirst(PATH_SYSTEM_BIN) == 0 ||
-					pathString.FindFirst(PATH_SYSTEM_SERVERS) == 0 ||
-					pathString.FindFirst(PATH_SYSTEM_TRACKER_ADDONS) == 0 ||
-					pathString.FindFirst(PATH_COMMON_BIN) == 0 ||
-					pathString.FindFirst(PATH_COMMON_TRACKER_ADDONS) == 0 ||
-					pathString.FindFirst(PATH_HOME_BIN) == 0 ||
-					pathString.FindFirst(PATH_HOME_TRACKER_ADDONS) == 0 )
+				if(pathString.StartsWith(kSysAddonsPath) ||
+					pathString.StartsWith(kSysBinPath) ||
+					pathString.StartsWith(kSysNonPackagedAddonsPath) ||
+					pathString.StartsWith(kSysNonPackagedBinPath) ||
+					pathString.StartsWith(kUserAddonsPath) ||
+					pathString.StartsWith(kUserBinPath) ||
+					pathString.StartsWith(kUserNonPackagedAddonsPath) ||
+					pathString.StartsWith(kUserNonPackagedBinPath) )
 				{
 					break;
 				}

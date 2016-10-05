@@ -26,6 +26,9 @@ private:
 	bool			fWatchingRoster;//will be true when roster is being watched
 	entry_ref		fTrueRef;
 	status_t		fTrueRefStatus;
+	BString			kSysAddonsPath, kSysBinPath, kSysPreferencesPath, kSysNonPackagedAddonsPath, kSysNonPackagedBinPath;
+	BString			kUserAddonsPath, kUserBinPath, kUserPreferencesPath, kUserNonPackagedAddonsPath, kUserNonPackagedBinPath;
+	BString			kPreferencesPath;
 };
 
 #endif

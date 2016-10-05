@@ -23,6 +23,31 @@ einsteinium_daemon::einsteinium_daemon()
 	find_directory(B_SYSTEM_BIN_DIRECTORY, &refPath);
 	refPath.Append("true");
 	fTrueRefStatus = get_ref_for_path(refPath.Path(), &fTrueRef);
+
+	//Get paths to ignore
+	BPath tempPath;
+	if( find_directory(B_SYSTEM_ADDONS_DIRECTORY, &tempPath) == B_OK)
+		kSysAddonsPath = tempPath.Path();
+	if( find_directory(B_SYSTEM_BIN_DIRECTORY, &tempPath) == B_OK)
+		kSysBinPath = tempPath.Path();
+	if( find_directory(B_SYSTEM_PREFERENCES_DIRECTORY, &tempPath) == B_OK)
+		kSysPreferencesPath = tempPath.Path();
+	if( find_directory(B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY, &tempPath) == B_OK)
+		kSysNonPackagedAddonsPath = tempPath.Path();
+	if( find_directory(B_SYSTEM_NONPACKAGED_BIN_DIRECTORY, &tempPath) == B_OK)
+		kSysNonPackagedBinPath = tempPath.Path();
+	if( find_directory(B_USER_ADDONS_DIRECTORY, &tempPath) == B_OK)
+		kUserAddonsPath = tempPath.Path();
+	if( find_directory(B_USER_BIN_DIRECTORY, &tempPath) == B_OK)
+		kUserBinPath = tempPath.Path();
+	if( find_directory(B_USER_PREFERENCES_DIRECTORY, &tempPath) == B_OK)
+		kUserPreferencesPath = tempPath.Path();
+	if( find_directory(B_USER_NONPACKAGED_ADDONS_DIRECTORY, &tempPath) == B_OK)
+		kUserNonPackagedAddonsPath = tempPath.Path();
+	if( find_directory(B_USER_NONPACKAGED_BIN_DIRECTORY, &tempPath) == B_OK)
+		kUserNonPackagedBinPath = tempPath.Path();
+	if( find_directory(B_PREFERENCES_DIRECTORY, &tempPath) == B_OK)
+		kPreferencesPath = tempPath.Path();
 }
 
 
@@ -123,13 +148,17 @@ einsteinium_daemon::MessageReceived(BMessage *msg)
 				//Automatically ignore binary commands, preferences, tracker addons
 				BPath path(&appEntry);
 				BString appPath(path.Path());
-				if(appPath.FindFirst(PATH_SYSTEM_BIN) == 0 ||
-					appPath.FindFirst(PATH_SYSTEM_PREFERENCES) == 0 ||
-					appPath.FindFirst(PATH_SYSTEM_TRACKER_ADDONS) == 0 ||
-					appPath.FindFirst(PATH_COMMON_BIN) == 0 ||
-					appPath.FindFirst(PATH_COMMON_TRACKER_ADDONS) == 0 ||
-					appPath.FindFirst(PATH_HOME_BIN) == 0 ||
-					appPath.FindFirst(PATH_HOME_TRACKER_ADDONS) == 0 )
+				if(appPath.StartsWith(kSysAddonsPath) ||
+					appPath.StartsWith(kSysBinPath) ||
+					appPath.StartsWith(kSysPreferencesPath) ||
+					appPath.StartsWith(kSysNonPackagedAddonsPath) ||
+					appPath.StartsWith(kSysNonPackagedBinPath) ||
+					appPath.StartsWith(kUserAddonsPath) ||
+					appPath.StartsWith(kUserBinPath) ||
+					appPath.StartsWith(kUserPreferencesPath) ||
+					appPath.StartsWith(kUserNonPackagedAddonsPath) ||
+					appPath.StartsWith(kUserNonPackagedBinPath) ||
+					appPath.StartsWith(kPreferencesPath) )
 				{
 					break;
 				}

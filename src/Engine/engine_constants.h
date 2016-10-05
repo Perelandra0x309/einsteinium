@@ -27,16 +27,6 @@
 #define ATTR_LAST_INTERVAL_NAME "EIN:LAST_INTERVAL"
 #define ATTR_TOTAL_RUNTIME_NAME "EIN:TOTAL_RUN_TIME"
 
-//Paths of executables to ignore by default
-#define PATH_SYSTEM_BIN "/boot/system/bin"
-#define PATH_SYSTEM_SERVERS "/boot/system/servers"
-#define PATH_SYSTEM_PREFERENCES "/boot/system/preferences"
-#define PATH_SYSTEM_TRACKER_ADDONS "/boot/system/add-ons/Tracker"
-#define PATH_COMMON_BIN "/boot/common/bin"
-#define PATH_COMMON_TRACKER_ADDONS "/boot/common/add-ons/Tracker"
-#define PATH_HOME_BIN "/boot/home/config/bin"
-#define PATH_HOME_TRACKER_ADDONS "/boot/home/config/add-ons/Tracker"
-
 //Quartile array indexes
 enum quartile_indexes
 {	Q_FIRST_LAUNCH_INDEX=0,
