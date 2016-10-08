@@ -27,7 +27,7 @@ fi
 
 # Copy bootscript to launch directory
 userBootDir=`finddir B_USER_BOOT_DIRECTORY`
-cp -af $dataDir/EinsteiniumBootscript.sh $userBootDir/launch
+cp -af $dataDir/Einsteinium/EinsteiniumBootscript.sh $userBootDir/launch
 
 # Notification to user
 notify --group Einsteinium --onClickApp application/x-vnd.Einsteinium_Launcher --timeout 60 --icon "$dataDir/Einsteinium/notify_icon" \
