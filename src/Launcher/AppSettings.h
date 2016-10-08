@@ -14,7 +14,7 @@ struct AppSettings {
 	float fontSize;
 	window_look windowLook;
 	BStringList exclusionsSignatureList;
-	bool subscribedToEngine;
+	bool subscribedToEngine, showDeskbarMenu;
 };
 
 struct ScaleSettings

@@ -30,12 +30,12 @@ ModifierMenuItem::DrawContent()
 			float width = Frame().Width()-50; //(ContentLocation().x + 39);
 			BFont font;
 			font.TruncateString(&truncLabel, B_TRUNCATE_END, width);
-			SetLabel(truncLabel);
+			SetLabel(truncLabel.String());
 			fRemoveEnabled = true;
 		}
 		else
 		{
-			SetLabel(fLabel);
+			SetLabel(fLabel.String());
 			fRemoveEnabled = false;
 		}
 		fLastModifier = modifier;
@@ -61,5 +61,5 @@ ModifierMenuItem::ResetModifiers()
 {
 	fLastModifier=0;
 	fRemoveEnabled=false;
-	SetLabel(fLabel);
+	SetLabel(fLabel.String());
 }

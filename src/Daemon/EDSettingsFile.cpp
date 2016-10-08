@@ -9,7 +9,7 @@ EDSettingsFile::EDSettingsFile(BHandler *messageHandler=NULL)
 	:
 	BHandler("name"),
 	fExternalMessageHandler(messageHandler),
-	fDefaultRelaunchAction(ACTION_PROMPT),
+	fDefaultRelaunchAction(ACTION_DEFAULT),
 	fInitStatus(B_ERROR)
 {
 	// find path for settings directory
@@ -35,11 +35,26 @@ EDSettingsFile::EDSettingsFile(BHandler *messageHandler=NULL)
 	// Settings file doesn't exist, create default settings file
 	if(!settingsEntry.Exists())
 	{
-		fSettingsList.AddItem(new AppRelaunchSettings("application/x-vnd.Be-input_server",
+		// look for legacy xml formatted settings file and convert if found
+		BPath legacySettingsPath;
+		fSettingsPath.GetParent(&legacySettingsPath);
+		legacySettingsPath.Append(ed_legacy_settings_file);
+		BEntry legacySettingsEntry(legacySettingsPath.Path());
+		if(legacySettingsEntry.Exists())
+		{
+			_ReadLegacyXMLSettingsFromFile(legacySettingsPath);
+			_WriteSettingsToFile(fSettingsPath);
+			if(settingsEntry.Exists())
+				legacySettingsEntry.Remove();
+		}
+		else
+		{
+			fSettingsList.AddItem(new AppRelaunchSettings("application/x-vnd.Be-input_server",
 					ACTION_AUTO));
-		fSettingsList.AddItem(new AppRelaunchSettings("application/x-vnd.Einsteinium_Launcher",
+			fSettingsList.AddItem(new AppRelaunchSettings("application/x-vnd.Einsteinium_Launcher",
 					ACTION_IGNORE));
-		_WriteSettingsToFile(fSettingsPath);
+			_WriteSettingsToFile(fSettingsPath);
+		}
 	}
 	settingsEntry.GetNodeRef(&fSettingsNodeRef);
 
@@ -69,7 +84,7 @@ EDSettingsFile::_StartWatching()
 {
 	status_t result = watch_node(&fSettingsNodeRef, B_WATCH_STAT, this, fWatchingLooper);
 	fWatchingSettingsNode = (result==B_OK);
-//	printf("Watching daemon settings node was %ssuccessful.\n", fWatchingSettingsNode? "": "not ");
+	printf("Watching daemon settings node was %ssuccessful.\n", fWatchingSettingsNode? "": "not ");
 }
 
 
@@ -78,14 +93,62 @@ EDSettingsFile::_StopWatching()
 {
 	if(fWatchingSettingsNode)//settings file is being watched
 	{	watch_node(&fSettingsNodeRef, B_STOP_WATCHING, this, fWatchingLooper);
-//		printf("Stopped watching daemon settings node\n");
+		printf("Stopped watching daemon settings node\n");
 		fWatchingSettingsNode = false;
 	}
 }
 
 
 status_t
-EDSettingsFile::_ReadSettingsFromFile(BPath file)
+EDSettingsFile::_ReadSettingsFromFile(BPath settingsPath)
+{
+	fInitStatus = B_ERROR;
+
+	//Read flattened BMessage
+	BFile settingsFile;
+	BMessage settings;
+	status_t result = settingsFile.SetTo(settingsPath.Path(), B_READ_ONLY);
+	if(result == B_OK)
+	{
+		settings.Unflatten(&settingsFile);
+	}
+	else
+		return B_ERROR;
+
+	//Delete existing list objects
+	AppRelaunchSettings *dummyPtr;
+	DeleteList(fSettingsList, dummyPtr);
+	fSettingsList.MakeEmpty();
+
+	//deafult launch action
+	fDefaultRelaunchAction = settings.GetInt8(ED_HMFL_PROPERTY_DEFAULT_RELAUNCH, ACTION_DEFAULT);
+
+	//specific app launch settings
+	int32 itemCount=0;
+	int8 action;
+	BString signature;
+	result = settings.GetInfo(ED_HMFL_PROPERTY_SIGNATURE, NULL, &itemCount);
+
+	if(result == B_OK)
+	{
+		AppRelaunchSettings *appSettings;
+		int index;
+		for(index=0; index<itemCount; index++)
+		{
+			signature = settings.GetString(ED_HMFL_PROPERTY_SIGNATURE, index, "not found");
+			action = settings.GetInt8(ED_HMFL_PROPERTY_RELAUNCH, index, ACTION_DEFAULT);
+			appSettings = new AppRelaunchSettings(signature.String(), action);
+			fSettingsList.AddItem(appSettings);
+		}
+	}
+
+	fInitStatus = B_OK;
+	return fInitStatus;
+}
+
+
+status_t
+EDSettingsFile::_ReadLegacyXMLSettingsFromFile(BPath settingsPath)
 {
 	fInitStatus = B_ERROR;
 
@@ -98,7 +161,7 @@ EDSettingsFile::_ReadSettingsFromFile(BPath file)
 	xmlDocPtr doc;
 	xmlNodePtr cur;
 
-	doc = xmlParseFile(file.Path());
+	doc = xmlParseFile(settingsPath.Path());
 	if (doc == NULL ) {
 		fprintf(stderr,"Einsteinium Daemon settings not parsed successfully. \n");
 		return fInitStatus;
@@ -179,6 +242,32 @@ EDSettingsFile::_TranslateRelaunchXML(xmlChar *value)
 }
 
 
+status_t
+EDSettingsFile::_WriteSettingsToFile(BPath settingsPath)
+{
+	BMessage settings;
+
+	//deafult launch setting
+	settings.AddInt8(ED_HMFL_PROPERTY_DEFAULT_RELAUNCH, fDefaultRelaunchAction);
+
+	// Write each app settings
+	AppRelaunchSettings *appSettings = NULL;
+	int index = 0, count = fSettingsList.CountItems();
+	for(index=0; index<count; index++)
+	{
+		appSettings = static_cast<AppRelaunchSettings *>(fSettingsList.ItemAt(index));
+		settings.AddString(ED_HMFL_PROPERTY_SIGNATURE, appSettings->appSig);
+		settings.AddInt8(ED_HMFL_PROPERTY_RELAUNCH, appSettings->relaunchAction);
+	}
+
+	// Save file
+//	_StopWatching();
+	BFile settingsFile(fSettingsPath.Path(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
+	settings.Flatten(&settingsFile);
+//	_StartWatching();
+}
+
+/*
 status_t
 EDSettingsFile::_WriteSettingsToFile(BPath file)
 {
@@ -287,7 +376,7 @@ EDSettingsFile::_WriteSettingsToFile(BPath file)
 	xmlSaveFormatFile (file.Path(), doc, 1);
 	xmlFreeDoc(doc);
 	xmlCleanupParser();
-}
+}*/
 
 
 void

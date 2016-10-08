@@ -25,6 +25,10 @@ The Launcher application could not be found."
 	exit 0
 fi
 
+# Copy bootscript to launch directory
+userBootDir=`finddir B_USER_BOOT_DIRECTORY`
+cp -af $dataDir/EinsteiniumBootscript.sh $userBootDir/launch
+
 # Notification to user
 notify --group Einsteinium --onClickApp application/x-vnd.Einsteinium_Launcher --timeout 60 --icon "$dataDir/Einsteinium/notify_icon" \
 "Thank you for installing Einsteinium.  Click on this message to open the Launcher application."

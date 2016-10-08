@@ -54,10 +54,12 @@ SettingsWindow::MessageReceived(BMessage* msg)
 
 		case EL_APP_ICON_OPTION_DRAG:
 		case EL_DOC_ICON_OPTION_DRAG:
+		case EL_DESKBAR_OPTION_CHANGED:
 		{
 			fLayoutView->MessageReceived(msg);
 			break;
 		}
+
 		default:
 			BWindow::MessageReceived(msg);
 	}

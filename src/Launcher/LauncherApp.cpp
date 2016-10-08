@@ -47,10 +47,10 @@ LauncherApp::LauncherApp()
 		fAppSettings.fontSize = fSettingsFile->GetFontSize();
 		fAppSettings.windowLook = fSettingsFile->GetWindowLook();
 		mainWindowRect = fSettingsFile->GetWindowFrame();
-		if(mainWindowRect.IsValid() && mainWindowRect.Width()!=0 && mainWindowRect.Height()!=0)
+	//	if(mainWindowRect.IsValid() && mainWindowRect.Width()!=0 && mainWindowRect.Height()!=0)
 			frameResult=B_OK;
-		else
-			mainWindowRect.Set(0,0,200,400);
+	//	else
+	//		mainWindowRect.Set(0,0,200,400);
 
 		// App rank scales settings
 		fSettingsFile->GetScales(&scaleSettings);
@@ -58,6 +58,9 @@ LauncherApp::LauncherApp()
 		// App exclusion settings
 		appExclusions = fSettingsFile->GetExclusionsList();
 		_CreateExclusionsSignatureList(&appExclusions);
+
+		//Deskbar menu
+		fAppSettings.showDeskbarMenu = fSettingsFile->GetShowDeskbarMenu();
 	}
 
 	// Create Windows
@@ -75,11 +78,11 @@ LauncherApp::LauncherApp()
 bool
 LauncherApp::QuitRequested()
 {
+	fSettingsFile->SaveWindowFrame(fWindow->Frame());
 	// Unsubscribe from the Einsteinium Engine
 	_UnsubscribeFromEngine();
 	delete fSettingsFile;
 	fSettingsFile = NULL;
-//	_ShowShelfView(false);
 
 	return true;
 }
@@ -114,6 +117,9 @@ LauncherApp::ReadyToRun()
 		engineAlert->Go(new BInvoker(runMessage, this));
 
 	}
+
+	// Create shelf view
+	_ShowShelfView(fAppSettings.showDeskbarMenu);
 }
 
 
@@ -185,6 +191,12 @@ LauncherApp::MessageReceived(BMessage* msg)
 			_SaveSettingsToFile(EL_LOOK_OPTION_CHANGED);
 			break;
 		}
+		case EL_DESKBAR_OPTION_CHANGED: {
+			fSettingsWindow->PopulateAppSettings(&fAppSettings);
+			_SaveSettingsToFile(msg->what);
+			_ShowShelfView(fAppSettings.showDeskbarMenu);
+			break;
+		}
 	/*	case FLOAT_OPTION_CHANGED: {
 			window_feel feel = fSettings->GetFloat();
 			fWindow->Lock();
@@ -235,11 +247,11 @@ LauncherApp::MessageReceived(BMessage* msg)
 			be_app->PostMessage(EL_UPDATE_RECENT_LISTS);
 			break;
 		}
-		case EL_WINDOW_MOVED:
+/*		case EL_WINDOW_MOVED:
 		{
 			fSettingsFile->SaveWindowFrame(fWindow->Frame());
 			break;
-		}
+		}*/
 		case EL_HIDE_APP:
 		{
 			if(!fSettingsWindow->IsHidden())
@@ -311,7 +323,7 @@ LauncherApp::_CreateExclusionsSignatureList(BMessage *exclusions)
 }
 
 
-/*
+
 void
 LauncherApp::_ShowShelfView(bool showShelfView)
 {
@@ -328,7 +340,7 @@ LauncherApp::_ShowShelfView(bool showShelfView)
 	{
 		deskbar.RemoveItem(EL_SHELFVIEW_NAME);
 	}
-}*/
+}
 
 
 void
@@ -374,6 +386,11 @@ LauncherApp::_SaveSettingsToFile(uint32 what)
 		case EL_LOOK_OPTION_CHANGED:
 		{
 			fSettingsFile->SaveWindowLook(fAppSettings.windowLook);
+			break;
+		}
+		case EL_DESKBAR_OPTION_CHANGED:
+		{
+			fSettingsFile->SaveShowDeskbarMenu(fAppSettings.showDeskbarMenu);
 			break;
 		}
 	/*	case FLOAT_OPTION_CHANGED:

@@ -15,6 +15,7 @@ LauncherSettingsFile::LauncherSettingsFile(BHandler *messageHandler=NULL)
 	fLastScale(DEFAULT_VALUE_LAST_SCALE),
 	fIntervalScale(DEFAULT_VALUE_INTERVAL_SCALE),
 	fRuntimeScale(DEFAULT_VALUE_RUNTIME_SCALE),
+	fShowDeskbarMenu(DEFAULT_VALUE_SHOW_DESKBAR_MENU),
 	fAppCount(DEFAULT_VALUE_RECENT_COUNT),
 	fExclusionsList(EL_MESSAGE_WHAT_EXCLUDED_APPS),
 	fLaunchEngineOnStart(DEFAULT_LAUNCH_ENGINE_ON_START),
@@ -49,28 +50,44 @@ LauncherSettingsFile::LauncherSettingsFile(BHandler *messageHandler=NULL)
 	// create path for settings file
 	fSettingsPath.Append(el_settings_file);
 	BEntry settingsEntry(fSettingsPath.Path());
-	if(!settingsEntry.Exists())
-	{
-		//settings file doesn't exist, create default file
-		fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, e_launcher_sig);
-		fExclusionsList.AddString(EL_EXCLUDE_NAME, "Einsteinium_Launcher");
-		fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, e_daemon_sig);
-		fExclusionsList.AddString(EL_EXCLUDE_NAME, "einsteinium_daemon");
-		fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, e_engine_sig);
-		fExclusionsList.AddString(EL_EXCLUDE_NAME, "einsteinium_engine");
-		fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, e_preferences_sig);
-		fExclusionsList.AddString(EL_EXCLUDE_NAME, "Einsteinium_Preferences");
-		fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, "application/x-vnd.Be-TSKB");
-		fExclusionsList.AddString(EL_EXCLUDE_NAME, "Deskbar");
-		fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, "application/x-vnd.Be-TRAK");
-		fExclusionsList.AddString(EL_EXCLUDE_NAME, "Tracker");
-
-		_WriteSettingsToFile();
-	}
-	else
+	if(settingsEntry.Exists())
 	{
 		_ReadSettingsFromFile(fSettingsPath);
 	}
+	else
+	{
+		// look for legacy xml formatted settings file and convert if found
+		BPath legacySettingsPath;
+		fSettingsPath.GetParent(&legacySettingsPath);
+		legacySettingsPath.Append(el_legacy_settings_file);
+		BEntry legacySettingsEntry(legacySettingsPath.Path());
+		if(legacySettingsEntry.Exists())
+		{
+			_ReadLegacyXMLSettingsFromFile(legacySettingsPath);
+			_WriteSettingsToFile();
+			if(settingsEntry.Exists())
+				legacySettingsEntry.Remove();
+		}
+		//settings files don't exist, create default file
+		else
+		{
+			fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, e_launcher_sig);
+			fExclusionsList.AddString(EL_EXCLUDE_NAME, "Einsteinium_Launcher");
+			fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, e_daemon_sig);
+			fExclusionsList.AddString(EL_EXCLUDE_NAME, "einsteinium_daemon");
+			fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, e_engine_sig);
+			fExclusionsList.AddString(EL_EXCLUDE_NAME, "einsteinium_engine");
+			fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, e_preferences_sig);
+			fExclusionsList.AddString(EL_EXCLUDE_NAME, "Einsteinium_Preferences");
+			fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, "application/x-vnd.Be-TSKB");
+			fExclusionsList.AddString(EL_EXCLUDE_NAME, "Deskbar");
+			fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, "application/x-vnd.Be-TRAK");
+			fExclusionsList.AddString(EL_EXCLUDE_NAME, "Tracker");
+
+			_WriteSettingsToFile();
+		}
+	}
+
 	settingsEntry.GetNodeRef(&fSettingsNodeRef);
 
 	//Start the Looper running
@@ -95,7 +112,7 @@ void
 LauncherSettingsFile::_StartWatching(){
 	status_t error = watch_node(&fSettingsNodeRef, B_WATCH_STAT, this, fWatchingLooper);
 	fWatchingSettingsNode = (error==B_OK);
-/*	printf("Watching engine settings node was %ssuccessful.\n", fWatchingSettingsNode? "": "not ");
+/*	printf("Watching Launcher settings node was %ssuccessful.\n", fWatchingSettingsNode? "": "not ");
 	if(!fWatchingSettingsNode)
 		printf("Error=%i (B_BAD_VALUE=%i, B_NO_MEMORY=%i, B_ERROR=%i)\n",
 			error, B_BAD_VALUE, B_NO_MEMORY, B_ERROR);*/
@@ -113,13 +130,95 @@ LauncherSettingsFile::_StopWatching(){
 
 
 void
-LauncherSettingsFile::_ReadSettingsFromFile(BPath file)
+LauncherSettingsFile::_ReadSettingsFromFile(BPath settingsPath)
+{
+	BFile settingsFile;
+	BMessage settings;
+	status_t result = settingsFile.SetTo(settingsPath.Path(), B_READ_ONLY);
+	if(result == B_OK)
+	{
+		settings.Unflatten(&settingsFile);
+	}
+	else
+		return;
+
+	// engine auto launch
+	fLaunchEngineOnStart = settings.GetBool(EL_HMFL_PROPERTY_AUTOLAUNCH, DEFAULT_LAUNCH_ENGINE_ON_START);
+
+	// scale settings
+	fLaunchScale = settings.GetInt8(EL_HMFL_PROPERTY_LAUNCHES, DEFAULT_VALUE_LAUNCH_SCALE);
+	fFirstScale = settings.GetInt8(EL_HMFL_PROPERTY_FIRSTLAUNCH, DEFAULT_VALUE_FIRST_SCALE);
+	fLastScale = settings.GetInt8(EL_HMFL_PROPERTY_LASTLAUNCH, DEFAULT_VALUE_LAST_SCALE);
+	fIntervalScale = settings.GetInt8(EL_HMFL_PROPERTY_INTERVAL, DEFAULT_VALUE_INTERVAL_SCALE);
+	fRuntimeScale = settings.GetInt8(EL_HMFL_PROPERTY_RUNTIME, DEFAULT_VALUE_RUNTIME_SCALE);
+
+	// deskbar settings
+	fShowDeskbarMenu = settings.GetBool(EL_HMFL_PROPERTY_SHOWDESKBAR, DEFAULT_VALUE_SHOW_DESKBAR_MENU);
+
+	// layout settings
+	fAppCount = settings.GetInt8(EL_HMFL_PROPERTY_APPCOUNT, DEFAULT_VALUE_RECENT_COUNT);
+	fMinAppIconSize = settings.GetInt8(EL_HMFL_PROPERTY_MINAPP, 16);
+	fMaxAppIconSize = settings.GetInt8(EL_HMFL_PROPERTY_MAXAPP, kIconDefaultSize);
+	fDocIconSize = settings.GetInt8(EL_HMFL_PROPERTY_DOCICON, kIconDefaultSize);
+	fRecentDocCount = settings.GetInt8(EL_HMFL_PROPERTY_DOCCOUNT, DEFAULT_VALUE_RECENT_COUNT);
+	fRecentFolderCount = settings.GetInt8(EL_HMFL_PROPERTY_FOLDERCOUNT, DEFAULT_VALUE_RECENT_COUNT);
+	fRecentQueryCount = settings.GetInt8(EL_HMFL_PROPERTY_QUERYCOUNT, DEFAULT_VALUE_RECENT_COUNT);
+	fFontSize = settings.GetInt8(EL_HMFL_PROPERTY_FONTSIZE, 0);
+
+	// window settings
+	int8 intValue;
+	result = settings.FindInt8(EL_HMFL_PROPERTY_WINDOWLOOK, &intValue);
+	if(result == B_OK)
+	{
+		switch(intValue)
+		{
+			case 0:
+			{
+				fWindowLook = B_TITLED_WINDOW_LOOK;
+				break;
+			}
+			case 1:
+			{
+				fWindowLook = B_FLOATING_WINDOW_LOOK;
+				break;
+			}
+			case 2:
+			{
+				fWindowLook = B_MODAL_WINDOW_LOOK;
+				break;
+			}
+			case 3:
+			{
+				fWindowLook = B_BORDERED_WINDOW_LOOK;
+				break;
+			}
+		}
+	}
+	int16 windowLeft, windowTop, windowRight, windowBottom;
+	status_t result1 = settings.FindInt16(EL_HMFL_PROPERTY_WINDOWFRAMELEFT, &windowLeft);
+	status_t result2 = settings.FindInt16(EL_HMFL_PROPERTY_WINDOWFRAMETOP, &windowTop);
+	status_t result3 = settings.FindInt16(EL_HMFL_PROPERTY_WINDOWFRAMERIGHT, &windowRight);
+	status_t result4 = settings.FindInt16(EL_HMFL_PROPERTY_WINDOWFRAMEBOTTOM, &windowBottom);
+	if( (result1==B_OK) && (result2==B_OK) && (result3==B_OK) && (result4==B_OK) )
+		fWindowFrame.Set(windowLeft, windowTop, windowRight, windowBottom);
+
+	// exclusion settings
+	fExclusionsList.MakeEmpty();
+	BMessage exclusionsMessage;
+	result = settings.FindMessage(EL_HMFL_PROPERTY_APP_EXCLUSIONS, &exclusionsMessage);
+	if(result == B_OK)
+		fExclusionsList = exclusionsMessage;
+}
+
+
+void
+LauncherSettingsFile::_ReadLegacyXMLSettingsFromFile(BPath settingsPath)
 {
 	// Parse XML
 	xmlDocPtr doc;
 	xmlNodePtr cur;
 
-	doc = xmlParseFile(file.Path());
+	doc = xmlParseFile(settingsPath.Path());
 	if (doc == NULL ) {
 		fprintf(stderr,"Einsteinium Engine settings not parsed successfully. \n");
 		return;
@@ -173,8 +272,10 @@ LauncherSettingsFile::_ReadSettingsFromFile(BPath file)
 		// deskbar settings
 		if (!xmlStrcmp(cur->name, (const xmlChar *) EL_XMLTEXT_CHILD_NAME_DESKBAR))
 		{
-//			xmlChar *value = xmlGetProp(cur, (const xmlChar *) EL_XMLTEXT_PROPERTY_SHOW);
-//			fShowDeskbarMenu = strcmp("true", (char *)value)==0;
+			xmlChar *value = xmlGetProp(cur, (const xmlChar *) EL_XMLTEXT_PROPERTY_SHOW);
+			if(value){
+				fShowDeskbarMenu = strcmp("true", (char *)value)==0;
+			}
 			fAppCount = _XmlGetIntProp(cur, EL_XMLTEXT_PROPERTY_COUNT);
 		}
 		// layout settings
@@ -273,159 +374,70 @@ LauncherSettingsFile::_XmlGetIntProp(xmlNodePtr cur, char *name, int defaultValu
 	return intValue;
 }
 
-
 status_t
 LauncherSettingsFile::_WriteSettingsToFile()
 {
-	xmlDocPtr doc = NULL;
-	xmlNodePtr root_node = NULL, child1node = NULL, child2node = NULL;
-	xmlDtdPtr dtd = NULL;
+	BMessage settings;
 
-	BString launchChar, firstChar, lastChar, intervalChar, runtimeChar;
-	launchChar << fLaunchScale;
-	firstChar << fFirstScale;
-	lastChar << fLastScale;
-	intervalChar << fIntervalScale;
-	runtimeChar << fRuntimeScale;
-	BString minAppIconChar, maxAppIconChar, docIconChar, docCountChar, folderCountChar, queryCountChar, fontSizeChar;
-	minAppIconChar << fMinAppIconSize;
-	maxAppIconChar << fMaxAppIconSize;
-	docIconChar << fDocIconSize;
-	docCountChar << fRecentDocCount;
-	folderCountChar << fRecentFolderCount;
-	queryCountChar << fRecentQueryCount;
-	fontSizeChar << int(fFontSize);
-	BString windowLookChar;
-	switch(fWindowLook){
+	// engine auto launch
+	settings.AddBool(EL_HMFL_PROPERTY_AUTOLAUNCH, fLaunchEngineOnStart);
+
+	// scale settings
+	settings.AddInt8(EL_HMFL_PROPERTY_LAUNCHES, fLaunchScale);
+	settings.AddInt8(EL_HMFL_PROPERTY_FIRSTLAUNCH, fFirstScale);
+	settings.AddInt8(EL_HMFL_PROPERTY_LASTLAUNCH, fLastScale);
+	settings.AddInt8(EL_HMFL_PROPERTY_INTERVAL, fIntervalScale);
+	settings.AddInt8(EL_HMFL_PROPERTY_RUNTIME, fRuntimeScale);
+
+	// deskbar settings
+	settings.AddBool(EL_HMFL_PROPERTY_SHOWDESKBAR, fShowDeskbarMenu);
+
+	// layout settings
+	settings.AddInt8(EL_HMFL_PROPERTY_APPCOUNT, fAppCount);
+	settings.AddInt8(EL_HMFL_PROPERTY_MINAPP, fMinAppIconSize);
+	settings.AddInt8(EL_HMFL_PROPERTY_MAXAPP, fMaxAppIconSize);
+	settings.AddInt8(EL_HMFL_PROPERTY_DOCICON, fDocIconSize);
+	settings.AddInt8(EL_HMFL_PROPERTY_DOCCOUNT, fRecentDocCount);
+	settings.AddInt8(EL_HMFL_PROPERTY_FOLDERCOUNT, fRecentFolderCount);
+	settings.AddInt8(EL_HMFL_PROPERTY_QUERYCOUNT, fRecentQueryCount);
+	settings.AddInt8(EL_HMFL_PROPERTY_FONTSIZE, fFontSize);
+
+	// window settings
+	switch(fWindowLook)
+	{
 		case B_TITLED_WINDOW_LOOK:
 		{
-			windowLookChar << 0;
+			settings.AddInt8(EL_HMFL_PROPERTY_WINDOWLOOK, 0);
 			break;
 		}
 		case B_FLOATING_WINDOW_LOOK:
 		{
-			windowLookChar << 1;
+			settings.AddInt8(EL_HMFL_PROPERTY_WINDOWLOOK, 1);
 			break;
 		}
 		case B_MODAL_WINDOW_LOOK:
 		{
-			windowLookChar << 2;
+			settings.AddInt8(EL_HMFL_PROPERTY_WINDOWLOOK, 2);
 			break;
 		}
 		case B_BORDERED_WINDOW_LOOK:
 		{
-			windowLookChar << 3;
+			settings.AddInt8(EL_HMFL_PROPERTY_WINDOWLOOK, 3);
 			break;
 		}
 	}
-	BString frameLeftChar, frameTopChar, frameRightChar, frameBottomChar;
-	frameLeftChar << fWindowFrame.left;
-	frameTopChar << fWindowFrame.top;
-	frameRightChar << fWindowFrame.right;
-	frameBottomChar << fWindowFrame.bottom;
+	settings.AddInt16(EL_HMFL_PROPERTY_WINDOWFRAMELEFT, fWindowFrame.left);
+	settings.AddInt16(EL_HMFL_PROPERTY_WINDOWFRAMETOP, fWindowFrame.top);
+	settings.AddInt16(EL_HMFL_PROPERTY_WINDOWFRAMERIGHT, fWindowFrame.right);
+	settings.AddInt16(EL_HMFL_PROPERTY_WINDOWFRAMEBOTTOM, fWindowFrame.bottom);
 
-
-	BString autoLaunchValue;
-	if(fLaunchEngineOnStart)
-		autoLaunchValue.SetTo("true");
-	else
-		autoLaunchValue.SetTo("false");
-
-	BString countChar;
-	countChar << fAppCount;
-
-	//Creates a new document, a node and set it as a root node
-	doc = xmlNewDoc(BAD_CAST "1.0");
-	root_node = xmlNewNode(NULL, BAD_CAST EL_XMLTEXT_ROOT_NAME);
-	xmlDocSetRootElement(doc, root_node);
-	dtd = xmlCreateIntSubset(doc, BAD_CAST EL_XMLTEXT_ROOT_NAME, NULL, BAD_CAST "tree.dtd");
-
-	// write default link inclusion value
-/*	child1node = xmlNewChild(root_node, NULL, BAD_CAST EL_XMLTEXT_CHILD_NAME_INCLUSION, NULL);
-	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_INCLUSION_DEFAULT,
-				BAD_CAST fInclusionDefault.String() );
-	*/
-	// Automatically launch the Engine when Launcher starts
-	child1node = xmlNewChild(root_node, NULL, BAD_CAST EL_XMLTEXT_CHILD_NAME_ENGINE, NULL);
-	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_AUTOLAUNCH,
-				BAD_CAST autoLaunchValue.String() );
-
-	// write scale values
-	child1node = xmlNewChild(root_node, NULL, BAD_CAST EL_XMLTEXT_CHILD_NAME_RANK, NULL);
-	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_LAUNCHES,
-				BAD_CAST launchChar.String() );
-	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_FIRSTLAUNCH,
-				BAD_CAST firstChar.String() );
-	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_LASTLAUNCH,
-				BAD_CAST lastChar.String() );
-	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_INTERVAL,
-				BAD_CAST intervalChar.String() );
-	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_RUNTIME,
-				BAD_CAST runtimeChar.String() );
-
-	// write deskbar settings
-	child1node = xmlNewChild(root_node, NULL, BAD_CAST EL_XMLTEXT_CHILD_NAME_DESKBAR, NULL);
-//	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_SHOW,
-//				BAD_CAST showDeskbar.String() );
-	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_COUNT,
-				BAD_CAST countChar.String() );
-
-	// layout settings
-	child1node = xmlNewChild(root_node, NULL, BAD_CAST EL_XMLTEXT_CHILD_NAME_LAYOUT, NULL);
-	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_APPCOUNT,
-				BAD_CAST countChar.String() );
-	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_MINAPP,
-				BAD_CAST minAppIconChar.String() );
-	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_MAXAPP,
-				BAD_CAST maxAppIconChar.String() );
-	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_DOCICON,
-				BAD_CAST docIconChar.String() );
-	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_DOCCOUNT,
-				BAD_CAST docCountChar.String() );
-	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_FOLDERCOUNT,
-				BAD_CAST folderCountChar.String() );
-	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_QUERYCOUNT,
-				BAD_CAST queryCountChar.String() );
-	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_FONTSIZE,
-				BAD_CAST fontSizeChar.String() );
-
-	// window settings
-	child1node = xmlNewChild(root_node, NULL, BAD_CAST EL_XMLTEXT_CHILD_NAME_WINDOW, NULL);
-	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_WINDOWLOOK,
-				BAD_CAST windowLookChar.String() );
-	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_WINDOWFRAMELEFT,
-				BAD_CAST frameLeftChar.String() );
-	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_WINDOWFRAMETOP,
-				BAD_CAST frameTopChar.String() );
-	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_WINDOWFRAMERIGHT,
-				BAD_CAST frameRightChar.String() );
-	xmlNewProp(child1node, BAD_CAST EL_XMLTEXT_PROPERTY_WINDOWFRAMEBOTTOM,
-				BAD_CAST frameBottomChar.String() );
-
-	// Write excluded applications
-	child1node = xmlNewChild(root_node, NULL, BAD_CAST EL_XMLTEXT_CHILD_NAME_EXCLUSIONS, NULL);
-	type_code typeFound;
-	int32 signatureCount = 0;
-	status_t result1 = fExclusionsList.GetInfo(EL_EXCLUDE_SIGNATURE, &typeFound, &signatureCount);
-	BString sig, name;
-	for(int i=0; i<signatureCount; i++)
-	{
-		sig.SetTo("");
-		name.SetTo("");
-		fExclusionsList.FindString(EL_EXCLUDE_SIGNATURE, i, &sig);
-		fExclusionsList.FindString(EL_EXCLUDE_NAME, i, &name);
-		child2node = xmlNewChild(child1node, NULL, BAD_CAST EL_XMLTEXT_CHILD_NAME_APP, NULL);
-		xmlNewProp(child2node, BAD_CAST EL_XMLTEXT_PROPERTY_SIGNATURE,
-				BAD_CAST sig.String() );
-		xmlNewProp(child2node, BAD_CAST EL_XMLTEXT_PROPERTY_NAME,
-				BAD_CAST name.String() );
-	}
+	// exclusion settings
+	settings.AddMessage(EL_HMFL_PROPERTY_APP_EXCLUSIONS, &fExclusionsList);
 
 	// Save file
 	_StopWatching();
-	xmlSaveFormatFile(fSettingsPath.Path(), doc, 1);
-	xmlFreeDoc(doc);
-	xmlCleanupParser();
+	BFile settingsFile(fSettingsPath.Path(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
+	settings.Flatten(&settingsFile);
 	_StartWatching();
 
 	return B_OK;
@@ -445,7 +457,7 @@ LauncherSettingsFile::MessageReceived(BMessage *msg)
 						msg->FindInt32("device", &nref.device);
 						msg->FindInt64("node", &nref.node);
 						if(nref == fSettingsNodeRef)
-						{	printf("Engine settings file changed, loading new settings...\n");
+						{	printf("Launcher settings file changed, loading new settings...\n");
 							_ReadSettingsFromFile(fSettingsPath);
 							// Notify the external message handler if available
 							if(fExternalMessageHandler!=NULL)
@@ -551,12 +563,21 @@ LauncherSettingsFile::SaveDeskbarCount(int count)
 
 
 void
+LauncherSettingsFile::SaveShowDeskbarMenu(bool show)
+{
+	fShowDeskbarMenu = show;
+	_WriteSettingsToFile();
+}
+
+
+void
 LauncherSettingsFile::SaveExclusionsList(BMessage &exclusionsList)
 {
 	fExclusionsList.MakeEmpty();
 	fExclusionsList = exclusionsList;
 	_WriteSettingsToFile();
 }
+
 
 void
 LauncherSettingsFile::AddToExclusionsList(const char *signature, const char *name)

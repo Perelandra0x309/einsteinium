@@ -85,7 +85,7 @@ MainWindow::MessageReceived(BMessage* msg)
 	}
 }
 
-
+/*
 void
 MainWindow::FrameMoved(BPoint new_position)
 {
@@ -100,7 +100,7 @@ MainWindow::FrameResized(float new_width, float new_height)
 	BWindow::FrameResized(new_width, new_height);
 	be_app->PostMessage(EL_WINDOW_MOVED);
 }
-
+*/
 
 void
 MainWindow::SettingsChanged(uint32 what)

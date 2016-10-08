@@ -14,8 +14,8 @@ public:
 							MainWindow(BRect, window_look look);
 	virtual	bool			QuitRequested();
 	virtual void			MessageReceived(BMessage*);
-	virtual void			FrameMoved(BPoint new_position);
-	virtual void			FrameResized(float new_width, float new_height);
+//	virtual void			FrameMoved(BPoint new_position);
+//	virtual void			FrameResized(float new_width, float new_height);
 			void			SettingsChanged(uint32 what);
 			void			SelectDefaultTab();
 			void			BuildAppsListView(BMessage *msg);

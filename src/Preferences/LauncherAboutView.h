@@ -8,6 +8,7 @@
 #include <InterfaceKit.h>
 #include <GroupLayout.h>
 #include <LayoutBuilder.h>
+#include "prefs_constants.h"
 
 class LauncherAboutView : public BView {
 public:
@@ -15,8 +16,9 @@ public:
 	virtual void	AttachedToWindow();
 	virtual void	FrameResized(float width, float height);
 private:
-	BBox			*fAboutBox;
-	BTextView		*fAboutTextView;
+	BBox			*fAboutBox, *fSettingsBox;
+	BTextView		*fAboutTextView, *fSettingsTV;
+	BButton			*fSettingsButton;
 };
 
 #endif

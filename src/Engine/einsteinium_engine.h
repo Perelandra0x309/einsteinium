@@ -50,6 +50,8 @@ private:
 //	BMessageRunner	*fQuartileRunner;
 	const time_t	fEngineSession;//current session number
 	BList			fSubscribersList;
+	BString			kSysAddonsPath, kSysBinPath, kSysServersPath, kSysNonPackagedAddonsPath, kSysNonPackagedBinPath;
+	BString			kUserAddonsPath, kUserBinPath, kUserNonPackagedAddonsPath, kUserNonPackagedBinPath;
 	// functions
 	Subscriber*		_FindSubscriber(int32 uniqueID);
 	void			_DeleteSubscriber(Subscriber *subscriber);
