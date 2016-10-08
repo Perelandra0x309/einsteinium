@@ -12,11 +12,8 @@
 #include "EngineMaintenanceView.h"
 #include "EngineStatusView.h"
 #include "LauncherAboutView.h"
-//#include "LauncherDeskbarView.h"
-//#include "LauncherExclusionsView.h"
-//#include "LauncherRankingsView.h"
-//#include "LauncherSettingsFile.h"
 #include "engine_constants.h"
+#include "launcher_constants.h"
 
 
 class prefsWindow : public BWindow {
@@ -28,7 +25,6 @@ public:
 	virtual void			MessageReceived(BMessage*);
 
 private:
-//	scale_settings			fScales;
 	BView					*fMainView, *fEmptySettingsView, *fCurrentView;
 	BBox					*fAboutBox;
 	BTextView				*fAboutTextView;
@@ -36,27 +32,18 @@ private:
 	BListView				*fPrefsListView;
 	BScrollView				*fPrefsScrollView;
 	BitmapListItem			*fDaemonBLI, *fEngineBLI, *fLauncherBLI;
-	BStringItem				*fDAppLaunchSI, *fLRankSI, *fLExclusionsSI, *fLDeskbarSI, *fEMaintSI;
+	BStringItem				*fDAppLaunchSI, *fEMaintSI;
 	BList					fSettingsViews;
 	DaemonRelaunchView		*fDRelaunchView;
 	DaemonStatusView		*fDStatusView;
 	LauncherAboutView		*fLAboutView;
-//	LauncherRankingsView	*fLRankingsView;
-//	LauncherExclusionsView	*fLExclusionsView;
-//	LauncherDeskbarView		*fLDeskbarView;
 	EngineMaintenanceView	*fMaintenanceView;
 	EngineStatusView		*fEStatusView;
-//	LauncherSettingsFile	*fLauncherSettings;
 	AppRefFilter			*fAppFilter;
 	BFilePanel				*fAppsPanel;
 	void					_AddSettingsView(BListItem*, BView*);
 	void					_ReadAllSettings();
 	void					_ReadDaemonSettings();
-//	void					_ReadLauncherSettings();
-//	void					_WriteLauncherScaleSettings();
-//	void					_WriteLauncherListInclusionSetting();
-//	void					_WriteLauncherDeskbarSettings();
-//	void					_WriteLauncherExclusions();
 };
 
 #endif

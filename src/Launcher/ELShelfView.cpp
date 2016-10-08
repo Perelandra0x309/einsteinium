@@ -484,7 +484,5 @@ int MenuItemSortLabel(const void* item1, const void* item2)
 {
 	BString label1((*(IconMenuItem**)item1)->Label());//get first label
 	BString label2((*(IconMenuItem**)item2)->Label());//get second label
-	if(label1 < label2) return -1;//object1 should be after object2
-	else if(label1 > label2) return 1;//object1 should be before object2
-	else return 0;//both objects have the same value
+	return label1.ICompare(label2);
 }

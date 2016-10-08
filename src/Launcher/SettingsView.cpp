@@ -119,7 +119,7 @@ SettingsView::SettingsView(BRect size, AppSettings* settings)
 	fWindowLookMenu->AddItem(new BMenuItem("No Border", new BMessage(EL_LOOK_OPTION_CHANGED)));
 	fWindowLookMF = new BMenuField("Window Look Field", "Window look:", fWindowLookMenu);
 
-	fDeskbarShowCB = new BCheckBox("Show Deskbar Menu", new BMessage(EL_DESKBAR_OPTION_CHANGED));
+	fDeskbarShowCB = new BCheckBox("Show Deskbar App List", new BMessage(EL_DESKBAR_OPTION_CHANGED));
 
 //	fFloatCB = new BCheckBox("Float above all windows", new BMessage(FLOAT_OPTION_CHANGED));
 
@@ -136,6 +136,7 @@ SettingsView::SettingsView(BRect size, AppSettings* settings)
 		)
 		.Add(fMaxIconsizeS)
 		.Add(fMinIconsizeS)
+		.Add(fDeskbarShowCB)
 		.SetInsets(8,20,8,8)
 	;
 
@@ -173,7 +174,6 @@ SettingsView::SettingsView(BRect size, AppSettings* settings)
 			.Add(fWindowLookMF)
 			.AddGlue()
 		)
-		.Add(fDeskbarShowCB)
 		.SetInsets(8,20,8,8)
 	;
 

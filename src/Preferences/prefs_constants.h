@@ -10,13 +10,6 @@
 #define BORDER_SIZE 5
 static const rgb_color bg_color = {216,216,216,0};//grey background color
 
-//settings
-/*struct scale_settings
-{	int		launches_scale, first_launch_scale, last_launch_scale,
-			interval_scale, total_run_time_scale;
-
-};*/
-
 //Messages
 enum prefs_messages
 {	//Daemon settings messages
@@ -26,32 +19,16 @@ enum prefs_messages
 	ED_REMOVE_APPITEM,
 	ED_AUTO_RELAUNCH_CHANGED,
 //	ED_PROMPT_RELAUNCH_CHANGED,
-	//Engine settings messages
-
-	//Launcher settings messages
-/*	EL_LAUNCHES_SL_CHANGED,
-	EL_FIRST_SL_CHANGED,
-	EL_LAST_SL_CHANGED,
-	EL_INTERVAL_SL_CHANGED,
-	EL_RUNTIME_SL_CHANGED,
-//	EE_IGNORE_ATTR_CHANGED,
-	EL_EXCLUSION_SELECTION_CHANGED,
-	EL_LIST_INCLUSION_CHANGED,
-	EL_ADD_EXCLUSION,
-	EL_ADD_EXCLUSION_REF,
-	EL_REMOVE_EXCLUSION,
-	EL_DESKBAR_CHANGED,
-	EL_ENGINELAUNCH_CHANGED,*/
 	//app messages
 	PREFS_ITEM_CHANGED,
-//	EL_SAVE_RANKING,
 	E_RECALC_SCORES,
 	E_RECALC_QUARTS,
 	E_RESCAN_DATA,
 	//services
 	RESTART_SERVICE,
 	START_SERVICE,
-	STOP_SERVICE
+	STOP_SERVICE,
+	OPEN_LAUNCHER_SETTINGS
 
 };
 
