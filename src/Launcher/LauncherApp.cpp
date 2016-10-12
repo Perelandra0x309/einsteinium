@@ -71,7 +71,6 @@ LauncherApp::LauncherApp()
 //	fWindow->SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
 	if(frameResult != B_OK)
 		fWindow->CenterOnScreen();
-	fWindow->Show();
 }
 
 
@@ -117,6 +116,7 @@ LauncherApp::ReadyToRun()
 		engineAlert->Go(new BInvoker(runMessage, this));
 
 	}
+	fWindow->Show();
 
 	// Create shelf view
 	_ShowShelfView(fAppSettings.showDeskbarMenu);
@@ -134,6 +134,12 @@ LauncherApp::ArgvReceived(int32 argc, char** argv)
 		if(strcmp(argv[1],"-q")==0 || strcmp(argv[1],"--quit")==0)
 		{	fQuitRequested=true;
 		//	be_app->PostMessage(B_QUIT_REQUESTED);
+		}
+		//only create the deskbar shelfview according to settings, then quit
+		else if(strcmp(argv[1],"--prepdeskbar")==0)
+		{
+			_ShowShelfView(fAppSettings.showDeskbarMenu);
+			fQuitRequested=true;
 		}
 		//option is not recognized
 		else
