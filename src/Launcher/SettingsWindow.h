@@ -31,6 +31,7 @@ public:
 			void			SetAppExclusions(BMessage *exclusionsList);
 
 private:
+	BTabView				*fTabView;
 	SettingsView			*fLayoutView;
 	LauncherRankingsView	*fRankingView;
 	LauncherExclusionsView	*fExclusionsView;

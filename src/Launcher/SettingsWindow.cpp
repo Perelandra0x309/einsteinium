@@ -15,18 +15,17 @@ SettingsWindow::SettingsWindow(AppSettings* settings, ScaleSettings* scales,
 	fLayoutView = new SettingsView(bounds, settings);
 	fRankingView = new LauncherRankingsView(bounds, scales);
 	fExclusionsView = new LauncherExclusionsView(bounds, appExclusions);
-//	AddChild(fView);
-	BTabView *tabView = new BTabView("Settings", B_WIDTH_FROM_LABEL);
+	fTabView = new BTabView("Settings", B_WIDTH_FROM_LABEL);
 	BTab *guiTab = new BTab();
-	tabView->AddTab(fLayoutView, guiTab);
+	fTabView->AddTab(fLayoutView, guiTab);
 	BTab *rankTab = new BTab();
-	tabView->AddTab(fRankingView, rankTab);
+	fTabView->AddTab(fRankingView, rankTab);
 	BTab *exclusionsTab = new BTab();
-	tabView->AddTab(fExclusionsView, exclusionsTab);
+	fTabView->AddTab(fExclusionsView, exclusionsTab);
 
 	SetLayout(new BGroupLayout(B_VERTICAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL)
-		.Add(tabView)
+		.Add(fTabView)
 		.SetInsets(2, 2, 2, 2)
 	);
 
@@ -41,6 +40,7 @@ SettingsWindow::SettingsWindow(AppSettings* settings, ScaleSettings* scales,
 bool
 SettingsWindow::QuitRequested()
 {
+	fTabView->MakeFocus(true);
 	Hide();
 	return false;
 }

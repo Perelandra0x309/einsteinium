@@ -1,3 +1,9 @@
+Version 1.3.1
+Boot script self-deletes if it does not find Einsteinium package installed
+Launcher add deskbar menu on boot if deskbar setting enabled
+Changed list item colors to system defined colors
+Bug fix- some Launcher settings did not apply when closing the settings window
+
 Version 1.3.0
 Added the Launcher Deskbar menu
 Changed settings files from XML to flattened BMessages
