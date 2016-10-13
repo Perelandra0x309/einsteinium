@@ -13,7 +13,7 @@ DaemonRelaunchView::DaemonRelaunchView(BRect size)
 	BView(size, "Auto-Relaunch", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS),
 	fSelectedItem(NULL)
 {
-	SetViewColor(bg_color);
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	fAddAppB = new BButton("Add", "Add" B_UTF8_ELLIPSIS, new BMessage(ED_ADD_APPITEM));
 	fRemoveAppB = new BButton("Remove", "Remove", new BMessage(ED_REMOVE_APPITEM));
@@ -366,10 +366,12 @@ RelaunchAppItem::DrawItem(BView* owner, BRect item_rect, bool complete)
 	rgb_color color;
 	bool selected = IsSelected();
 	// Background redraw
-	if(selected)
-		color = selected_color;
-	else
-		color = owner->ViewColor();
+	if(selected) {
+		color = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
+	}
+	else {
+		color = ui_color(B_LIST_BACKGROUND_COLOR);
+	}
 	owner->SetLowColor(color);
 	owner->SetDrawingMode(B_OP_COPY);
 	if(selected || complete)

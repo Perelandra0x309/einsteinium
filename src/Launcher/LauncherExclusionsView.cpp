@@ -332,16 +332,19 @@ ExcludeItem::DrawItem(BView* owner, BRect item_rect, bool complete)
 	rgb_color color;
 	bool selected = IsSelected();
 	if(selected)
-		color = ui_color(B_MENU_SELECTED_BACKGROUND_COLOR);
+		color = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
 	else
-		color = owner->ViewColor();
+		color = ui_color(B_LIST_BACKGROUND_COLOR);
 	owner->SetLowColor(color);
 	owner->SetDrawingMode(B_OP_COPY);
 	if(selected || complete)
 	{	owner->SetHighColor(color);
 		owner->FillRect(item_rect);
 	}
-	owner->SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
+	if(IsSelected())
+		owner->SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
+	else
+		owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
 	BString text(fAppName);
 	text.Append(" (").Append(fAppSig).Append(")");
 	owner->DrawString(text.String(), BPoint(item_rect.left+5.0,item_rect.bottom - 2.0));

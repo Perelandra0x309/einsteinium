@@ -31,7 +31,7 @@ EngineStatusView::EngineStatusView(BRect size)
 	;
 
 	// Status Box
-	SetViewColor(bg_color);
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	BEntry serviceEntry = GetEntryFromSig(e_engine_sig);
 	if(serviceEntry.Exists())
 		fStatusBox = new SystemStatusBox("Engine Running Status", serviceEntry, e_engine_sig);

@@ -8,7 +8,6 @@
 /*	constant definitions and message commands */
 
 #define BORDER_SIZE 5
-static const rgb_color bg_color = {216,216,216,0};//grey background color
 
 //Messages
 enum prefs_messages
@@ -33,11 +32,8 @@ enum prefs_messages
 };
 
 //Colors
-const rgb_color enabled_color = {0,0,0,0};
-const rgb_color disabled_color = {100,100,100,0};
 const rgb_color auto_relaunch_color = {0, 100, 0, 0};
 const rgb_color prompt_relaunch_color = {0, 0, 150, 0};
 const rgb_color dontrelaunch_color = {150,0,0,0};
-const rgb_color selected_color = {178,178,178,255};
 
 #endif

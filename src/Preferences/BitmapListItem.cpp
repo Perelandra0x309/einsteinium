@@ -8,7 +8,8 @@
 BitmapListItem::BitmapListItem(const uint8 *iconBits, BRect iconRect,
 					const color_space colorSpace, const char *text)
 	:
-	BStringItem(text),
+	BListItem(),
+	fText(text),
 	fIcon(NULL)
 {
 	fIcon = new BBitmap(iconRect, colorSpace);
@@ -19,7 +20,8 @@ BitmapListItem::BitmapListItem(const uint8 *iconBits, BRect iconRect,
 
 BitmapListItem::BitmapListItem(const char *signature, const char *text)
 	:
-	BStringItem(text),
+	BListItem(),
+	fText(text),
 	fIcon(NULL)
 {
 	BEntry appEntry = GetEntryFromSig(signature);
@@ -89,54 +91,86 @@ BitmapListItem::_GetIcon(entry_ref entryRef)
 void
 BitmapListItem::DrawItem(BView *owner, BRect item_rect, bool complete)
 {
-	float offset_width = 0, offset_height = 0;
+	float offset_width = 0, offset_height = fFontAscent;
 	float listItemHeight = Height();
+	rgb_color backgroundColor;
 
-	if(IsSelected())
-	{
-		owner->SetHighColor(selected_color);
-		owner->FillRect(item_rect);
-		owner->SetHighColor(enabled_color);
+	//background
+	if(IsSelected()) {
+		backgroundColor = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
 	}
+	else {
+		backgroundColor = ui_color(B_LIST_BACKGROUND_COLOR);
+	}
+	owner->SetHighColor(backgroundColor);
+	owner->SetLowColor(backgroundColor);
+	owner->FillRect(item_rect);
 
-	// draw icon with the same offset for width and height
+	//icon
 	if (fIcon) {
-		offset_width = floor( (listItemHeight - fIconSize)/2) ;
+		float offsetMarginHeight = floor( (listItemHeight - fIconSize)/2);
+		float offsetMarginWidth = kIconInset;
 		owner->SetDrawingMode(B_OP_OVER);
-		owner->DrawBitmap(fIcon, BPoint(item_rect.left + offset_width, item_rect.top + offset_width));
+		owner->DrawBitmap(fIcon, BPoint(item_rect.left + offsetMarginWidth,
+							item_rect.top + offsetMarginHeight));
 		owner->SetDrawingMode(B_OP_COPY);
-		// calculate offsets for text
-		offset_width += fIconSize + offset_width + 1;
-		float iconSpacing = fIconSize + (2*kIconInset);
-		if(iconSpacing > fTextHeight)
-			offset_height += floor( (iconSpacing - fTextHeight)/2 );
+		offset_width += fIconSize + 2*kIconInset;
+	}
+	// no icon, give the text some margin space
+	else
+	{
+		offset_width += kTextInset;
 	}
 
-	// Draw text next to the icon
-	BRect textRect(item_rect);
-	textRect.left += offset_width;
-	textRect.top += offset_height;
-	BStringItem::DrawItem(owner, textRect, complete);
+	//text
+	if(listItemHeight > fTextOnlyHeight)
+		offset_height += floor( (listItemHeight - fTextOnlyHeight)/2 );
+			// center the text vertically
+	BPoint cursor(item_rect.left + offset_width, item_rect.top + offset_height + kTextInset);
+	if(IsSelected())
+		owner->SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
+	else
+		owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
+	owner->MovePenTo(cursor.x, cursor.y);
+	owner->DrawString(fText);
+
 }
 
 
 void
 BitmapListItem::Update(BView *owner, const BFont *font)
 {
-	BStringItem::Update(owner, font);
-
+	BListItem::Update(owner, font);
 	// Make sure there is enough space for the icon plus insets with smaller fonts
-	fTextHeight = Height();
-	float iconSpacing = fIconSize + (2*kIconInset);
-	if( iconSpacing > fTextHeight )
-		SetHeight(iconSpacing);
+	_UpdateHeight(font);
+}
+
+
+void
+BitmapListItem::_UpdateHeight(const BFont *font)
+{
+	font_height fontHeight;
+	font->GetHeight(&fontHeight);
+	fFontHeight = fontHeight.ascent + fontHeight.descent + fontHeight.leading;
+	fFontAscent = fontHeight.ascent;
+	fTextOnlyHeight = fFontHeight + 2*kTextInset;
+
+	if(fIcon) {
+		float iconSpacing = fIconSize + 2*kIconInset;
+		if(iconSpacing > fTextOnlyHeight)
+			SetHeight(iconSpacing);
+		else
+			SetHeight(fTextOnlyHeight);
+	}
+	else
+		SetHeight(fTextOnlyHeight);
 }
 
 
 float
 BitmapListItem::GetWidth(const BFont *font)
 {
-	float width = font->StringWidth(Text());
+	float width = font->StringWidth(fText);
 	if(fIcon)
 		width += fIconSize + (2*kIconInset);
 	return width;

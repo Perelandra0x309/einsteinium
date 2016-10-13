@@ -11,7 +11,7 @@ prefsWindow::prefsWindow(BRect size)
 	Lock();
 	BRect viewRect(Bounds());
 	fMainView = new BView(viewRect, "Background View", B_FOLLOW_ALL_SIDES, B_WILL_DRAW);
-	fMainView->SetViewColor(bg_color);
+	fMainView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(fMainView);
 
 
@@ -40,7 +40,7 @@ prefsWindow::prefsWindow(BRect size)
 
 	//Main about view
 	fEmptySettingsView = new BView(viewRect, "Empty SettingsView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW);
-	fEmptySettingsView->SetViewColor(bg_color);
+	fEmptySettingsView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fAboutBox = new BBox("About");
 	fAboutBox->SetLabel("About Einsteinium Preferences");
 	fAboutTextView = new BTextView("About text");

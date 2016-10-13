@@ -10,7 +10,7 @@
 #include "methods.h"
 #include "prefs_constants.h"
 
-class BitmapListItem : public BStringItem {
+class BitmapListItem : public BListItem {
 public:
 					BitmapListItem(const uint8 *iconBits, BRect iconRect,
 									const color_space colorSpace, const char *text);
@@ -21,9 +21,13 @@ public:
 	float			GetWidth(const BFont*);
 private:
 	static const float kIconInset = 2;
+	static const float kTextInset = 2;
+	BString			fText;
 	BBitmap			*fIcon;
+	float			fFontHeight, fFontAscent, fTextOnlyHeight;
 	float			fIconSize, fTextHeight;
 	void			_GetIcon(entry_ref entryRef);
+	void			_UpdateHeight(const BFont*);
 };
 
 #endif
