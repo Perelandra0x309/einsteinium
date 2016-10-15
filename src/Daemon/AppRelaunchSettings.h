@@ -8,6 +8,7 @@
 #include <StorageKit.h>
 #include <String.h>
 #include <Roster.h>
+#include <Catalog.h>
 #include "daemon_constants.h"
 
 

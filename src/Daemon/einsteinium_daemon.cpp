@@ -4,6 +4,8 @@
  */
 #include "einsteinium_daemon.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "BApplication(einsteinium_daemon.cpp)"
 
 einsteinium_daemon::einsteinium_daemon()
 	:
@@ -172,11 +174,10 @@ einsteinium_daemon::MessageReceived(BMessage *msg)
 				break;
 			// user wants to be prompted to restart app
 			if(actionToTake == ACTION_PROMPT)
-			{	BString alertS("Einsteinium Daemon Alert:\n\nThe application '");
-				alertS.Append(appSettings->name);
-				alertS.Append("' has quit.  Do you wish to restart this app?");
-				RememberChoiceAlert *alert = new RememberChoiceAlert("",alertS.String(), "No",
-					"Yes", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			{	BString alertS(B_TRANSLATE_COMMENT("Einsteinium Daemon Alert:\n\nThe application '%appName%' has quit.  Do you wish to restart this app?", "Don't translate %appName%"));
+				alertS.ReplaceFirst("%appName%", appSettings->name);
+				RememberChoiceAlert *alert = new RememberChoiceAlert("",alertS.String(), B_TRANSLATE("No"),
+					B_TRANSLATE("Yes"), NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 					// Custom Alert window to prompt for app restart.
 				BMessage *runMessage = new BMessage(ED_LAUNCH_APP);
 				runMessage->AddString("app_sig",sig);

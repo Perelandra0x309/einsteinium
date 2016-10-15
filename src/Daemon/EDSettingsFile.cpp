@@ -261,10 +261,8 @@ EDSettingsFile::_WriteSettingsToFile(BPath settingsPath)
 	}
 
 	// Save file
-//	_StopWatching();
 	BFile settingsFile(fSettingsPath.Path(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 	settings.Flatten(&settingsFile);
-//	_StartWatching();
 }
 
 /*

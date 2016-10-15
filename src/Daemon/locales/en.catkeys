@@ -1,0 +1,6 @@
+1	English	application/x-vnd.Einsteinium_Daemon	3924950264
+Always use the following choice:	RememberChoiceAlert.cpp		Always use the following choice:
+<Name not found>	AppRelaunchSettings.cpp	Keep first and last < >	<Name not found>
+No	BApplication(einsteinium_daemon.cpp)		No
+Einsteinium Daemon Alert:\n\nThe application '%appName%' has quit.  Do you wish to restart this app?	BApplication(einsteinium_daemon.cpp)	Don't translate %appName%	Einsteinium Daemon Alert:\n\nThe application '%appName%' has quit.  Do you wish to restart this app?
+Yes	BApplication(einsteinium_daemon.cpp)		Yes

@@ -8,6 +8,7 @@
 #include <AppKit.h>
 #include <InterfaceKit.h>
 #include <SupportKit.h>
+#include <Catalog.h>
 #include "daemon_constants.h"
 #include "EDSettingsFile.h"
 #include "RememberChoiceAlert.h"

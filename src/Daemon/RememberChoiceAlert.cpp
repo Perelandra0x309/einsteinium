@@ -4,6 +4,9 @@
  */
 #include "RememberChoiceAlert.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "RememberChoiceAlert.cpp"
+
 RememberChoiceAlert::RememberChoiceAlert(const char* title, const char* text,
 								const char* button0Label, const char* button1Label = NULL,
 								const char* button2Label = NULL,
@@ -14,7 +17,7 @@ RememberChoiceAlert::RememberChoiceAlert(const char* title, const char* text,
 {
 	fInvoker = NULL;
 	// Use the text view to add a check box to the alert
-	fRememberCB = new BCheckBox("Save Settings", "Always use the following choice:", NULL);
+	fRememberCB = new BCheckBox("Save Settings", B_TRANSLATE("Always use the following choice:"), NULL);
 	BTextView *textView = TextView();
 	BLayoutBuilder::Group<>(textView, B_VERTICAL, 0)
 		.AddGlue()

@@ -7,6 +7,7 @@
 
 #include <InterfaceKit.h>
 #include <LayoutBuilder.h>
+#include <Catalog.h>
 #include "daemon_constants.h"
 
 

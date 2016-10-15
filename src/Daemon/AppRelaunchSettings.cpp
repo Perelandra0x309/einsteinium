@@ -4,10 +4,13 @@
  */
 #include "AppRelaunchSettings.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "AppRelaunchSettings.cpp"
+
 AppRelaunchSettings::AppRelaunchSettings()
 	:
 	appPath(""),
-	name("<Name not found>"),
+	name(B_TRANSLATE_COMMENT("<Name not found>", "Keep first and last < >")),
 	relaunchAction(ACTION_PROMPT)
 {	}
 
@@ -24,7 +27,7 @@ AppRelaunchSettings::AppRelaunchSettings(AppRelaunchSettings* sourceSettings)
 AppRelaunchSettings::AppRelaunchSettings(const char *_signature, int _relaunch = ACTION_DEFAULT)
 	:
 	appPath(""),
-	name("<Name not found>")
+	name(B_TRANSLATE_COMMENT("<Name not found>", "Keep first and last < >"))
 {
 	appSig.SetTo(_signature);
 	relaunchAction = _relaunch;
@@ -44,7 +47,7 @@ AppRelaunchSettings::AppRelaunchSettings(const char *_signature, BPath _path,
 	int _relaunch = ACTION_DEFAULT)
 	:
 	appPath(""),
-	name("<Name not found>")
+	name(B_TRANSLATE_COMMENT("<Name not found>", "Keep first and last < >"))
 {
 	appSig.SetTo(_signature);
 	appPath.SetTo(_path.Path());
