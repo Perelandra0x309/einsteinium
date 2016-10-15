@@ -10,6 +10,7 @@
 #include <Application.h>
 #include <LayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
+#include <Catalog.h>
 #include "AppSettings.h"
 #include "launcher_constants.h"
 

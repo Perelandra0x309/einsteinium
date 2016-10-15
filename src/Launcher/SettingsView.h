@@ -10,6 +10,7 @@
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <LayoutBuilder.h>
+#include <Catalog.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "AppSettings.h"

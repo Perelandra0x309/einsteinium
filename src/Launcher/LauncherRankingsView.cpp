@@ -4,6 +4,9 @@
  */
 #include "LauncherRankingsView.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Settings 'Apps Ranking' tab"
+
 /*	Definitions and objects for the view to change settings for calculation
 	of app rank in the engine
 */
@@ -22,41 +25,41 @@ LauncherRankingsView::LauncherRankingsView(BRect size, ScaleSettings* scales)
 	_InitSlider(fLaunchesSl, EL_LAUNCHES_SL_CHANGED);
 	BBox *launchesBox = new BBox("Launches Box");
 	launchesBox->SetBorder(B_PLAIN_BORDER);
-	launchesBox->SetLabel("Total number of launches:");
+	launchesBox->SetLabel(B_TRANSLATE_COMMENT("Total number of launches:", "Box label"));
 	launchesBox->AddChild(fLaunchesSl);
 	fFirstSl = new BSlider("First Launch", "First Launch",
 							NULL, -5, 5, B_HORIZONTAL, B_TRIANGLE_THUMB);
 	_InitSlider(fFirstSl, EL_FIRST_SL_CHANGED);
 	BBox *firstBox = new BBox("First Box");
 	firstBox->SetBorder(B_PLAIN_BORDER);
-	firstBox->SetLabel("Date of very first launch:");
+	firstBox->SetLabel(B_TRANSLATE_COMMENT("Date of very first launch:", "Box label"));
 	firstBox->AddChild(fFirstSl);
 	fLastSl = new BSlider("Last Launch", "Last Launch",
 							NULL, -5, 5, B_HORIZONTAL, B_TRIANGLE_THUMB);
 	_InitSlider(fLastSl, EL_LAST_SL_CHANGED);
 	BBox *lastBox = new BBox("Last Box");
 	lastBox->SetBorder(B_PLAIN_BORDER);
-	lastBox->SetLabel("Date of most recent launch:");
+	lastBox->SetLabel(B_TRANSLATE_COMMENT("Date of most recent launch:", "Box label"));
 	lastBox->AddChild(fLastSl);
 	fIntervalSl = new BSlider("Interval", "Interval between last two launches",
 							NULL, -5, 5, B_HORIZONTAL, B_TRIANGLE_THUMB);
 	_InitSlider(fIntervalSl, EL_INTERVAL_SL_CHANGED);
 	BBox *intervalBox = new BBox("Interval Box");
 	intervalBox->SetBorder(B_PLAIN_BORDER);
-	intervalBox->SetLabel("Time lapsed between the last two launches:");
+	intervalBox->SetLabel(B_TRANSLATE_COMMENT("Time lapsed between the last two launches:", "Box label"));
 	intervalBox->AddChild(fIntervalSl);
 	fRuntimeSl = new BSlider("RunTime", "Total Running Time",
 							NULL, -5, 5, B_HORIZONTAL, B_TRIANGLE_THUMB);
 	_InitSlider(fRuntimeSl, EL_RUNTIME_SL_CHANGED);
 	BBox *runtimeBox = new BBox("Runtime Box");
 	runtimeBox->SetBorder(B_PLAIN_BORDER);
-	runtimeBox->SetLabel("Total lifetime running time:");
+	runtimeBox->SetLabel(B_TRANSLATE_COMMENT("Total lifetime running time:", "Box label"));
 	runtimeBox->AddChild(fRuntimeSl);
-	fSetB = new BButton("Set Button", "Save and Recalculate Ranks", new BMessage(EL_SAVE_RANKING));
-	fSetB->SetToolTip("Click this button once the sliders are at their proper values.\n"
-							"The Launcher menu will be updated with these new settings.");
+	fSetB = new BButton("Set Button", B_TRANSLATE_COMMENT("Save and Recalculate Ranks", "Button label"), new BMessage(EL_SAVE_RANKING));
+	fSetB->SetToolTip(B_TRANSLATE_COMMENT("Click this button once the sliders are at their proper values.\n"
+							"The Launcher menu will be updated with these new settings.", "Button tooltip"));
 	fSlidersBox = new BBox("Rank Sliders");
-	fSlidersBox->SetLabel("Application Ranking Weights");
+	fSlidersBox->SetLabel(B_TRANSLATE_COMMENT("Application Ranking Weights", "Box label"));
 
 	BGroupLayout *boxLayout = new BGroupLayout(B_VERTICAL, 5);
 	fSlidersBox->SetLayout(boxLayout);
@@ -163,7 +166,8 @@ LauncherRankingsView::_InitSlider(BSlider *slider, uint32 message)
 {
 	slider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	slider->SetHashMarkCount(11);
-	slider->SetLimitLabels("Decrease Rank","Increase Rank");
+	slider->SetLimitLabels(B_TRANSLATE_COMMENT("Decrease Rank", "Slider low text"),
+						B_TRANSLATE_COMMENT("Increase Rank", "Slider high text"));
 	slider->SetBarColor(kBarColor);
 	slider->UseFillColor(true, &kFillColor);
 	slider->SetModificationMessage(new BMessage(message));
@@ -174,31 +178,31 @@ LauncherRankingsView::_InitSlider(BSlider *slider, uint32 message)
 void
 LauncherRankingsView::_SetSliderScaleLabel(BSlider* sldr, int n)
 {
-	BString label, tooltip("This slider will set how much the application's final rank is determined by\n");
+	BString label, tooltip(B_TRANSLATE_COMMENT("This slider will set how much the application's final rank is determined by\n", "Slider tooltip part 1"));
 	if(sldr==fLaunchesSl)
 	{
-		label.SetTo("More launches will ");
-		tooltip.Append("the total number of times the application has been launched.");
+		label.SetTo(B_TRANSLATE_COMMENT("More launches will ", "Slider label part 1"));
+		tooltip.Append(B_TRANSLATE_COMMENT("the total number of times the application has been launched.", "Slider tooltip part 2"));
 	}
 	else if(sldr==fFirstSl)
 	{
-		label.SetTo("More recent dates will ");
-		tooltip.Append("the very first date and time the application was launched.");
+		label.SetTo(B_TRANSLATE_COMMENT("More recent dates will ", "Slider label part 1"));
+		tooltip.Append(B_TRANSLATE_COMMENT("the very first date and time the application was launched.", "Slider tooltip part 2"));
 	}
 	else if(sldr==fLastSl)
 	{
-		label.SetTo("More recent dates will ");
-		tooltip.Append("the most recent date and time the application was launched.");
+		label.SetTo(B_TRANSLATE_COMMENT("More recent dates will ", "Slider label part 1"));
+		tooltip.Append(B_TRANSLATE_COMMENT("the most recent date and time the application was launched.", "Slider tooltip part 2"));
 	}
 	else if(sldr==fIntervalSl)
 	{
-		label.SetTo("Shorter interval will ");
-		tooltip.Append("the length of time between the application's two most recent launches.");
+		label.SetTo(B_TRANSLATE_COMMENT("Shorter interval will ", "Slider label part 1"));
+		tooltip.Append(B_TRANSLATE_COMMENT("the length of time between the application's two most recent launches.", "Slider tooltip part 2"));
 	}
 	else if(sldr==fRuntimeSl)
 	{
-		label.SetTo("Higher runtime total will ");
-		tooltip.Append("the total cumulative running time of the application since its first launch.");
+		label.SetTo(B_TRANSLATE_COMMENT("Higher runtime total will ", "Slider label part 1"));
+		tooltip.Append(B_TRANSLATE_COMMENT("the total cumulative running time of the application since its first launch.", "Slider tooltip part 2"));
 	}
 	else
 		return;
@@ -206,57 +210,57 @@ LauncherRankingsView::_SetSliderScaleLabel(BSlider* sldr, int n)
 	{
 		case -5:
 		{
-			label.Append("very heavily decrease the rank");
+			label.Append(B_TRANSLATE_COMMENT("very heavily decrease the rank", "Slider label part 2"));
 			break;
 		}
 		case -4:
 		{
-			label.Append("heavily decrease the rank");
+			label.Append(B_TRANSLATE_COMMENT("heavily decrease the rank", "Slider label part 2"));
 			break;
 		}
 		case -3:
 		{
-			label.Append("moderately decrease the rank");
+			label.Append(B_TRANSLATE_COMMENT("moderately decrease the rank", "Slider label part 2"));
 			break;
 		}
 		case -2:
 		{
-			label.Append("slightly decrease the rank");
+			label.Append(B_TRANSLATE_COMMENT("slightly decrease the rank", "Slider label part 2"));
 			break;
 		}
 		case -1:
 		{
-			label.Append("minimally decrease the rank");
+			label.Append(B_TRANSLATE_COMMENT("minimally decrease the rank", "Slider label part 2"));
 			break;
 		}
 		case 0:
 		{
-			label.Append("have no effect");
+			label.Append(B_TRANSLATE_COMMENT("have no effect", "Slider label part 2"));
 			break;
 		}
 		case 1:
 		{
-			label.Append("minimally increase the rank");
+			label.Append(B_TRANSLATE_COMMENT("minimally increase the rank", "Slider label part 2"));
 			break;
 		}
 		case 2:
 		{
-			label.Append("slightly increase the rank");
+			label.Append(B_TRANSLATE_COMMENT("slightly increase the rank", "Slider label part 2"));
 			break;
 		}
 		case 3:
 		{
-			label.Append("moderately increase the rank");
+			label.Append(B_TRANSLATE_COMMENT("moderately increase the rank", "Slider label part 2"));
 			break;
 		}
 		case 4:
 		{
-			label.Append("heavily increase the rank");
+			label.Append(B_TRANSLATE_COMMENT("heavily increase the rank", "Slider label part 2"));
 			break;
 		}
 		case 5:
 		{
-			label.Append("very heavily increase the rank");
+			label.Append(B_TRANSLATE_COMMENT("very heavily increase the rank", "Slider label part 2"));
 			break;
 		}
 	}

@@ -7,6 +7,7 @@
 
 #include <InterfaceKit.h>
 #include <StringList.h>
+#include <Catalog.h>
 #include <fs_attr.h>
 #include "launcher_constants.h"
 #include "AppListItem.h"

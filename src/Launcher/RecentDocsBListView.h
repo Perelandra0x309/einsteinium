@@ -6,6 +6,7 @@
 #define EINSTEINIUM_LAUNCHER_RECDOCSBLISTVIEW_H
 
 #include <InterfaceKit.h>
+#include <Catalog.h>
 #include "launcher_constants.h"
 #include "DocListItem.h"
 #include "SuperTypeListItem.h"

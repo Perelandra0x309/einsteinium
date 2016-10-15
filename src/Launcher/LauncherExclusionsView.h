@@ -11,6 +11,7 @@
 #include <Roster.h>
 #include <LayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
+#include <Catalog.h>
 #include "AppRefFilter.h"
 #include "launcher_constants.h"
 #include "EngineSubscriber.h"

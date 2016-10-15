@@ -4,6 +4,8 @@
  */
 #include "LauncherExclusionsView.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Settings 'App Exclusions' tab"
 
 LauncherExclusionsView::LauncherExclusionsView(BRect size, BMessage *appExclusions)
 	:
@@ -35,9 +37,9 @@ LauncherExclusionsView::LauncherExclusionsView(BRect size, BMessage *appExclusio
 	// Subscribe to the engine to get a current list of applications.
 
 	// Buttons
-	fAddB = new BButton("Add", "Add" B_UTF8_ELLIPSIS, new BMessage(EL_ADD_EXCLUSION));
+	fAddB = new BButton("Add",B_TRANSLATE_COMMENT("Add" B_UTF8_ELLIPSIS, "Button label"), new BMessage(EL_ADD_EXCLUSION));
 	fAddB->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
-	fRemoveB = new BButton("Remove", "Remove", new BMessage(EL_REMOVE_EXCLUSION));
+	fRemoveB = new BButton("Remove", B_TRANSLATE_COMMENT("Remove", "Button label"), new BMessage(EL_REMOVE_EXCLUSION));
 	fRemoveB->SetEnabled(false);
 
 	// Create list for applications
@@ -46,13 +48,13 @@ LauncherExclusionsView::LauncherExclusionsView(BRect size, BMessage *appExclusio
 	fExclusionLView->SetSelectionMessage(new BMessage(EL_EXCLUSION_SELECTION_CHANGED));
 	fExclusionSView = new BScrollView("Attr List Scroll View", fExclusionLView, B_FOLLOW_ALL_SIDES, 0,
 								false, true);
-	fExclusionSView->SetToolTip("Applications in this list will be completely excluded from\n"
+	fExclusionSView->SetToolTip(B_TRANSLATE_COMMENT("Applications in this list will be completely excluded from\n"
 								"the Launcher deskbar menu.  Adding or removing applications\n"
-								"from this list will instantly update the Launcher.");
+								"from this list will instantly update the Launcher.", "List tooltip"));
 
 	// Inidividual app settings
 	fSettingsBox = new BBox("Exclusion Settings");
-	fSettingsBox->SetLabel("Exclude These Apps From The Launcher");
+	fSettingsBox->SetLabel(B_TRANSLATE_COMMENT("Exclude These Apps From The Launcher", "Box label"));
 
 	BGridLayout *boxLayout = new BGridLayout(5, 5);
 	fSettingsBox->SetLayout(boxLayout);
@@ -164,8 +166,8 @@ LauncherExclusionsView::AddExclusion(BMessage* refMsg)
 	else
 	{
 		BString text(srcRef.name);
-		text.Append(" does not have an application signature");
-		(new BAlert("",text,"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go(NULL);
+		text.Append(B_TRANSLATE_COMMENT(" does not have an application signature", "Alert message.  Note space needed as first character"));
+		(new BAlert("",text,B_TRANSLATE_COMMENT("OK", "Button label"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go(NULL);
 	}
 	delete[] buf;
 	Window()->Unlock();

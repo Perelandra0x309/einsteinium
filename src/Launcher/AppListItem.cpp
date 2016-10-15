@@ -4,12 +4,14 @@
  */
 #include "AppListItem.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "'Apps' list"
 
 AppListItem::AppListItem(BEntry entry, const char * sig, int iconSize)
 	:
 	BListItem(),
 //	fDrawTwoLines(false),
-	fRemoveName("Exclude "),
+	fRemoveName(B_TRANSLATE_COMMENT("Exclude ", "Include one space at the end of text")),
 	fInitStatus(B_ERROR)
 {
 	// Draw Settings

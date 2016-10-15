@@ -4,6 +4,8 @@
  */
 #include "ELShelfView.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Deskbar Menu"
 
 ELShelfView::ELShelfView()
 	:
@@ -342,10 +344,10 @@ ELShelfView::_BuildMenu(BMessage *message)
 		// The engine is not running
 		if(!_IsEngineRunning())
 		{
-			BMenuItem *menuItem1 = new BMenuItem("Warning:", NULL);
-			BMenuItem *menuItem2 = new BMenuItem("Einsteinium Engine is not running.", NULL);
-			BMenuItem *menuItem3 = new BMenuItem("Please start the Engine to populate", NULL);
-			BMenuItem *menuItem4 = new BMenuItem("this menu.", NULL);
+			BMenuItem *menuItem1 = new BMenuItem(B_TRANSLATE_COMMENT("Warning:", "Message (line 1) when Engine is not running"), NULL);
+			BMenuItem *menuItem2 = new BMenuItem(B_TRANSLATE_COMMENT("Einsteinium Engine is not running.", "Message (line 2) when Engine is not running"), NULL);
+			BMenuItem *menuItem3 = new BMenuItem(B_TRANSLATE_COMMENT("Please start the Engine to populate", "Message (line 3) when Engine is not running"), NULL);
+			BMenuItem *menuItem4 = new BMenuItem(B_TRANSLATE_COMMENT("this menu.", "Message (line 4) when Engine is not running"), NULL);
 			menuItem1->SetEnabled(false);
 			menuItem2->SetEnabled(false);
 			menuItem3->SetEnabled(false);
@@ -359,7 +361,7 @@ ELShelfView::_BuildMenu(BMessage *message)
 		// The engine is running but there were no applications in the subscription message
 		else
 		{
-			BMenuItem *menuItem1 = new BMenuItem("There are no applications to list.", NULL);
+			BMenuItem *menuItem1 = new BMenuItem(B_TRANSLATE_COMMENT("There are no applications to list.", "Menu text when there are no applications in deskbar menu"), NULL);
 			menuItem1->SetEnabled(false);
 			fMenu->AddItem(menuItem1);
 		}
@@ -369,13 +371,13 @@ ELShelfView::_BuildMenu(BMessage *message)
 	fMenu->AddSeparatorItem();
 	if(showStartEngineItem)
 	{
-		BMenuItem *menuItemStart = new BMenuItem("Start the Einsteinium Engine",
+		BMenuItem *menuItemStart = new BMenuItem(B_TRANSLATE_COMMENT("Start the Einsteinium Engine", "Deskbar menu option to start the Engine"),
 											new BMessage(EL_START_ENGINE));
 		fMenu->AddItem(menuItemStart);
 	}
-	fMenu->AddItem(new BMenuItem("Preferences"B_UTF8_ELLIPSIS,
+	fMenu->AddItem(new BMenuItem(B_TRANSLATE_COMMENT("Settings"B_UTF8_ELLIPSIS, "Deskbar menu option to open Launcher settings"),
 		new BMessage(EL_SHELFVIEW_OPENPREFS)));
-	fMenu->AddItem(new BMenuItem("Close Deskbar Menu", new BMessage(EL_SHELFVIEW_MENU_QUIT)));
+	fMenu->AddItem(new BMenuItem(B_TRANSLATE_COMMENT("Close Deskbar Menu", "Deskbar menu option"), new BMessage(EL_SHELFVIEW_MENU_QUIT)));
 
 	BMenuItem* item;
 	BMessage* msg;
@@ -396,8 +398,8 @@ ELShelfView::_CheckEngineStatus(bool showWarning = false)
 	// and the warning is not already showing
 	if (!engineIsRunning && showWarning && !fEngineAlertIsShowing) {
 		fEngineAlert = new BAlert("StartEngine",
-			"The Einsteinium Launcher has detected that the Engine is not running.  Would you like to start the Engine?",
-			"No", "Yes", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			B_TRANSLATE_COMMENT("The Einsteinium Launcher has detected that the Engine is not running.  Would you like to start the Engine?", "Alert window asking to start the Engine"),
+			B_TRANSLATE("No"), B_TRANSLATE("Yes"), NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		// Set the feel to FLOATING so that the alert does not block use of the Deskbar while showing
 		fEngineAlert->SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
 		BMessage *runMessage = new BMessage(EL_START_ENGINE_ALERT);
@@ -456,8 +458,8 @@ ELShelfView::_SubscribeFailed()
 {
 	// Show error message
 	BAlert *subscriptioneAlert = new BAlert("Subscription",
-			"The Einsteinium Launcher sent an invalid subscription to the Engine.  Please check your Launcher settings.",
-			"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+			B_TRANSLATE_COMMENT("The Einsteinium Launcher sent an invalid subscription to the Engine.  Please check your Launcher settings.", "Error message when Engine subscription fails"),
+			B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 	// Set the feel to FLOATING so that the alert does not block use of the Deskbar while showing
 	subscriptioneAlert->SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
 	subscriptioneAlert->Go(NULL);

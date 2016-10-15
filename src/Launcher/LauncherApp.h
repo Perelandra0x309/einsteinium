@@ -7,6 +7,7 @@
 
 #include <Application.h>
 #include <Notification.h>
+#include <Catalog.h>
 #include "launcher_constants.h"
 #include "ELShelfView.h"
 #include "LauncherSettingsFile.h"

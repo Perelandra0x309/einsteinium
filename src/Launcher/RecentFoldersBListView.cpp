@@ -4,6 +4,9 @@
  */
 #include "RecentFoldersBListView.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "'Folders & Queries' tab"
+
 RecentFoldersBListView::RecentFoldersBListView(BRect size)
 	:
 	RecentDocsBListView(size),
@@ -92,7 +95,7 @@ RecentFoldersBListView::BuildList(bool force=false)
 		{
 			fFolderSuperListItem = new SuperTypeListItem(&folderSuperType, settings->docIconSize);
 			if(fFolderSuperListItem->InitStatus()==B_OK)
-				fFolderSuperListItem->SetName("Folders");
+				fFolderSuperListItem->SetName(B_TRANSLATE_COMMENT("Folders", "Folders top parent item"));
 			else
 				fFolderSuperListItem = NULL;
 		}
@@ -106,7 +109,7 @@ RecentFoldersBListView::BuildList(bool force=false)
 		{
 			fQuerySuperListItem = new SuperTypeListItem(&querySuperType, settings->docIconSize);
 			if(fQuerySuperListItem->InitStatus()==B_OK)
-				fQuerySuperListItem->SetName("Queries");
+				fQuerySuperListItem->SetName(B_TRANSLATE_COMMENT("Queries", "Queries top parent item"));
 			else
 				fQuerySuperListItem = NULL;
 		}

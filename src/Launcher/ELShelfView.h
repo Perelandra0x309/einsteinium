@@ -13,6 +13,7 @@
 #include <Resources.h>
 #include <Roster.h>
 #include <StorageKit.h>
+#include <Catalog.h>
 #include <stdio.h>
 
 #include "EngineSubscriber.h"

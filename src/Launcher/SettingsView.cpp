@@ -4,6 +4,9 @@
  */
 #include "SettingsView.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Settings 'Layout' tab"
+
 SettingsView::SettingsView(BRect size, AppSettings* settings)
 	:
 	BView(size, "Layout", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
@@ -43,7 +46,7 @@ SettingsView::SettingsView(BRect size, AppSettings* settings)
 	fDocIconSizeMenu->AddItem(new BMenuItem("64", new BMessage(DOC_ICON_OPTION_CHANGED)));
 	fDocIconSizeMF = new BMenuField("Recent Docs Icon Size Field", "Recent documents icon size:", fDocIconSizeMenu);
 */
-	fAppsCountTC = new BTextControl("Show this many apps:", "",
+	fAppsCountTC = new BTextControl(B_TRANSLATE_COMMENT("Show this many apps:", "Input box label"), "",
 							new BMessage(EL_APP_COUNT_OPTION_CHANGED));
 	BTextView *textView = fAppsCountTC->TextView();
 	uint32 i;
@@ -53,7 +56,7 @@ SettingsView::SettingsView(BRect size, AppSettings* settings)
 	textView->SetMaxBytes(3);
 //	textView->SetExplicitMaxSize(BSize(be_plain_font->StringWidth("0000"), B_SIZE_UNSET));
 
-	fMaxIconsizeS = new BSlider("Max Icon Size", "Highest rank icon size:",
+	fMaxIconsizeS = new BSlider("Max Icon Size", B_TRANSLATE_COMMENT("Highest rank icon size:", "Slider label"),
 						NULL, 1, 8, B_HORIZONTAL, B_TRIANGLE_THUMB);
 	fMaxIconsizeS->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fMaxIconsizeS->SetHashMarkCount(8);
@@ -63,21 +66,21 @@ SettingsView::SettingsView(BRect size, AppSettings* settings)
 	fMaxIconsizeS->SetLimitLabels(minLabel.String(),maxLabel.String());
 	fMaxIconsizeS->SetModificationMessage(new BMessage(EL_APP_ICON_OPTION_DRAG));
 
-	fMinIconsizeS = new BSlider("Min Icon Size", "Lowest rank icon size:",
+	fMinIconsizeS = new BSlider("Min Icon Size", B_TRANSLATE_COMMENT("Lowest rank icon size:", "Slider label"),
 						NULL, 1, 8, B_HORIZONTAL, B_TRIANGLE_THUMB);
 	fMinIconsizeS->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fMinIconsizeS->SetHashMarkCount(8);
 	fMinIconsizeS->SetLimitLabels(minLabel.String(),maxLabel.String());
 	fMinIconsizeS->SetModificationMessage(new BMessage(EL_APP_ICON_OPTION_DRAG));
 
-	fDocIconsizeS = new BSlider("Doc Icon Size", "Recent files icon size:",
+	fDocIconsizeS = new BSlider("Doc Icon Size", B_TRANSLATE_COMMENT("Recent files icon size:", "Slider label"),
 						NULL, 1, 8, B_HORIZONTAL, B_TRIANGLE_THUMB);
 	fDocIconsizeS->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fDocIconsizeS->SetHashMarkCount(8);
 	fDocIconsizeS->SetLimitLabels(minLabel.String(),maxLabel.String());
 	fDocIconsizeS->SetModificationMessage(new BMessage(EL_DOC_ICON_OPTION_DRAG));
 
-	fRecentFilesCountTC = new BTextControl("Show this many recent files:", "",
+	fRecentFilesCountTC = new BTextControl(B_TRANSLATE_COMMENT("Show this many recent files:", "Input box label"), "",
 								new BMessage(EL_DOC_COUNT_OPTION_CHANGED));
 	textView = fRecentFilesCountTC->TextView();
 	for (i=0; i<256; i++) textView->DisallowChar(i);
@@ -85,7 +88,7 @@ SettingsView::SettingsView(BRect size, AppSettings* settings)
 	textView->AllowChar(B_BACKSPACE);
 	textView->SetMaxBytes(3);
 
-	fRecentFoldersCountTC = new BTextControl("Show this many recent folders:", "",
+	fRecentFoldersCountTC = new BTextControl(B_TRANSLATE_COMMENT("Show this many recent folders:", "Input box label"), "",
 								new BMessage(EL_FOLDER_COUNT_OPTION_CHANGED));
 	textView = fRecentFoldersCountTC->TextView();
 	for (i=0; i<256; i++) textView->DisallowChar(i);
@@ -93,7 +96,7 @@ SettingsView::SettingsView(BRect size, AppSettings* settings)
 	textView->AllowChar(B_BACKSPACE);
 	textView->SetMaxBytes(3);
 
-	fRecentQueriesCountTC = new BTextControl("Show this many recent queries:", "",
+	fRecentQueriesCountTC = new BTextControl(B_TRANSLATE_COMMENT("Show this many recent queries:", "Input box label"), "",
 								new BMessage(EL_QUERY_COUNT_OPTION_CHANGED));
 	textView = fRecentQueriesCountTC->TextView();
 	for (i=0; i<256; i++) textView->DisallowChar(i);
@@ -102,7 +105,7 @@ SettingsView::SettingsView(BRect size, AppSettings* settings)
 	textView->SetMaxBytes(3);
 
 	fFontSizeMenu = new BPopUpMenu("Font Size Menu");
-	fFontSizeMenu->AddItem(new BMenuItem("System size", new BMessage(EL_FONT_OPTION_CHANGED)));
+	fFontSizeMenu->AddItem(new BMenuItem(B_TRANSLATE_COMMENT("System size", "First font menu item"), new BMessage(EL_FONT_OPTION_CHANGED)));
 	BString fontSize;
 	for(int i=8; i<25; i++)
 	{
@@ -110,23 +113,23 @@ SettingsView::SettingsView(BRect size, AppSettings* settings)
 		fontSize << i;
 		fFontSizeMenu->AddItem(new BMenuItem(fontSize.String(), new BMessage(EL_FONT_OPTION_CHANGED)));
 	}
-	fFontSizeMF = new BMenuField("Font Size Field", "Font size:", fFontSizeMenu);
+	fFontSizeMF = new BMenuField("Font Size Field", B_TRANSLATE_COMMENT("Font size:", "Menu label"), fFontSizeMenu);
 
 	fWindowLookMenu = new BPopUpMenu("Window Look Menu");
-	fWindowLookMenu->AddItem(new BMenuItem("Normal Title Bar", new BMessage(EL_LOOK_OPTION_CHANGED)));
-	fWindowLookMenu->AddItem(new BMenuItem("Small Title Bar", new BMessage(EL_LOOK_OPTION_CHANGED)));
-	fWindowLookMenu->AddItem(new BMenuItem("No Title Bar", new BMessage(EL_LOOK_OPTION_CHANGED)));
-	fWindowLookMenu->AddItem(new BMenuItem("No Border", new BMessage(EL_LOOK_OPTION_CHANGED)));
-	fWindowLookMF = new BMenuField("Window Look Field", "Window look:", fWindowLookMenu);
+	fWindowLookMenu->AddItem(new BMenuItem(B_TRANSLATE_COMMENT("Normal Title Bar", "Window look menu item"), new BMessage(EL_LOOK_OPTION_CHANGED)));
+	fWindowLookMenu->AddItem(new BMenuItem(B_TRANSLATE_COMMENT("Small Title Bar", "Window look menu item"), new BMessage(EL_LOOK_OPTION_CHANGED)));
+	fWindowLookMenu->AddItem(new BMenuItem(B_TRANSLATE_COMMENT("No Title Bar", "Window look menu item"), new BMessage(EL_LOOK_OPTION_CHANGED)));
+	fWindowLookMenu->AddItem(new BMenuItem(B_TRANSLATE_COMMENT("No Border", "Window look menu item"), new BMessage(EL_LOOK_OPTION_CHANGED)));
+	fWindowLookMF = new BMenuField("Window Look Field", B_TRANSLATE_COMMENT("Window look:", "Menu label"), fWindowLookMenu);
 
-	fDeskbarShowCB = new BCheckBox("Show Deskbar App List", new BMessage(EL_DESKBAR_OPTION_CHANGED));
+	fDeskbarShowCB = new BCheckBox(B_TRANSLATE_COMMENT("Show Deskbar App List", "Checkbox label"), new BMessage(EL_DESKBAR_OPTION_CHANGED));
 
-//	fFloatCB = new BCheckBox("Float above all windows", new BMessage(FLOAT_OPTION_CHANGED));
+//	fFloatCB = new BCheckBox(B_TRANSLATE_COMMENT("Float above all windows", "Checkbox label"), new BMessage(FLOAT_OPTION_CHANGED));
 
-//	fAboutB = new BButton("About", "About" B_UTF8_ELLIPSIS, new BMessage(B_ABOUT_REQUESTED));
+//	fAboutB = new BButton("About", B_TRANSLATE_COMMENT("About", "Button label") B_UTF8_ELLIPSIS, new BMessage(B_ABOUT_REQUESTED));
 
 	BBox *appsBox = new BBox("Apps");
-	appsBox->SetLabel("Apps");
+	appsBox->SetLabel(B_TRANSLATE_COMMENT("Apps", "Box label"));
 	BGroupLayout *appsBoxLayout = new BGroupLayout(B_VERTICAL);
 	appsBox->SetLayout(appsBoxLayout);
 	BLayoutBuilder::Group<>(appsBoxLayout)
@@ -141,7 +144,7 @@ SettingsView::SettingsView(BRect size, AppSettings* settings)
 	;
 
 	BBox *filesBox = new BBox("Recent Files");
-	filesBox->SetLabel("Files, Folders and Queries");
+	filesBox->SetLabel(B_TRANSLATE_COMMENT("Files, Folders and Queries", "Box label"));
 	BGroupLayout *filesBoxLayout = new BGroupLayout(B_VERTICAL);
 	filesBox->SetLayout(filesBoxLayout);
 	BLayoutBuilder::Group<>(filesBoxLayout)

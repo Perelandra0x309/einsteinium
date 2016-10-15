@@ -4,6 +4,8 @@
  */
 #include "LauncherApp.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Launcher application"
 
 /*bool IsEngineRunning(){
 	return ((LauncherApp *)be_app)->GetIsEngineRunning();
@@ -108,9 +110,9 @@ LauncherApp::ReadyToRun()
 //		notify.SetTitle("Einsteinium Engine not running");
 		notify.SetContent("The Apps list will be populated from Haiku's recent applications list.  Please start the Engine if you wish to use the Engine's app statitistics.");
 		notify.Send(10000000);*/
-		BString alertS("The Einsteinium Engine is not running.  Without the Engine the Launcher's Apps list will be populated from Haiku's recent applications list.  Do you wish to start the Engine now?");
-		BAlert *engineAlert = new BAlert("StartEngine",alertS.String(), "No",
-					"Yes", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		BString alertS(B_TRANSLATE_COMMENT("The Einsteinium Engine is not running.  Without the Engine the Launcher's Apps list will be populated from Haiku's recent applications list.  Do you wish to start the Engine now?", "Warning message when Engine is not running"));
+		BAlert *engineAlert = new BAlert("StartEngine",alertS.String(), B_TRANSLATE_COMMENT("No", "Alert button label"),
+					B_TRANSLATE_COMMENT("Yes", "Alert button label"), NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		engineAlert->SetFeel(B_FLOATING_APP_WINDOW_FEEL);
 		BMessage *runMessage = new BMessage(EL_START_ENGINE_ALERT);
 		engineAlert->Go(new BInvoker(runMessage, this));
@@ -444,8 +446,8 @@ LauncherApp::_SubscribeFailed()
 	fAppSettings.subscribedToEngine=false;
 	// Show error message
 	BAlert *subscriptioneAlert = new BAlert("Subscription",
-			"The Einsteinium Launcher sent an invalid subscription to the Engine.  Please check your Launcher settings.",
-			"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+			B_TRANSLATE_COMMENT("The Einsteinium Launcher sent an invalid subscription to the Engine.  Please check your Launcher settings.", "Failed subscription warning message"),
+			B_TRANSLATE_COMMENT("OK", "Button label"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 	// Set the feel to FLOATING so that the alert does not block use of the Deskbar while showing
 	subscriptioneAlert->SetFeel(B_FLOATING_APP_WINDOW_FEEL);
 	subscriptioneAlert->Go(NULL);

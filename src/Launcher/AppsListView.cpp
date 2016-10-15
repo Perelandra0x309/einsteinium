@@ -4,6 +4,9 @@
  */
 #include "AppsListView.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "'Apps' list"
+
 AppsListView::AppsListView(BRect size)
 	:
 	BListView(size, "Apps List", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES),
@@ -503,12 +506,12 @@ AppsListView::_InitPopUpMenu(int32 selectedIndex)
 		fMenu = new LPopUpMenu(B_EMPTY_STRING);
 		fStartStopMI = new BMenuItem("Start", new BMessage());
 		fMenu->AddItem(fStartStopMI);
-		fTrackerMI = new BMenuItem("Show in Tracker", new BMessage(EL_SHOW_IN_TRACKER));
+		fTrackerMI = new BMenuItem(B_TRANSLATE_COMMENT("Show in Tracker", "Application pop-up menu"), new BMessage(EL_SHOW_IN_TRACKER));
 		fMenu->AddItem(fTrackerMI);
-		fRemoveMI = new BMenuItem("Exclude from Apps list", new BMessage(EL_ADD_APP_EXCLUSION));
+		fRemoveMI = new BMenuItem(B_TRANSLATE_COMMENT("Exclude from Apps list", "Application pop-up menu"), new BMessage(EL_ADD_APP_EXCLUSION));
 		fMenu->AddItem(fRemoveMI);
 		fMenu->AddSeparatorItem();
-		fSettingsMI = new BMenuItem("Settings" B_UTF8_ELLIPSIS, new BMessage(EL_SHOW_SETTINGS));
+		fSettingsMI = new BMenuItem(B_TRANSLATE_COMMENT("Settings" B_UTF8_ELLIPSIS, "Application pop-up menu"), new BMessage(EL_SHOW_SETTINGS));
 		fMenu->AddItem(fSettingsMI);
 	//	fMenu->SetTargetForItems(this);
 		fStartStopMI->SetTarget(this);
@@ -522,12 +525,12 @@ AppsListView::_InitPopUpMenu(int32 selectedIndex)
 		bool isRunning = selectedItem->IsRunning();
 		if(isRunning)
 		{
-			fStartStopMI->SetLabel("Quit");
+			fStartStopMI->SetLabel(B_TRANSLATE_COMMENT("Quit", "Application pop-up menu"));
 			fStartStopMI->Message()->what = EL_STOP_SERVICE;
 		}
 		else
 		{
-			fStartStopMI->SetLabel("Launch");
+			fStartStopMI->SetLabel(B_TRANSLATE_COMMENT("Launch", "Application pop-up menu"));
 			fStartStopMI->Message()->what = EL_START_SERVICE;
 		}
 		BMessage *message = fRemoveMI->Message();
@@ -536,7 +539,6 @@ AppsListView::_InitPopUpMenu(int32 selectedIndex)
 		message->AddString(EL_EXCLUDE_NAME, selectedItem->GetName());
 	}
 }
-
 
 
 void

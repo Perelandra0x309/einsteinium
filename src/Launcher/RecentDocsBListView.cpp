@@ -4,6 +4,9 @@
  */
 #include "RecentDocsBListView.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "'Files' tab"
+
 RecentDocsBListView::RecentDocsBListView(BRect size)
 	:
 	BOutlineListView(size, "Files List", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES),
@@ -520,7 +523,7 @@ RecentDocsBListView::_GetGenericSuperItem(int docIconSize)
 		}
 		else
 		{
-			fGenericSuperItem->SetName("Unknown type");
+			fGenericSuperItem->SetName(B_TRANSLATE_COMMENT("Unknown type", "Label for unknown document type"));
 //			AddItem(fGenericSuperItem);
 		}
 	}
@@ -564,8 +567,8 @@ RecentDocsBListView::_InitPopUpMenu(int32 selectedIndex)
 	if(fMenu==NULL)
 	{
 		fMenu = new LPopUpMenu(B_EMPTY_STRING);
-		fTrackerMI = new BMenuItem("Show in Tracker", new BMessage(EL_SHOW_IN_TRACKER));
-		fSettingsMI = new BMenuItem("Settings" B_UTF8_ELLIPSIS, new BMessage(EL_SHOW_SETTINGS));
+		fTrackerMI = new BMenuItem(B_TRANSLATE_COMMENT("Show in Tracker", "Popup menu option"), new BMessage(EL_SHOW_IN_TRACKER));
+		fSettingsMI = new BMenuItem(B_TRANSLATE_COMMENT("Settings" B_UTF8_ELLIPSIS, "Popup menu option"), new BMessage(EL_SHOW_SETTINGS));
 		fMenu->AddItem(fTrackerMI);
 		fMenu->AddSeparatorItem();
 		fMenu->AddItem(fSettingsMI);
