@@ -11,8 +11,6 @@
 //Main directory for all Einsteinium settings
 #define e_settings_dir "Einsteinium"
 #define e_settings_app_dir "Applications"
-//Engine settings file
-#define ee_settings_file "engine_settings"
 
 //Attribute names
 #define ATTR_SESSION_NAME "EIN:SESSION"
