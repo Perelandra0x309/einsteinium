@@ -5,6 +5,7 @@ Changed list item colors to system defined colors
 Bug fixes:
 -Some Launcher settings did not apply when closing the settings window
 -Launcher window position not centered when no settings found
+-Filter non query items in Launcher recent queries list returned by Haiku
 
 Version 1.3.0
 Added the Launcher Deskbar menu

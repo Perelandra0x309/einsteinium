@@ -129,6 +129,7 @@ RecentFoldersBListView::BuildList(bool force=false)
 		entry_ref newref;
 		BEntry newEntry;
 		bool needFirstRecentFolder = true;
+		bool addedItem = false;
 
 		// Create DocListItems
 		AddItem(fFolderSuperListItem);
@@ -139,10 +140,12 @@ RecentFoldersBListView::BuildList(bool force=false)
 			newEntry.SetTo(&newref);
 			if(newEntry.Exists())
 			{
+				addedItem = false;
 				DocListItem *newItem = new DocListItem(&newref, settings, 1);
 				if(newItem->InitStatus() == B_OK)
 				{
 					AddItem(newItem);
+					addedItem = true;
 					totalCount++;
 					// Save first recent doc entry
 					if(needFirstRecentFolder)
@@ -151,7 +154,7 @@ RecentFoldersBListView::BuildList(bool force=false)
 						needFirstRecentFolder = false;
 					}
 				}
-				else
+				if(!addedItem)
 					delete newItem;
 			}
 		}
@@ -177,6 +180,7 @@ RecentFoldersBListView::BuildList(bool force=false)
 		entry_ref newref;
 		BEntry newEntry;
 		bool needFirstRecentQuery = true;
+		bool addedItem = false;
 
 		// Create DocListItems
 		AddItem(fQuerySuperListItem);
@@ -189,19 +193,25 @@ RecentFoldersBListView::BuildList(bool force=false)
 			newEntry.SetTo(&newref);
 			if(newEntry.Exists())
 			{
+				addedItem = false;
 				DocListItem *newItem = new DocListItem(&newref, settings, 1);
 				if(newItem->InitStatus() == B_OK)
 				{
-					AddItem(newItem);
-					totalCount++;
-					// Save first recent doc entry
-					if(needFirstRecentQuery)
+					BString mimeType(newItem->GetTypeName());
+					if(mimeType.Compare(kQueryType)==0 || mimeType.Compare(kQueryTemplateType)==0)
 					{
-						fLastRecentQueryRef = newref;
-						needFirstRecentQuery = false;
+						AddItem(newItem);
+						addedItem = true;
+						totalCount++;
+						// Save first recent doc entry
+						if(needFirstRecentQuery)
+						{
+							fLastRecentQueryRef = newref;
+							needFirstRecentQuery = false;
+						}
 					}
 				}
-				else
+				if(!addedItem)
 					delete newItem;
 			}
 		}
