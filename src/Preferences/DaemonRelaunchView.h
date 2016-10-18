@@ -9,6 +9,7 @@
 #include <StorageKit.h>
 #include <SupportKit.h>
 #include <LayoutBuilder.h>
+#include <Catalog.h>
 #include <fstream>
 #include "AppRefFilter.h"
 #include "EDSettingsFile.h"

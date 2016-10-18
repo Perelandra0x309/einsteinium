@@ -1,0 +1,43 @@
+1	English	application/x-vnd.Einsteinium_Preferences	548383269
+Stopping...	Status box	Status 'Stopping...' text	Stopping...
+<Name not found>	AppRelaunchSettings.cpp	Keep first and last < >	<Name not found>
+Restart	Status box	Button label	Restart
+Warning: This app was not able to succeesfully start watching the roster for aplication quit and launch messages.  The status of the Einsteinium Engine may not be up to date at any time.	Daemon status view	Alert message text	Warning: This app was not able to succeesfully start watching the roster for aplication quit and launch messages.  The status of the Einsteinium Engine may not be up to date at any time.
+The Launcher settings are set within the Launcher application.  Click the button below to make changes to the Launcher settings.	Launcher about view	Description text	The Launcher settings are set within the Launcher application.  Click the button below to make changes to the Launcher settings.
+About Einsteinum Launcher	Launcher about view	Box label	About Einsteinum Launcher
+Error: Could not create messenger for service 	Status box	Alert message	Error: Could not create messenger for service 
+Restarting...	Status box	Status 'Restarting...' text	Restarting...
+Open Launcher Settings	Launcher about view	Button label	Open Launcher Settings
+Start	Status box	Button label	Start
+The Einsteinium Engine is a background app which keeps statistics on every application that runs.  These statistics are available for anyone to use, and can be used to create ranked lists of applications based on certain criteria.  For example, a list of the most recently run apps (the typical Recent Applications list), a list of apps with the longest total running time, a list of apps with the highest number of launches, and more are possible using the statictics gathered by the Einsteinium Engine.	Engine status view	Description text	The Einsteinium Engine is a background app which keeps statistics on every application that runs.  These statistics are available for anyone to use, and can be used to create ranked lists of applications based on certain criteria.  For example, a list of the most recently run apps (the typical Recent Applications list), a list of apps with the longest total running time, a list of apps with the highest number of launches, and more are possible using the statictics gathered by the Einsteinium Engine.
+Stop	Status box	Button label	Stop
+for all applications not in this list	Daemon relaunch view	Default list item label	for all applications not in this list
+The Einsteinium Daemon is a background app that watches all the apps which are running.  The daemon can automatically restart an app which quits or crashes, provide a prompt to ask whether the app should be restarted, or allow the app to quit without restarting it.  The Einsteinium Daemon determines the appropriate action to take for each app by the settings you specify.	Daemon status view	Description text	The Einsteinium Daemon is a background app that watches all the apps which are running.  The daemon can automatically restart an app which quits or crashes, provide a prompt to ask whether the app should be restarted, or allow the app to quit without restarting it.  The Einsteinium Daemon determines the appropriate action to take for each app by the settings you specify.
+About Einsteinum Daemon	Daemon status view	Box label	About Einsteinum Daemon
+Warning: This app was not able to successfully start watching the roster for aplication quit and launch messages.  The status of the Einsteinium Engine may not be up to date at any time.	Engine status view	Alert warning text	Warning: This app was not able to successfully start watching the roster for aplication quit and launch messages.  The status of the Einsteinium Engine may not be up to date at any time.
+Use this list to specify what actions you want the Einsteinium Daemon to take\nwhen an application quits.  The \"Default setting\" item specifies the action\nto take for any apps that are not in this list.  Add specific apps to this list\nto override the default action for that specific app.  Each app in this list will\nbe color coded based on the action specified, so you can quickly view all your\napp settings.	Daemon relaunch view	Tootip text	Use this list to specify what actions you want the Einsteinium Daemon to take\nwhen an application quits.  The \"Default setting\" item specifies the action\nto take for any apps that are not in this list.  Add specific apps to this list\nto override the default action for that specific app.  Each app in this list will\nbe color coded based on the action specified, so you can quickly view all your\napp settings.
+Rescan Data	Engine maintenance view	Button label	Rescan Data
+About Einsteinum Engine	Engine status view	Box label	About Einsteinum Engine
+Running	Status box	Status 'Running' text	Running
+Unknown	Status box	Status 'unknown' text	Unknown
+There was an error stopping the service	Status box	Status error message	There was an error stopping the service
+There was an error starting the service	Status box	Status error message	There was an error starting the service
+Database Maintenance	Engine maintenance view	Box label	Database Maintenance
+Starting...	Status box	Status 'Starting...' text	Starting...
+Stopped	Status box	Status 'Stopped' text	Stopped
+Daemon Running Status	Daemon status view	Box label	Daemon Running Status
+Remove	Daemon relaunch view	Button label	Remove
+Einsteinium Copyright 2013 by Brian Hill	Main Window	Copyright text	Einsteinium Copyright 2013 by Brian Hill
+If you are having trouble with applications not ranking properly you can press the \"Rescan Data\" button below to have the Engine rescan the database and recreate application statistics.  The Engine must be running to perform this task.	Engine maintenance view	Description text	If you are having trouble with applications not ranking properly you can press the \"Rescan Data\" button below to have the Engine rescan the database and recreate application statistics.  The Engine must be running to perform this task.
+Ask me whether to relaunch this application when it quits	Daemon relaunch view	Radio button label	Ask me whether to relaunch this application when it quits
+Engine Running Status	Engine status view	Box label	Engine Running Status
+Executable does not have an application signature	Daemon relaunch view	Alert message	Executable does not have an application signature
+Add…	Daemon relaunch view	Button label	Add…
+The Einsteinium Launcher is a smart application and file launcher which displays lists of applications, files, folders and queries. The Launcher queries the Engine to create the list of applications that are ranked by weighted criteria that you define. This allows you to have a launcher with applications ordered the way you want them.	Launcher about view	About text	The Einsteinium Launcher is a smart application and file launcher which displays lists of applications, files, folders and queries. The Launcher queries the Engine to create the list of applications that are ranked by weighted criteria that you define. This allows you to have a launcher with applications ordered the way you want them.
+Status:	Status box	Status text	Status:
+Do not relaunch this application when it quits	Daemon relaunch view	Radio button label	Do not relaunch this application when it quits
+Launcher Settings	Launcher about view	Box label	Launcher Settings
+Einsteinium provides smarter monitoring of applications and system services for Haiku.  Currently the two major functions implimented are automatically restarting applications and system services that quit or crash, and gathering statistics on application usage to provide customizable ranked lists of applications.\n\nThis preferences application is used to set options for the Einsteinium Daemon and Engine.  See each application's main section to get more details.	Main Window	About text	Einsteinium provides smarter monitoring of applications and system services for Haiku.  Currently the two major functions implimented are automatically restarting applications and system services that quit or crash, and gathering statistics on application usage to provide customizable ranked lists of applications.\n\nThis preferences application is used to set options for the Einsteinium Daemon and Engine.  See each application's main section to get more details.
+About Einsteinium Preferences	Main Window	Box label	About Einsteinium Preferences
+Application Relaunch Settings	Daemon relaunch view	Box label	Application Relaunch Settings
+Automatically relaunch this application when it quits	Daemon relaunch view	Radio button label	Automatically relaunch this application when it quits

@@ -4,9 +4,8 @@
  */
 #include "DaemonRelaunchView.h"
 
-/*	Definitions and objects for the view containing settings for relaunching
-	apps with the daemon
-*/
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Daemon relaunch view"
 
 DaemonRelaunchView::DaemonRelaunchView(BRect size)
 	:
@@ -15,31 +14,31 @@ DaemonRelaunchView::DaemonRelaunchView(BRect size)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	fAddAppB = new BButton("Add", "Add" B_UTF8_ELLIPSIS, new BMessage(ED_ADD_APPITEM));
-	fRemoveAppB = new BButton("Remove", "Remove", new BMessage(ED_REMOVE_APPITEM));
+	fAddAppB = new BButton("Add", B_TRANSLATE_COMMENT("Add" B_UTF8_ELLIPSIS, "Button label"), new BMessage(ED_ADD_APPITEM));
+	fRemoveAppB = new BButton("Remove", B_TRANSLATE_COMMENT("Remove", "Button label"), new BMessage(ED_REMOVE_APPITEM));
 	fRemoveAppB->SetEnabled(false);
 	fRelaunchBox = new BBox("Application Relaunch Behavior");
-	fRelaunchBox->SetLabel("Application Relaunch Settings");
+	fRelaunchBox->SetLabel(B_TRANSLATE_COMMENT("Application Relaunch Settings", "Box label"));
 	// TODO Can the radio button labels be color coded to match the list view?
 	fAutoRelaunchRB = new BRadioButton("Auto Relaunch",
-						"Automatically relaunch this application when it quits",
+						B_TRANSLATE_COMMENT("Automatically relaunch this application when it quits", "Radio button label"),
 						new BMessage(ED_AUTO_RELAUNCH_CHANGED));
 	fPromptRelaunchRB = new BRadioButton("Prompt Relaunch",
-						"Ask me whether to relaunch this application when it quits",
+						B_TRANSLATE_COMMENT("Ask me whether to relaunch this application when it quits", "Radio button label"),
 						new BMessage(ED_AUTO_RELAUNCH_CHANGED));
 	fDontRelaunchRB = new BRadioButton("Ignore Relaunch",
-						"Do not relaunch this application when it quits",
+						B_TRANSLATE_COMMENT("Do not relaunch this application when it quits", "Radio button label"),
 						new BMessage(ED_AUTO_RELAUNCH_CHANGED));
 
 	fAppsLView = new BListView("App List View", B_SINGLE_SELECTION_LIST);
 	fAppsLView->SetSelectionMessage(new BMessage(ED_RELAPP_SELECTION_CHANGED));
 	fAppsSView = new BScrollView("Apps List Scroll View", fAppsLView, 0, false, true);
-	fAppsSView->SetToolTip("Use this list to specify what actions you want the Einsteinium Daemon to take\n"
+	fAppsSView->SetToolTip(B_TRANSLATE_COMMENT("Use this list to specify what actions you want the Einsteinium Daemon to take\n"
 							"when an application quits.  The \"Default setting\" item specifies the action\n"
 							"to take for any apps that are not in this list.  Add specific apps to this list\n"
 							"to override the default action for that specific app.  Each app in this list will\n"
 							"be color coded based on the action specified, so you can quickly view all your\n"
-							"app settings.");
+							"app settings.", "Tootip text"));
 
 	BGroupLayout *boxLayout = BLayoutBuilder::Group<>(B_VERTICAL)
 		.Add(fAppsSView)
@@ -67,7 +66,7 @@ DaemonRelaunchView::DaemonRelaunchView(BRect size)
 
 	//Default relaunch settings item
 	BPath path("/dummy/Default setting");
-	fDefaultSettings = new AppRelaunchSettings("for all applications not in this list", path);
+	fDefaultSettings = new AppRelaunchSettings(B_TRANSLATE_COMMENT("for all applications not in this list", "Default list item label"), path);
 
 	//Settings file
 	fDaemonSettings = new EDSettingsFile(this);
@@ -124,7 +123,7 @@ DaemonRelaunchView::MessageReceived(BMessage* msg)
 				Window()->Unlock();
 				fDaemonSettings->UpdateActionForApp(buf, item->fSettings->relaunchAction);
 			}
-			else (new BAlert("","Excecutable does not have an application signature","OK"))->Go();
+			else (new BAlert("",B_TRANSLATE_COMMENT("Executable does not have an application signature", "Alert message"),"OK"))->Go();
 			delete[] buf;
 			break; }
 		case ED_REMOVE_APPITEM: {

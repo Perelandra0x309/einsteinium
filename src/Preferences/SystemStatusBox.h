@@ -9,6 +9,7 @@
 #include <Path.h>
 #include <Roster.h>
 #include <LayoutBuilder.h>
+#include <Catalog.h>
 #include "prefs_constants.h"
 
 
@@ -36,6 +37,8 @@ public:
 private:
 	BStringView				*fStatusSV;
 	BString					fSignature, fName, fStringViewText;
+	BString					fStatusText, fRestartLabel, fStartLabel, fStopLabel;
+	BString					fStartingErrorText, fStoppingErrorText, fStatusUnknownText, fStatusRunningText, fStatusStoppingText, fStatusStoppedText, fStatusStartingText, fStatusRestartingText;
 	BButton					*fRestartB, *fStartstopB;
 	float					fUsedWidth;
 	int						fCurrentState;

@@ -8,6 +8,7 @@
 #include <InterfaceKit.h>
 #include <GroupLayout.h>
 #include <LayoutBuilder.h>
+#include <Catalog.h>
 #include "prefs_constants.h"
 
 class LauncherAboutView : public BView {

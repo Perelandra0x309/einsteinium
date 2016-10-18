@@ -8,7 +8,7 @@ SRCS = ../Common/methods.cpp \
 		main.cpp
 LIBS = be tracker stdc++.r4 xml2 sqlite3
 OPTIMIZE = FULL
-RDEFS = einsteinium_engine.rsrc
+RDEFS = einsteinium_engine.rdef
 
 #	Specify additional paths to directories following the standard libXXX.so
 #	or libXXX.a naming scheme. You can specify full paths or paths relative

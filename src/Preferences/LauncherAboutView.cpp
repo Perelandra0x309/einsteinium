@@ -4,19 +4,22 @@
  */
 #include "LauncherAboutView.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Launcher about view"
+
 LauncherAboutView::LauncherAboutView(BRect size)
 	:
 	BView(size, "Launcher Status", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS)
 {
 	// About box
 	fAboutBox = new BBox("About");
-	fAboutBox->SetLabel("About Einsteinum Launcher");
+	fAboutBox->SetLabel(B_TRANSLATE_COMMENT("About Einsteinum Launcher", "Box label"));
 	fAboutTextView = new BTextView("About text");
-	fAboutTextView->SetText("The Einsteinium Launcher is a smart application and file launcher"
+	fAboutTextView->SetText(B_TRANSLATE_COMMENT("The Einsteinium Launcher is a smart application and file launcher"
 					" which displays lists of applications, files, folders and queries."
 					" The Launcher queries the Engine to create the list of applications that are"
 					" ranked by weighted criteria that you define. This allows you to have a"
-					" launcher with applications ordered the way you want them.");
+					" launcher with applications ordered the way you want them.", "About text"));
 	fAboutTextView->MakeSelectable(false);
 	fAboutTextView->MakeEditable(false);
 	BGroupLayout *boxLayout = new BGroupLayout(B_VERTICAL);
@@ -28,13 +31,13 @@ LauncherAboutView::LauncherAboutView(BRect size)
 
 	// Launch settings box
 	fSettingsBox = new BBox("Settings");
-	fSettingsBox->SetLabel("Launcher Settings");
+	fSettingsBox->SetLabel(B_TRANSLATE_COMMENT("Launcher Settings", "Box label"));
 	fSettingsTV = new BTextView("Settings Instructions");
-	fSettingsTV->SetText("The Launcher settings are set within the Launcher application."
-						"  Click the button below to make changes to the Launcher settings.");
+	fSettingsTV->SetText(B_TRANSLATE_COMMENT("The Launcher settings are set within the Launcher application."
+						"  Click the button below to make changes to the Launcher settings.", "Description text"));
 	fSettingsTV->MakeSelectable(false);
 	fSettingsTV->MakeEditable(false);
-	fSettingsButton = new BButton("Open Launcher Settings", new BMessage(OPEN_LAUNCHER_SETTINGS));
+	fSettingsButton = new BButton(B_TRANSLATE_COMMENT("Open Launcher Settings", "Button label"), new BMessage(OPEN_LAUNCHER_SETTINGS));
 	BGroupLayout *settingsBoxLayout = new BGroupLayout(B_VERTICAL);
 	fSettingsBox->SetLayout(settingsBoxLayout);
 	BLayoutBuilder::Group<>(settingsBoxLayout)

@@ -24,7 +24,7 @@ SRCS = ../Engine/EngineSubscriber.cpp \
 	ModifierMenu.cpp
 LIBS = be localestub tracker stdc++.r4 xml2
 OPTIMIZE = FULL
-RDEFS = einsteinium_launcher.rsrc
+RDEFS = einsteinium_launcher.rdef
 
 #	Specify additional paths to directories following the standard libXXX.so
 #	or libXXX.a naming scheme. You can specify full paths or paths relative

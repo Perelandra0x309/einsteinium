@@ -4,6 +4,9 @@
  */
 #include "EngineStatusView.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Engine status view"
+
 EngineStatusView::EngineStatusView(BRect size)
 	:
 	BView(size, "Engine Status", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS),
@@ -12,15 +15,15 @@ EngineStatusView::EngineStatusView(BRect size)
 {
 	// About box
 	fAboutBox = new BBox("About");
-	fAboutBox->SetLabel("About Einsteinum Engine");
+	fAboutBox->SetLabel(B_TRANSLATE_COMMENT("About Einsteinum Engine", "Box label"));
 	fAboutTextView = new BTextView("About text");
-	fAboutTextView->SetText("The Einsteinium Engine is a background app which keeps statistics"
+	fAboutTextView->SetText(B_TRANSLATE_COMMENT("The Einsteinium Engine is a background app which keeps statistics"
 		" on every application that runs.  These statistics are available for anyone to use,"
 		" and can be used to create ranked lists of applications based on certain criteria."
 		"  For example, a list of the most recently run apps (the typical Recent Applications"
 		" list), a list of apps with the longest total running time, a list of apps with the"
 		" highest number of launches, and more are possible using the statictics gathered by"
-		" the Einsteinium Engine.");
+		" the Einsteinium Engine.", "Description text"));
 	fAboutTextView->MakeSelectable(false);
 	fAboutTextView->MakeEditable(false);
 	BGroupLayout *boxLayout = new BGroupLayout(B_VERTICAL);
@@ -34,7 +37,7 @@ EngineStatusView::EngineStatusView(BRect size)
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	BEntry serviceEntry = GetEntryFromSig(e_engine_sig);
 	if(serviceEntry.Exists())
-		fStatusBox = new SystemStatusBox("Engine Running Status", serviceEntry, e_engine_sig);
+		fStatusBox = new SystemStatusBox(B_TRANSLATE_COMMENT("Engine Running Status", "Box label"), serviceEntry, e_engine_sig);
 
 	// Layout
 	BGroupLayout *layout = new BGroupLayout(B_VERTICAL);
@@ -72,9 +75,9 @@ EngineStatusView::AttachedToWindow()
 							B_REQUEST_QUIT | B_REQUEST_LAUNCHED);
 	if(result  != B_OK)
 		//roster failed to be watched.  Show warning, but we can continue.
-		(new BAlert("Watching Warning", "Warning: This app was not able to succeesfully start "
+		(new BAlert("Watching Warning", B_TRANSLATE_COMMENT("Warning: This app was not able to successfully start "
 					"watching the roster for aplication quit and launch messages.  "
-					"The status of the Einsteinium Engine may not be up to date at any time.",
+					"The status of the Einsteinium Engine may not be up to date at any time.", "Alert warning text"),
 					"OK"))->Go();
 	else
 		//watching was sucessful

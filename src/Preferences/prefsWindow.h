@@ -6,6 +6,7 @@
 #define EP_WINDOW_H
 
 #include <InterfaceKit.h>
+#include <Catalog.h>
 #include "BitmapListItem.h"
 #include "DaemonRelaunchView.h"
 #include "DaemonStatusView.h"

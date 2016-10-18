@@ -4,21 +4,35 @@
  */
 #include "SystemStatusBox.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Status box"
 
 SystemStatusBox::SystemStatusBox(const char *label, BEntry entry, const char * sig)
 	:
 	BBox(sig),
-	fCurrentState(STATE_NONE)
+	fCurrentState(STATE_NONE),
+	fStatusText(B_TRANSLATE_COMMENT("Status:", "Status text")),
+	fRestartLabel(B_TRANSLATE_COMMENT("Restart", "Button label")),
+	fStartLabel(B_TRANSLATE_COMMENT("Start", "Button label")),
+	fStopLabel(B_TRANSLATE_COMMENT("Stop", "Button label")),
+	fStartingErrorText(B_TRANSLATE_COMMENT("There was an error starting the service", "Status error message")),
+	fStoppingErrorText(B_TRANSLATE_COMMENT("There was an error stopping the service", "Status error message")),
+	fStatusUnknownText(B_TRANSLATE_COMMENT("Unknown", "Status 'unknown' text")),
+	fStatusRunningText(B_TRANSLATE_COMMENT("Running", "Status 'Running' text")),
+	fStatusStoppingText(B_TRANSLATE_COMMENT("Stopping...", "Status 'Stopping...' text")),
+	fStatusStoppedText(B_TRANSLATE_COMMENT("Stopped", "Status 'Stopped' text")),
+	fStatusStartingText(B_TRANSLATE_COMMENT("Starting...", "Status 'Starting...' text")),
+	fStatusRestartingText(B_TRANSLATE_COMMENT("Restarting...", "Status 'Restarting...' text"))
 {
 	BPath path;
 	entry.GetPath(&path);
 	fName.SetTo(path.Leaf());
 	SetLabel(label);
 	fSignature.SetTo(sig);
-	fStatusSV = new BStringView("Status String", "Status: ");
-	fRestartB = new BButton("Restart", new BMessage(RESTART_SERVICE));
+	fStatusSV = new BStringView("Status String", fStatusText);
+	fRestartB = new BButton(fRestartLabel, new BMessage(RESTART_SERVICE));
 	fRestartB->SetEnabled(false);
-	fStartstopB = new BButton("Stop");
+	fStartstopB = new BButton(fStopLabel);
 	fStartstopB->SetEnabled(false);
 
 	BGroupLayout *layout = new BGroupLayout(B_HORIZONTAL, 10);
@@ -149,7 +163,7 @@ SystemStatusBox::_StopService()
 	BMessenger appMessenger(fSignature.String());
 	if(!appMessenger.IsValid())
 	{
-		BString err("Error: Could not create messenger for service ");
+		BString err(B_TRANSLATE_COMMENT("Error: Could not create messenger for service ", "Alert message"));
 		err.Append(fName);
 		(new BAlert("", err.String(),"OK"))->Go(NULL);
 		return rc;
@@ -162,9 +176,10 @@ SystemStatusBox::_StopService()
 void
 SystemStatusBox::_SetStatusText(const char* text)
 {
-	fStringViewText.SetTo("Status: ");
+	fStringViewText.SetTo(fStatusText);
+	fStringViewText.Append(" ");
 	fStringViewText.Append(text);
-//	stringViewText.Append(" (Really really long text used for testing purposes.)");
+//	fStringViewText.Append(" (Really really long text used for testing purposes.)");
 	ResizeStatusText();
 }
 
@@ -206,9 +221,9 @@ SystemStatusBox::_SetState(int newstate)
 	{
 		case STATE_OK_RUNNING:
 		{
-			_SetStatusText("Running");
+			_SetStatusText(fStatusRunningText);
 			fRestartB->SetEnabled(true);
-			fStartstopB->SetLabel("Stop");
+			fStartstopB->SetLabel(fStopLabel);
 			fStartstopB->SetEnabled(true);
 			fStartstopB->SetMessage(new BMessage(STOP_SERVICE));
 			fCurrentState = STATE_OK_RUNNING;
@@ -216,19 +231,17 @@ SystemStatusBox::_SetState(int newstate)
 		}
 		case STATE_OK_STOPPING:
 		{
-			_SetStatusText("Stopping...");
+			_SetStatusText(fStatusStoppingText);
 			fRestartB->SetEnabled(false);
-			//fStartstopB->SetLabel("Start");
 			fStartstopB->SetEnabled(false);
-			//fStartstopB->SetMessage(new BMessage(START_SERVICE));
 			fCurrentState = STATE_OK_STOPPING;
 			break;
 		}
 		case STATE_ERROR_STOPPING__IS_NOT_RUNNING:
 		{
-			_SetStatusText("There was an error stopping the service");
+			_SetStatusText(fStoppingErrorText);
 			fRestartB->SetEnabled(false);
-			fStartstopB->SetLabel("Start");
+			fStartstopB->SetLabel(fStartLabel);
 			fStartstopB->SetEnabled(true);
 			fStartstopB->SetMessage(new BMessage(START_SERVICE));
 			fCurrentState = STATE_ERROR_STOPPING__IS_NOT_RUNNING;
@@ -236,9 +249,9 @@ SystemStatusBox::_SetState(int newstate)
 		}
 		case STATE_ERROR_STOPPING__IS_RUNNING:
 		{
-			_SetStatusText("There was an error stopping the service");
+			_SetStatusText(fStoppingErrorText);
 			fRestartB->SetEnabled(true);
-			fStartstopB->SetLabel("Stop");
+			fStartstopB->SetLabel(fStopLabel);
 			fStartstopB->SetEnabled(true);
 			fStartstopB->SetMessage(new BMessage(STOP_SERVICE));
 			fCurrentState = STATE_ERROR_STOPPING__IS_RUNNING;
@@ -246,9 +259,9 @@ SystemStatusBox::_SetState(int newstate)
 		}
 		case STATE_OK_STOPPED:
 		{
-			_SetStatusText("Stopped");
+			_SetStatusText(fStatusStoppedText);
 			fRestartB->SetEnabled(false);
-			fStartstopB->SetLabel("Start");
+			fStartstopB->SetLabel(fStartLabel);
 			fStartstopB->SetEnabled(true);
 			fStartstopB->SetMessage(new BMessage(START_SERVICE));
 			fCurrentState = STATE_OK_STOPPED;
@@ -256,28 +269,26 @@ SystemStatusBox::_SetState(int newstate)
 		}
 		case STATE_OK_STARTING:
 		{
-			_SetStatusText("Starting...");
+			_SetStatusText(fStatusStartingText);
 			fRestartB->SetEnabled(false);
-			//fStartstopB->SetLabel("Start");
 			fStartstopB->SetEnabled(false);
-			//fStartstopB->SetMessage(new BMessage(START_SERVICE));
 			fCurrentState = STATE_OK_STARTING;
 			break;
 		}
 		case STATE_ERROR_STARTING__IS_RUNNING:
 		{
-			_SetStatusText("There was an error starting the service");
+			_SetStatusText(fStartingErrorText);
 			fRestartB->SetEnabled(true);
-			fStartstopB->SetLabel("Stop");
+			fStartstopB->SetLabel(fStopLabel);
 			fStartstopB->SetEnabled(true);
 			fStartstopB->SetMessage(new BMessage(STOP_SERVICE));
 			fCurrentState = STATE_ERROR_STARTING__IS_RUNNING;
 		}
 		case STATE_ERROR_STARTING__IS_NOT_RUNNING:
 		{
-			_SetStatusText("There was an error starting the service");
+			_SetStatusText(fStartingErrorText);
 			fRestartB->SetEnabled(false);
-			fStartstopB->SetLabel("Start");
+			fStartstopB->SetLabel(fStartLabel);
 			fStartstopB->SetEnabled(true);
 			fStartstopB->SetMessage(new BMessage(START_SERVICE));
 			fCurrentState = STATE_ERROR_STARTING__IS_NOT_RUNNING;
@@ -285,19 +296,17 @@ SystemStatusBox::_SetState(int newstate)
 		}
 		case STATE_OK_RESTARTING:
 		{
-			_SetStatusText("Restarting...");
+			_SetStatusText(fStatusRestartingText);
 			fRestartB->SetEnabled(false);
-			//fStartstopB->SetLabel("Start");
 			fStartstopB->SetEnabled(false);
-			//fStartstopB->SetMessage(new BMessage(START_SERVICE));
 			fCurrentState = STATE_OK_RESTARTING;
 			break;
 		}
 		default:
 		{
-			_SetStatusText("Unknown");
+			_SetStatusText(fStatusUnknownText);
 			fRestartB->SetEnabled(false);
-			fStartstopB->SetLabel("Stop");
+			fStartstopB->SetLabel(fStopLabel);
 			fStartstopB->SetEnabled(false);
 			fStartstopB->SetMessage(NULL);
 			fCurrentState = STATE_NONE;

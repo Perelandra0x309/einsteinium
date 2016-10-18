@@ -4,6 +4,9 @@
  */
 #include "DaemonStatusView.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Daemon status view"
+
 DaemonStatusView::DaemonStatusView(BRect size)
 	:
 	BView(size, "Daemon Status", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS),
@@ -13,13 +16,13 @@ DaemonStatusView::DaemonStatusView(BRect size)
 
 	// About box
 	fAboutBox = new BBox("About");
-	fAboutBox->SetLabel("About Einsteinum Daemon");
+	fAboutBox->SetLabel(B_TRANSLATE_COMMENT("About Einsteinum Daemon", "Box label"));
 	fAboutTextView = new BTextView("About text");
-	fAboutTextView->SetText("The Einsteinium Daemon is a background app that watches"
+	fAboutTextView->SetText(B_TRANSLATE_COMMENT("The Einsteinium Daemon is a background app that watches"
 		" all the apps which are running.  The daemon can automatically restart an app which"
 		" quits or crashes, provide a prompt to ask whether the app should be restarted, or"
 		" allow the app to quit without restarting it.  The Einsteinium Daemon determines the"
-		" appropriate action to take for each app by the settings you specify.");
+		" appropriate action to take for each app by the settings you specify.", "Description text"));
 	fAboutTextView->MakeSelectable(false);
 	fAboutTextView->MakeEditable(false);
 
@@ -33,7 +36,7 @@ DaemonStatusView::DaemonStatusView(BRect size)
 	// Status Box
 	BEntry serviceEntry = GetEntryFromSig(e_daemon_sig);
 	if(serviceEntry.Exists())
-		fStatusBox = new SystemStatusBox("Daemon Running Status", serviceEntry, e_daemon_sig);
+		fStatusBox = new SystemStatusBox(B_TRANSLATE_COMMENT("Daemon Running Status", "Box label"), serviceEntry, e_daemon_sig);
 
 	// Layout
 	BGroupLayout *layout = new BGroupLayout(B_VERTICAL);
@@ -71,9 +74,9 @@ DaemonStatusView::AttachedToWindow()
 							B_REQUEST_QUIT | B_REQUEST_LAUNCHED);
 	if(result  != B_OK)
 		//roster failed to be watched.  Show warning, but we can continue.
-		(new BAlert("Watching Warning", "Warning: This app was not able to succeesfully start "
+		(new BAlert("Watching Warning", B_TRANSLATE_COMMENT("Warning: This app was not able to succeesfully start "
 					"watching the roster for aplication quit and launch messages.  "
-					"The status of the Einsteinium Engine may not be up to date at any time.",
+					"The status of the Einsteinium Engine may not be up to date at any time.", "Alert message text"),
 					"OK"))->Go();
 	else
 		//watching was sucessful
