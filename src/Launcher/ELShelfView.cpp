@@ -308,7 +308,6 @@ ELShelfView::_BuildMenu(BMessage *message)
 {
 	delete fMenu;
 	fMenu = new BPopUpMenu(B_EMPTY_STRING, false, false);
-	//fMenu = new ModifierMenu(B_EMPTY_STRING, false, false);
 	fMenu->SetFont(be_plain_font);
 
 	// Add any refs found
@@ -324,18 +323,13 @@ ELShelfView::_BuildMenu(BMessage *message)
 		{
 			message->FindRef("refs", i, &newref);
 		//	printf("Found ref %s\n", newref.name);
-			BNode refNode(&newref);
-			BNodeInfo refNodeInfo(&refNode);
 			BMessage *newMsg = new BMessage(EL_SHELFVIEW_MENUITEM_INVOKED);
 			newMsg->AddRef("refs", &newref);
-			itemList.AddItem(new IconMenuItem(newref.name, newMsg, &refNodeInfo, B_MINI_ICON));
-			//fMenu->AddItem(new IconMenuItem(newref.name, newMsg, &refNodeInfo, B_MINI_ICON));
-			//fMenu->AddItem(new ModifierMenuItem(newref.name, newMsg, &refNodeInfo, B_MINI_ICON));
+			itemList.AddItem(new AppMenuItem(newref, newMsg));
 		}
 		itemList.SortItems(MenuItemSortLabel);
 		fMenu->AddList(&itemList,0);
 	}
-//	fMenu->SetRefCount(fSubscriptionRefCount);
 
 	// No applications to display- create a helpful message
 	bool showStartEngineItem = false;
@@ -484,7 +478,7 @@ ELShelfView::_UpdateReceived(BMessage *message)
 //Sort menu items by their label
 int MenuItemSortLabel(const void* item1, const void* item2)
 {
-	BString label1((*(IconMenuItem**)item1)->Label());//get first label
-	BString label2((*(IconMenuItem**)item2)->Label());//get second label
+	BString label1((*(AppMenuItem**)item1)->Label());//get first label
+	BString label2((*(AppMenuItem**)item2)->Label());//get second label
 	return label1.ICompare(label2);
 }

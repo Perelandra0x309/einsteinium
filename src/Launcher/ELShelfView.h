@@ -16,10 +16,13 @@
 #include <Catalog.h>
 #include <stdio.h>
 
+#include <MenuItem.h>
+
+#include "AppMenuItem.h"
 #include "EngineSubscriber.h"
 //#include "IconMenuItem.h"
-#include "ModifierMenuItem.h"
-#include "ModifierMenu.h"
+//#include "ModifierMenuItem.h"
+//#include "ModifierMenu.h"
 #include "LauncherSettingsFile.h"
 #include "launcher_constants.h"
 

@@ -18,10 +18,9 @@ SRCS = ../Engine/EngineSubscriber.cpp \
 	SettingsWindow.cpp \
 	AppListItem.cpp \
 	DocListItem.cpp \
+	AppMenuItem.h \
 	SuperTypeListItem.cpp \
-	LauncherSettingsFile.cpp \
-	ModifierMenuItem.cpp \
-	ModifierMenu.cpp
+	LauncherSettingsFile.cpp
 LIBS = be localestub tracker stdc++.r4 xml2
 OPTIMIZE = FULL
 RDEFS = einsteinium_launcher.rdef
@@ -41,7 +40,7 @@ SYSTEM_INCLUDE_PATHS = /boot/system/develop/headers/libxml2
 #	Additional paths paths to look for local headers. These use the form
 #	#include "header". Directories that contain the files in SRCS are
 #	automatically included.
-LOCAL_INCLUDE_PATHS = ../Common ../Common/Tracker
+LOCAL_INCLUDE_PATHS = ../Common
 
 # 	Specify the codes for languages you are going to support in this
 # 	application. The default "en" one must be provided too. "make catkeys"
