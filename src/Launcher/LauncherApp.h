@@ -29,10 +29,14 @@ protected:
 	AppSettings				fAppSettings;
 
 private:
-	bool					fQuitRequested;
+	bool					fQuitRequested, fLastEngineStatusRunning, fWatchingRoster, fEngineAlertIsShowing;
 	MainWindow				*fWindow;
 	SettingsWindow			*fSettingsWindow;
 	LauncherSettingsFile	*fSettingsFile;
+	BAlert					*fEngineAlert;
+	bool					_CheckEngineStatus(bool showWarning = false);
+	void					_CloseEngineAlert();
+	void					_WatchForEngineChanges(bool firstRun = false);
 	void					_CreateExclusionsSignatureList(BMessage *exclusions);
 	void					_ShowShelfView(bool showShelfView);
 	void					_SaveSettingsToFile(uint32 what);

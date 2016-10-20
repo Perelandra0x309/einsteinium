@@ -4,6 +4,7 @@ Launcher add deskbar menu on boot if deskbar setting enabled
 Changed list item colors to system defined colors
 Localization for Daemon, Launcher and Preferences
 Created a new AppMenuItem class to replace the old Tracker IconMenuItem class
+Launcher detects when Engine quits or launches
 Bug fixes:
 -Some Launcher settings did not apply when closing the settings window
 -Launcher window position not centered when no settings found

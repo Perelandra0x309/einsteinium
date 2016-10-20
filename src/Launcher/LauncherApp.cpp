@@ -21,7 +21,11 @@ LauncherApp::LauncherApp()
 	BApplication(e_launcher_sig),
 	EngineSubscriber(),
 	fSettingsFile(NULL),
-	fQuitRequested(false)
+	fQuitRequested(false),
+	fLastEngineStatusRunning(false),
+	fEngineAlert(NULL),
+	fEngineAlertIsShowing(false),
+	fWatchingRoster(false)
 {
 	fAppSettings.subscribedToEngine=false;
 	// Get saved settings
@@ -100,7 +104,8 @@ LauncherApp::ReadyToRun()
 
 	if(_IsEngineRunning())
 		_Subscribe();
-	else
+	//Deskbar menu automatically starts the engine, so don't need this if we are showing the deskbar menu
+	else if(!fAppSettings.showDeskbarMenu)
 	{
 		// Force an update to the Apps list
 		fWindow->SelectDefaultTab();
@@ -110,15 +115,19 @@ LauncherApp::ReadyToRun()
 //		notify.SetTitle("Einsteinium Engine not running");
 		notify.SetContent("The Apps list will be populated from Haiku's recent applications list.  Please start the Engine if you wish to use the Engine's app statitistics.");
 		notify.Send(10000000);*/
-		BString alertS(B_TRANSLATE_COMMENT("The Einsteinium Engine is not running.  Without the Engine the Launcher's Apps list will be populated from Haiku's recent applications list.  Do you wish to start the Engine now?", "Warning message when Engine is not running"));
+/*		BString alertS(B_TRANSLATE_COMMENT("The Einsteinium Engine is not running.  Without the Engine the Launcher's Apps list will be populated from Haiku's recent applications list.  Do you wish to start the Engine now?", "Warning message when Engine is not running"));
 		BAlert *engineAlert = new BAlert("StartEngine",alertS.String(), B_TRANSLATE_COMMENT("No", "Alert button label"),
 					B_TRANSLATE_COMMENT("Yes", "Alert button label"), NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		engineAlert->SetFeel(B_FLOATING_APP_WINDOW_FEEL);
 		BMessage *runMessage = new BMessage(EL_START_ENGINE_ALERT);
-		engineAlert->Go(new BInvoker(runMessage, this));
-
+		engineAlert->Go(new BInvoker(runMessage, this));*/
+		_CheckEngineStatus(true);
 	}
+	else
+		PostMessage(EL_UPDATE_RECENT_LISTS_FORCE);
 	fWindow->Show();
+
+	_WatchForEngineChanges(true);
 
 	// Create shelf view
 	_ShowShelfView(fAppSettings.showDeskbarMenu);
@@ -299,16 +308,99 @@ LauncherApp::MessageReceived(BMessage* msg)
 			int32 selection;
 			msg->FindInt32("which", &selection);
 			// If the Yes button was selected, launch the Engine
-			if(selection){
-				status_t result = _LaunchEngine();
-				if(result==B_OK)
-					_Subscribe();
+			if(selection)
+				_LaunchEngine();
+			fEngineAlert = NULL;
+			fEngineAlertIsShowing = false;
+			break;
+		}
+		case B_SOME_APP_QUIT:
+		case B_SOME_APP_LAUNCHED: {
+			// Update Apps list if Engine launches or quits
+			const char* sig;
+			status_t result = msg->FindString("be:signature", &sig);
+			if ( result != B_OK)
+				break;
+			if(strcmp(sig, einsteinium_engine_sig) == 0)
+			{
+				_WatchForEngineChanges();
+				_Subscribe();
+				if(msg->what == B_SOME_APP_QUIT)
+				{
+					//Populate with standard recent apps list
+					PostMessage(EL_UPDATE_RECENT_LISTS_FORCE);
+					//If the deskbar menu is not running, need to ask if you want to start the Engine
+					if(!fAppSettings.showDeskbarMenu)
+						_CheckEngineStatus(true);
+				}
+				else
+				{
+					//Close the Alert if active when the Engine starts
+					_CloseEngineAlert();
+				}
 			}
 			break;
 		}
 		default:
 			BApplication::MessageReceived(msg);
 			break;
+	}
+}
+
+
+bool
+LauncherApp::_CheckEngineStatus(bool showWarning = false)
+{
+	bool engineIsRunning = _IsEngineRunning();
+
+	// Show the warning if the engine is not running, the applications wants the warning shown,
+	// and the warning is not already showing
+	if (!engineIsRunning && showWarning && !fEngineAlertIsShowing) {
+		fEngineAlert = new BAlert("StartEngine",
+			B_TRANSLATE_COMMENT("The Einsteinium Launcher has detected that the Engine is not running.  Would you like to start the Engine?", "Alert window asking to start the Engine"),
+			B_TRANSLATE("No"), B_TRANSLATE("Yes"), NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		// Set the feel to FLOATING so that the alert does not block use of the Deskbar while showing
+		fEngineAlert->SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
+		BMessage *runMessage = new BMessage(EL_START_ENGINE_ALERT);
+		fEngineAlert->Go(new BInvoker(runMessage, this));
+		fEngineAlert->Activate();
+		fEngineAlertIsShowing = true;
+	}
+	return engineIsRunning;
+}
+
+
+void
+LauncherApp::_CloseEngineAlert()
+{
+	// If the Engine warning alert is showing, close it
+	if(fEngineAlert)
+	{
+		fEngineAlert->PostMessage(B_QUIT_REQUESTED);
+		fEngineAlert = NULL;
+		fEngineAlertIsShowing = false;
+	}
+}
+
+
+void
+LauncherApp::_WatchForEngineChanges(bool firstRun = false)
+{
+	bool currentRunningStatus = _IsEngineRunning();
+	if( (currentRunningStatus != fLastEngineStatusRunning) || firstRun )
+	{
+		//Stop current watching subscription
+		if(fWatchingRoster)
+		{
+			be_roster->StopWatching(BMessenger(this));
+			fWatchingRoster = false;
+		}
+		//Set new watch subscription
+		status_t result = be_roster->StartWatching(BMessenger(this),
+							currentRunningStatus ? B_REQUEST_QUIT : B_REQUEST_LAUNCHED);
+		if(result == B_OK)
+			fWatchingRoster = true;
+		fLastEngineStatusRunning = currentRunningStatus;
 	}
 }
 
