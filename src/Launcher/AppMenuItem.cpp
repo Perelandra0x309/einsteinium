@@ -91,9 +91,9 @@ AppMenuItem::DrawContent()
 		font.GetHeight(&fFontHeight);
 	}
 
+	fSuper->SetDrawingMode(B_OP_OVER);
 	//draw icon
 	if (fIcon) {
-		fSuper->SetDrawingMode(B_OP_OVER);
 		fSuper->DrawBitmap(fIcon);
 	}
 
@@ -104,8 +104,7 @@ AppMenuItem::DrawContent()
 	GetContentSize(&labelWidth, &labelHeight);
 	float maxContentWidth = fSuper->MaxContentWidth();
 	float frameWidth = maxContentWidth > 0 ? maxContentWidth
-		: fSuper->Frame().Width() - kTextMargin;
-	frameWidth -= fOffsetWidth;
+		: fSuper->Frame().Width();
 
 	if (roundf(frameWidth) >= roundf(labelWidth))
 		fSuper->DrawString(fName);
@@ -125,4 +124,5 @@ AppMenuItem::GetContentSize(float *_width, float *_height)
 	BMenuItem::GetContentSize(_width, _height);
 	//Add 2 pixels to accommodate icon
 	(*_height)+=2;
+	(*_width)+=fOffsetWidth;
 }
