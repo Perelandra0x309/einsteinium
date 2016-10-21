@@ -5,6 +5,10 @@ Einsteinium for Haiku OS
 
 <p><b>Einsteinium Homepage:</b>
 <p><a href="https://perelandra0x309.github.io/einsteinium">https://perelandra0x309.github.io/einsteinium</a>
+<p><b>ReadMe:</a>
+<p><a href="https://github.com/Perelandra0x309/einsteinium/blob/master/docs/ReadMe.pdf">https://github.com/Perelandra0x309/einsteinium/blob/master/docs/ReadMe.pdf</a>
+<p><b>Change log:</b>
+<p><a href="https://github.com/Perelandra0x309/einsteinium/blob/master/docs/Changes">https://github.com/Perelandra0x309/einsteinium/blob/master/docs/Changes</a>
 
 <hr>
 <p><b>Older non-package management version</b>
