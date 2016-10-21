@@ -34,9 +34,9 @@ notify --group Einsteinium --onClickApp application/x-vnd.Einsteinium_Launcher -
 "Thank you for installing Einsteinium.  Click on this message to open the Launcher application."
 
 # Open ReadMe file
-if [ -f $appDir/ReadMe ]
+if [ -f $appDir/ReadMe.pdf ]
 then
-	open $appDir/ReadMe
+	open $appDir/ReadMe.pdf
 fi
 
 exit 0
