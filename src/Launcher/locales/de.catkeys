@@ -1,0 +1,84 @@
+1	German	application/x-vnd.Einsteinium_Engine	888062527
+Files, Folders and Queries	Settings 'Layout' tab	Box label	Dateien, Ordner und Queries
+the length of time between the application's two most recent launches.	Settings 'Apps Ranking' tab	Slider tooltip part 2	the length of time between the application's two most recent launches.
+Einsteinium Engine is not running.	Deskbar Menu	Message (line 2) when Engine is not running	Die Einsteinium Engine wurde nicht gestartet.
+Decrease Rank	Settings 'Apps Ranking' tab	Slider low text	Rang verringern
+Show this many apps:	Settings 'Layout' tab	Input box label	Anzahl anzuzeigender Anwendungen:
+Settings…	'Files' tab	Popup menu option	Einstellungen…
+OK	Launcher application	Button label	OK
+Quit	'Apps' list	Application pop-up menu	Beenden
+The Einsteinium Engine is not running.  Without the Engine the Launcher's Apps list will be populated from Haiku's recent applications list.  Do you wish to start the Engine now?	Launcher application	Warning message when Engine is not running	Die Einsteinium Engine wurde nicht gestartet. Ohne die Engine wird die Anwendungsliste des Launchers mit Haikus Liste der letzten Anwendungen befüllt. Soll die Engine jetzt gestartet werden?
+No	Launcher application	Alert button label	Nein
+the total number of times the application has been launched.	Settings 'Apps Ranking' tab	Slider tooltip part 2	der Anzahl der bisherigen Anwendungssstarts.
+minimally increase the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang minimal erhöhen
+Increase Rank	Settings 'Apps Ranking' tab	Slider high text	Rang erhöhen
+Show this many recent files:	Settings 'Layout' tab	Input box label	Anzahl der zuletzt benutzen Dateien:
+Small Title Bar	Settings 'Layout' tab	Window look menu item	Kleine Fensterreiter
+Exclude 	'Apps' list	Include one space at the end of text	Ausschließen 
+Font size:	Settings 'Layout' tab	Menu label	Schriftgröße:
+Date of most recent launch:	Settings 'Apps Ranking' tab	Box label	Datum des letzten Starts:
+Show in Tracker	'Files' tab	Popup menu option	Im Tracker zeigen
+Save and Recalculate Ranks	Settings 'Apps Ranking' tab	Button label	Speichern und Ränge neu berechnen
+moderately increase the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang moderat erhöhen
+Show this many recent folders:	Settings 'Layout' tab	Input box label	Anzahl der zuletzt benutzten Ordner:
+The Einsteinium Launcher sent an invalid subscription to the Engine.  Please check your Launcher settings.	Deskbar Menu	Error message when Engine subscription fails	Der Einsteinium Launcher hat eine ungültige Indizierung zur Engine gesandt. Bitte die Launcher Einstellungen überprüfen.
+Shorter interval will 	Settings 'Apps Ranking' tab	Slider label part 1	Kürzere Intervalle werden
+Date of very first launch:	Settings 'Apps Ranking' tab	Box label	Datum des ersten Starts:
+Settings…	Deskbar Menu	Deskbar menu option to open Launcher settings	Einstellungen…
+Recent files icon size:	Settings 'Layout' tab	Slider label	Icongröße der zuletzt benutzen Dateien:
+the very first date and time the application was launched.	Settings 'Apps Ranking' tab	Slider tooltip part 2	Datum und Zeit des ersten Starts der Anwendung.
+Applications in this list will be completely excluded from\nthe Launcher deskbar menu.  Adding or removing applications\nfrom this list will instantly update the Launcher.	Settings 'App Exclusions' tab	List tooltip	Anwendungen in dieser Liste tauchen im Launcher\nin der Deskbar nicht auf. Aus dieser Liste entfernte oder hinzugefügte Anwendungen werden sofort im Launcher aktualisiert.
+very heavily increase the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang sehr stark erhöhen
+Queries	'Folders & Queries' tab	Queries top parent item	Queries
+Show in Tracker	'Apps' list	Application pop-up menu	Im Tracker zeigen
+Higher runtime total will 	Settings 'Apps Ranking' tab	Slider label part 1	Längere Laufzeiten werden
+Yes	Deskbar Menu		Ja
+System size	Settings 'Layout' tab	First font menu item	Systemgröße
+Unknown type	'Files' tab	Label for unknown document type	Unbekannter Typ
+Normal Title Bar	Settings 'Layout' tab	Window look menu item	Normale Fensterreiter
+this menu.	Deskbar Menu	Message (line 4) when Engine is not running	zu füllen.
+ does not have an application signature	Settings 'App Exclusions' tab	Alert message.  Note space needed as first character	 hat keine Anwendungs-Signatur
+Warning:	Deskbar Menu	Message (line 1) when Engine is not running	Warnung:
+Time lapsed between the last two launches:	Settings 'Apps Ranking' tab	Box label	Vergangene Zeit zwischen den letzten beiden Starts:
+Total number of launches:	Settings 'Apps Ranking' tab	Box label	Gesamtzahl der Starts:
+More recent dates will 	Settings 'Apps Ranking' tab	Slider label part 1	Jüngere Daten werden 
+heavily decrease the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang stark verringern
+No	Deskbar Menu		Nein
+Lowest rank icon size:	Settings 'Layout' tab	Slider label	Icongröße des niedrigsten Rangs:
+Close Deskbar Menu	Deskbar Menu	Deskbar menu option	Deskbar Menü schließen
+Highest rank icon size:	Settings 'Layout' tab	Slider label	Icongröße des höchsten Rangs:
+slightly decrease the rank	Settings 'Apps Ranking' tab	Slider label part 2	den nur Rang leicht verringern
+This slider will set how much the application's final rank is determined by\n	Settings 'Apps Ranking' tab	Slider tooltip part 1	Dieser Regler bestimmt wie sehr der endgültige Rang der Anwendung abhängt von\n
+OK	Deskbar Menu		OK
+More launches will 	Settings 'Apps Ranking' tab	Slider label part 1	Weitere Starts werden 
+Start the Einsteinium Engine	Deskbar Menu	Deskbar menu option to start the Engine	Einsteinium Engine starten
+the total cumulative running time of the application since its first launch.	Settings 'Apps Ranking' tab	Slider tooltip part 2	die sich ansammelnde Laufzeit der Anwendung seit ihrem ersten Start.
+Settings…	'Apps' list	Application pop-up menu	Einstellungen…
+Show this many recent queries:	Settings 'Layout' tab	Input box label	Anzahl der zuletzt benutzen Queries:
+No Border	Settings 'Layout' tab	Window look menu item	Ohne Rahmen
+Yes	Launcher application	Alert button label	Ja
+There are no applications to list.	Deskbar Menu	Menu text when there are no applications in deskbar menu	Keine Anwendung für die Auflistung vorhanden.
+Show Deskbar App List	Settings 'Layout' tab	Checkbox label	Deskbar Anwendungsliste zeigen
+heavily increase the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang stark erhöhen
+have no effect	Settings 'Apps Ranking' tab	Slider label part 2	keine Auswirkung haben.
+Window look:	Settings 'Layout' tab	Menu label	Fensterstil:
+No Title Bar	Settings 'Layout' tab	Window look menu item	Ohne Fensterreiter
+slightly increase the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang leicht erhöhen
+Add…	Settings 'App Exclusions' tab	Button label	Hinzu…
+OK	Settings 'App Exclusions' tab	Button label	OK
+Total lifetime running time:	Settings 'Apps Ranking' tab	Box label	Gesamte Laufzeit:
+Click this button once the sliders are at their proper values.\nThe Launcher menu will be updated with these new settings.	Settings 'Apps Ranking' tab	Button tooltip	Diesen Button klicken wenn die Regler die gewünschten Werte zeigen.\nDas Launcher Menü wird dann mit diesen neuen Einstellungen aktualisiert.
+The Einsteinium Launcher has detected that the Engine is not running.  Would you like to start the Engine?	Deskbar Menu	Alert window asking to start the Engine	Der Einsteinium Launcher hat festgestellt, dass die Engine nicht läuft. Soll die Engine gestartet werden?
+Remove	Settings 'App Exclusions' tab	Button label	Entfernen
+Application Ranking Weights	Settings 'Apps Ranking' tab	Box label	Gewichtung der Anwendungs-Ränge
+Apps	Settings 'Layout' tab	Box label	Anwendungen
+Exclude These Apps From The Launcher	Settings 'App Exclusions' tab	Box label	Diese Anwendungen vom Launcher ausschließen.
+Folders	'Folders & Queries' tab	Folders top parent item	Ordner
+Launch	'Apps' list	Application pop-up menu	Starten
+moderately decrease the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang moderat verringern
+Exclude from Apps list	'Apps' list	Application pop-up menu	Von Anwendungsliste ausschließen
+minimally decrease the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang minimal verringern
+the most recent date and time the application was launched.	Settings 'Apps Ranking' tab	Slider tooltip part 2	Datum und Zeit des letzten Starts der Anwendung.
+The Einsteinium Launcher sent an invalid subscription to the Engine.  Please check your Launcher settings.	Launcher application	Failed subscription warning message	Der Einsteinium Launcher hat eine ungültige Indizierung zur Engine gesandt. Bitte die Launcher Einstellungen überprüfen.
+very heavily decrease the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang sehr stark verringern
+Please start the Engine to populate	Deskbar Menu	Message (line 3) when Engine is not running	Bitte Engine starten, um dieses Menü
