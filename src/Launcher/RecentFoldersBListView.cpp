@@ -51,7 +51,7 @@ RecentFoldersBListView::SettingsChanged(uint32 what)
 
 
 void
-RecentFoldersBListView::BuildList(bool force=false)
+RecentFoldersBListView::BuildList(bool force)
 {
 	if(!fWindow)
 	{

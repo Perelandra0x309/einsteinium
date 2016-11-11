@@ -564,7 +564,7 @@ einsteinium_engine::_DeleteSubscriber(Subscriber *subscriber)
 
 
 void
-einsteinium_engine::_SendListToSubscriber(Subscriber *subscriber, uint32 msgWhat = E_SUBSCRIBER_UPDATE_RANKED_APPS)
+einsteinium_engine::_SendListToSubscriber(Subscriber *subscriber, uint32 msgWhat)
 {
 	BMessage rankMsg(msgWhat);
 	int appsCount = min_c(subscriber->count, subscriber->appStatsList.CountItems());
@@ -592,7 +592,7 @@ einsteinium_engine::_PopulateAppRankMessage(BList *appStatsList, BMessage *messa
 
 /*
 void
-//einsteinium_engine::_ForEachAttrFile(int action, BList *appStatsList = NULL)
+//einsteinium_engine::_ForEachAttrFile(int action, BList *appStatsList)
 {
 	//create path for the application attribute files directory
 	BPath appAttrDirPath(fSettingsDirPath);
@@ -682,7 +682,7 @@ einsteinium_engine::_AppIsExcluded(Subscriber *subscriber, const char *signature
 
 
 void
-einsteinium_engine::_CreateAppStatsList(Subscriber *subscriber, int sortAction=SORT_BY_NONE)
+einsteinium_engine::_CreateAppStatsList(Subscriber *subscriber, int sortAction)
 {
 	_EmptyAppStatsList(subscriber->appStatsList);
 

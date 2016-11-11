@@ -95,7 +95,7 @@ EngineSubscriber::_SetTotalRuntimeScale(int value)
 
 
 void
-EngineSubscriber::_SetExcludeList(BMessage *list = NULL)
+EngineSubscriber::_SetExcludeList(BMessage *list)
 {
 	fExcludeList.MakeEmpty();
 	if(list)

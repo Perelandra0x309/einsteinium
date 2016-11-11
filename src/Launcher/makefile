@@ -21,7 +21,7 @@ SRCS = ../Engine/EngineSubscriber.cpp \
 	AppMenuItem.h \
 	SuperTypeListItem.cpp \
 	LauncherSettingsFile.cpp
-LIBS = be localestub tracker stdc++.r4 xml2
+LIBS = be localestub tracker $(STDCPPLIBS) xml2
 OPTIMIZE = FULL
 RDEFS = einsteinium_launcher.rdef
 
@@ -80,7 +80,7 @@ LINKER_FLAGS =
 APP_VERSION :=
 
 #       Specify if you want the object files to be somewhere besides the default location.
-OBJ_DIR := _objects
+OBJ_DIR := _Lobjects
 
 #       Specify a non default placement for the target
 TARGET_DIR := .

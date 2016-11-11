@@ -327,7 +327,7 @@ RecentDocsBListView::ScrollToNextDocBeginningWith(char letter)
 
 
 void
-RecentDocsBListView::BuildList(bool force=false)
+RecentDocsBListView::BuildList(bool force)
 {
 	if(!fWindow)
 	{
@@ -579,7 +579,7 @@ RecentDocsBListView::_InitPopUpMenu(int32 selectedIndex)
 
 
 void
-RecentDocsBListView::_HideApp(uint32 modifier=0)
+RecentDocsBListView::_HideApp(uint32 modifier)
 {
 	if(!(modifier & kPreventHideModifier) )
 		be_app->PostMessage(EL_HIDE_APP);

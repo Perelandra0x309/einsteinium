@@ -61,7 +61,7 @@ LINKER_FLAGS =
 APP_VERSION :=
 
 #       Specify if you want the object files to be somewhere besides the default location.
-OBJ_DIR := _objects
+OBJ_DIR := _Dobjects
 
 #       Specify a non default placement for the target
 TARGET_DIR := .

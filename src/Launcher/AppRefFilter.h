@@ -7,6 +7,7 @@
 
 #include <FilePanel.h>
 #include <NodeInfo.h>
+#include <string.h>
 
 class AppRefFilter : public BRefFilter {
 public:

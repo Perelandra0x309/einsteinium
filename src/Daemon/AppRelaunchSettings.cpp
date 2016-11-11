@@ -24,7 +24,7 @@ AppRelaunchSettings::AppRelaunchSettings(AppRelaunchSettings* sourceSettings)
 }
 
 
-AppRelaunchSettings::AppRelaunchSettings(const char *_signature, int _relaunch = ACTION_DEFAULT)
+AppRelaunchSettings::AppRelaunchSettings(const char *_signature, int _relaunch)
 	:
 	appPath(""),
 	name(B_TRANSLATE_COMMENT("<Name not found>", "Keep first and last < >"))
@@ -44,7 +44,7 @@ AppRelaunchSettings::AppRelaunchSettings(const char *_signature, int _relaunch =
 
 
 AppRelaunchSettings::AppRelaunchSettings(const char *_signature, BPath _path,
-	int _relaunch = ACTION_DEFAULT)
+	int _relaunch)
 	:
 	appPath(""),
 	name(B_TRANSLATE_COMMENT("<Name not found>", "Keep first and last < >"))

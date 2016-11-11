@@ -384,7 +384,7 @@ ELShelfView::_BuildMenu(BMessage *message)
 
 
 bool
-ELShelfView::_CheckEngineStatus(bool showWarning = false)
+ELShelfView::_CheckEngineStatus(bool showWarning)
 {
 	bool engineIsRunning = _IsEngineRunning();
 

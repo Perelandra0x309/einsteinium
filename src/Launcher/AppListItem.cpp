@@ -290,7 +290,7 @@ AppListItem::_StopService()
 
 
 void
-AppListItem::DrawItem(BView *owner, BRect item_rect, bool complete = false)
+AppListItem::DrawItem(BView *owner, BRect item_rect, bool complete)
 {
 	float offset_width = 0, offset_height = fFontAscent;
 	float listItemHeight = Height();
