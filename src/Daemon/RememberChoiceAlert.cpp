@@ -8,10 +8,10 @@
 #define B_TRANSLATION_CONTEXT "RememberChoiceAlert.cpp"
 
 RememberChoiceAlert::RememberChoiceAlert(const char* title, const char* text,
-								const char* button0Label, const char* button1Label = NULL,
-								const char* button2Label = NULL,
-								button_width widthStyle = B_WIDTH_AS_USUAL,
-								alert_type type = B_INFO_ALERT)
+								const char* button0Label, const char* button1Label,
+								const char* button2Label,
+								button_width widthStyle,
+								alert_type type)
 	:
 	BAlert(title, text, button0Label, button1Label, button2Label, widthStyle, type)
 {

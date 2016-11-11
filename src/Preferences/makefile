@@ -15,7 +15,7 @@ SRCS = ../Common/methods.cpp \
 		prefsWindow.cpp \
 		prefs_app.cpp \
 		main.cpp
-LIBS = be localestub tracker stdc++.r4 xml2
+LIBS = be localestub tracker $(STDCPPLIBS) xml2
 OPTIMIZE = FULL
 RDEFS = einsteinium_prefs.rdef
 
@@ -74,7 +74,7 @@ LINKER_FLAGS =
 APP_VERSION :=
 
 #       Specify if you want the object files to be somewhere besides the default location.
-OBJ_DIR := _objects
+OBJ_DIR := _Pobjects
 
 #       Specify a non default placement for the target
 TARGET_DIR := .

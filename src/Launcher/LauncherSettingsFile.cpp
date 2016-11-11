@@ -5,7 +5,7 @@
 #include "LauncherSettingsFile.h"
 
 
-LauncherSettingsFile::LauncherSettingsFile(BHandler *messageHandler=NULL)
+LauncherSettingsFile::LauncherSettingsFile(BHandler *messageHandler)
 	:
 	BHandler("name"),
 	fStatus(B_ERROR),
@@ -359,7 +359,7 @@ LauncherSettingsFile::_ParseExclusionSettings(xmlDocPtr doc, xmlNodePtr cur)
 
 
 int
-LauncherSettingsFile::_XmlGetIntProp(xmlNodePtr cur, char *name, int defaultValue=0)
+LauncherSettingsFile::_XmlGetIntProp(xmlNodePtr cur, const char *name, int defaultValue)
 {
 	int intValue;
 	xmlChar *xmlValue = xmlGetProp(cur, (const xmlChar *) name);

@@ -5,7 +5,7 @@
 #include "EDSettingsFile.h"
 
 
-EDSettingsFile::EDSettingsFile(BHandler *messageHandler=NULL)
+EDSettingsFile::EDSettingsFile(BHandler *messageHandler)
 	:
 	BHandler("name"),
 	fExternalMessageHandler(messageHandler),

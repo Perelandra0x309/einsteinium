@@ -243,7 +243,7 @@ MainView::BuildAppsListView(BMessage *message)
 
 
 void
-MainView::_BuildAppsListViewFromRecent(bool force=false)
+MainView::_BuildAppsListViewFromRecent(bool force)
 {
 	fAppsListView->BuildAppsListFromRecent(force);
 	MakeFocus();
@@ -251,14 +251,14 @@ MainView::_BuildAppsListViewFromRecent(bool force=false)
 
 
 void
-MainView::_BuildDocsListView(bool force=false)
+MainView::_BuildDocsListView(bool force)
 {
 	fDocsListView->BuildList(force);
 	MakeFocus();
 }
 
 void
-MainView::_BuildFoldersListView(bool force=false)
+MainView::_BuildFoldersListView(bool force)
 {
 	fFoldersListView->BuildList(force);
 	MakeFocus();

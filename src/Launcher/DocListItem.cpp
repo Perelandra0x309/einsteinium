@@ -5,7 +5,7 @@
 #include "DocListItem.h"
 
 
-DocListItem::DocListItem(entry_ref *entry, AppSettings *settings, int level=0)
+DocListItem::DocListItem(entry_ref *entry, AppSettings *settings, int level)
 	:
 	BListItem(level),
 //	fDrawTwoLines(false),
@@ -244,7 +244,7 @@ DocListItem::_OpenDoc()
 
 
 void
-DocListItem::DrawItem(BView *owner, BRect item_rect, bool complete = false)
+DocListItem::DrawItem(BView *owner, BRect item_rect, bool complete)
 {
 	float offset_width = 0, offset_height = fFontAscent;
 	float listItemHeight = Height();

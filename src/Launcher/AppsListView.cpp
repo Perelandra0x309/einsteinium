@@ -352,7 +352,7 @@ AppsListView::BuildAppsListView(BMessage *message)
 
 
 void
-AppsListView::BuildAppsListFromRecent(bool force=false)
+AppsListView::BuildAppsListFromRecent(bool force)
 {
 	if(!fWindow)
 		return;
@@ -542,7 +542,7 @@ AppsListView::_InitPopUpMenu(int32 selectedIndex)
 
 
 void
-AppsListView::_HideApp(uint32 modifier=0)
+AppsListView::_HideApp(uint32 modifier)
 {
 	if(!(modifier & kPreventHideModifier) )
 		be_app->PostMessage(EL_HIDE_APP);

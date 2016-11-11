@@ -6,7 +6,7 @@ SRCS = ../Common/methods.cpp \
 		AppAttrFile.cpp \
 		einsteinium_engine.cpp \
 		main.cpp
-LIBS = be tracker stdc++.r4 xml2 sqlite3
+LIBS = be tracker $(STDCPPLIBS) xml2 sqlite3
 OPTIMIZE = FULL
 RDEFS = einsteinium_engine.rdef
 
@@ -58,7 +58,7 @@ LINKER_FLAGS =
 APP_VERSION :=
 
 #       Specify if you want the object files to be somewhere besides the default location.
-OBJ_DIR := _objects
+OBJ_DIR := _Eobjects
 
 #       Specify a non default placement for the target
 TARGET_DIR := .

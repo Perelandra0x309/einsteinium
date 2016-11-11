@@ -349,7 +349,7 @@ LauncherApp::MessageReceived(BMessage* msg)
 
 
 bool
-LauncherApp::_CheckEngineStatus(bool showWarning = false)
+LauncherApp::_CheckEngineStatus(bool showWarning)
 {
 	bool engineIsRunning = _IsEngineRunning();
 
@@ -384,7 +384,7 @@ LauncherApp::_CloseEngineAlert()
 
 
 void
-LauncherApp::_WatchForEngineChanges(bool firstRun = false)
+LauncherApp::_WatchForEngineChanges(bool firstRun)
 {
 	bool currentRunningStatus = _IsEngineRunning();
 	if( (currentRunningStatus != fLastEngineStatusRunning) || firstRun )

@@ -82,7 +82,7 @@ private:
 
 	void					_StartWatching();
 	void					_StopWatching();
-	int						_XmlGetIntProp(xmlNodePtr cur, char *name, int defaultValue=0);
+	int						_XmlGetIntProp(xmlNodePtr cur, const char *name, int defaultValue=0);
 	void					_ReadSettingsFromFile(BPath settingsPath);
 	void					_ReadLegacyXMLSettingsFromFile(BPath settingsPath);
 	void					_ParseExclusionSettings(xmlDocPtr doc, xmlNodePtr cur);
