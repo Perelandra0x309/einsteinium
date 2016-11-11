@@ -357,8 +357,8 @@ LauncherApp::_CheckEngineStatus(bool showWarning)
 	// and the warning is not already showing
 	if (!engineIsRunning && showWarning && !fEngineAlertIsShowing) {
 		fEngineAlert = new BAlert("StartEngine",
-			B_TRANSLATE_COMMENT("The Einsteinium Launcher has detected that the Engine is not running.  Would you like to start the Engine?", "Alert window asking to start the Engine"),
-			B_TRANSLATE("No"), B_TRANSLATE("Yes"), NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+			B_TRANSLATE_COMMENT("The Einsteinium Engine is not running.  Without the Engine the Launcher's Apps list will be populated from Haiku's recent applications list.  Do you wish to start the Engine now?", "Warning message when Engine is not running"),
+			B_TRANSLATE_COMMENT("No", "Alert button label"), B_TRANSLATE_COMMENT("Yes", "Alert button label"), NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		// Set the feel to FLOATING so that the alert does not block use of the Deskbar while showing
 		fEngineAlert->SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
 		BMessage *runMessage = new BMessage(EL_START_ENGINE_ALERT);
