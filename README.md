@@ -10,6 +10,9 @@ Einsteinium for Haiku OS
 <p><b>Change log:</b>
 <p><a href="https://github.com/Perelandra0x309/einsteinium/blob/master/docs/Changes">https://github.com/Perelandra0x309/einsteinium/blob/master/docs/Changes</a>
 
+<p><b>Translations Help:</b>
+<p>Yes Einsteinium has been localized!  If you would like to help with a translation please reference the <a href="https://github.com/Perelandra0x309/einsteinium/wiki/Translations-Help">wiki page</a>.
+
 <hr>
 <p><b>Older non-package management version</b>
 <p>The last release for Haiku OS Release 1 Alpha 4 (non-package management) was version 1.1 and is available at the old Sourceforge page:
