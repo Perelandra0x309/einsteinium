@@ -9,7 +9,7 @@
 
 LauncherExclusionsView::LauncherExclusionsView(BRect size, BMessage *appExclusions)
 	:
-	BView(size, "Apps Exclusions", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS)
+	BView(size, B_TRANSLATE_COMMENT("Apps Exclusions", "Tab label"), B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS)
 {
 //	SetViewColor(bg_color);
 	BRect viewRect;
@@ -48,9 +48,8 @@ LauncherExclusionsView::LauncherExclusionsView(BRect size, BMessage *appExclusio
 	fExclusionLView->SetSelectionMessage(new BMessage(EL_EXCLUSION_SELECTION_CHANGED));
 	fExclusionSView = new BScrollView("Attr List Scroll View", fExclusionLView, B_FOLLOW_ALL_SIDES, 0,
 								false, true);
-	fExclusionSView->SetToolTip(B_TRANSLATE_COMMENT("Applications in this list will be completely excluded from\n"
-								"the Launcher deskbar menu.  Adding or removing applications\n"
-								"from this list will instantly update the Launcher.", "List tooltip"));
+	fExclusionSView->SetToolTip(B_TRANSLATE_COMMENT("Applications in this list will be excluded from "
+								"the Launcher.", "List tooltip"));
 
 	// Inidividual app settings
 	fSettingsBox = new BBox("Exclusion Settings");
@@ -166,7 +165,8 @@ LauncherExclusionsView::AddExclusion(BMessage* refMsg)
 	else
 	{
 		BString text(srcRef.name);
-		text.Append(B_TRANSLATE_COMMENT(" does not have an application signature", "Alert message.  Note space needed as first character"));
+		text.Append(" ");
+		text.Append(B_TRANSLATE_COMMENT("does not have an application signature", "Alert message"));
 		(new BAlert("",text,B_TRANSLATE_COMMENT("OK", "Button label"), NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go(NULL);
 	}
 	delete[] buf;

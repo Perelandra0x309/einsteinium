@@ -1,10 +1,10 @@
-1	English	application/x-vnd.Einsteinium_Engine	888062527
+1	English	application/x-vnd.Einsteinium_Engine	419800861
+Exclude	'Apps' list	Added to application label when modifier key pressed	Exclude
 Exclude from Apps list	'Apps' list	Application pop-up menu	Exclude from Apps list
 Launch	'Apps' list	Application pop-up menu	Launch
 Quit	'Apps' list	Application pop-up menu	Quit
 Settings…	'Apps' list	Application pop-up menu	Settings…
 Show in Tracker	'Apps' list	Application pop-up menu	Show in Tracker
-Exclude 	'Apps' list	Include one space at the end of text	Exclude 
 Unknown type	'Files' tab	Label for unknown document type	Unknown type
 Settings…	'Files' tab	Popup menu option	Settings…
 Show in Tracker	'Files' tab	Popup menu option	Show in Tracker
@@ -28,12 +28,16 @@ Yes	Launcher application	Alert button label	Yes
 OK	Launcher application	Button label	OK
 The Einsteinium Launcher sent an invalid subscription to the Engine.  Please check your Launcher settings.	Launcher application	Failed subscription warning message	The Einsteinium Launcher sent an invalid subscription to the Engine.  Please check your Launcher settings.
 The Einsteinium Engine is not running.  Without the Engine the Launcher's Apps list will be populated from Haiku's recent applications list.  Do you wish to start the Engine now?	Launcher application	Warning message when Engine is not running	The Einsteinium Engine is not running.  Without the Engine the Launcher's Apps list will be populated from Haiku's recent applications list.  Do you wish to start the Engine now?
- does not have an application signature	Settings 'App Exclusions' tab	Alert message.  Note space needed as first character	 does not have an application signature
+Apps	Launcher tabs	Tab label	Apps
+Files	Launcher tabs	Tab label	Files
+Folders & Queries	Launcher tabs	Tab label	Folders & Queries
+does not have an application signature	Settings 'App Exclusions' tab	Alert message	does not have an application signature
 Exclude These Apps From The Launcher	Settings 'App Exclusions' tab	Box label	Exclude These Apps From The Launcher
 Add…	Settings 'App Exclusions' tab	Button label	Add…
 OK	Settings 'App Exclusions' tab	Button label	OK
 Remove	Settings 'App Exclusions' tab	Button label	Remove
-Applications in this list will be completely excluded from\nthe Launcher deskbar menu.  Adding or removing applications\nfrom this list will instantly update the Launcher.	Settings 'App Exclusions' tab	List tooltip	Applications in this list will be completely excluded from\nthe Launcher deskbar menu.  Adding or removing applications\nfrom this list will instantly update the Launcher.
+Applications in this list will be excluded from the Launcher.	Settings 'App Exclusions' tab	List tooltip	Applications in this list will be excluded from the Launcher.
+Apps Exclusions	Settings 'App Exclusions' tab	Tab label	Apps Exclusions
 Application Ranking Weights	Settings 'Apps Ranking' tab	Box label	Application Ranking Weights
 Date of most recent launch:	Settings 'Apps Ranking' tab	Box label	Date of most recent launch:
 Date of very first launch:	Settings 'Apps Ranking' tab	Box label	Date of very first launch:
@@ -41,12 +45,12 @@ Time lapsed between the last two launches:	Settings 'Apps Ranking' tab	Box label
 Total lifetime running time:	Settings 'Apps Ranking' tab	Box label	Total lifetime running time:
 Total number of launches:	Settings 'Apps Ranking' tab	Box label	Total number of launches:
 Save and Recalculate Ranks	Settings 'Apps Ranking' tab	Button label	Save and Recalculate Ranks
-Click this button once the sliders are at their proper values.\nThe Launcher menu will be updated with these new settings.	Settings 'Apps Ranking' tab	Button tooltip	Click this button once the sliders are at their proper values.\nThe Launcher menu will be updated with these new settings.
+Click this button once the sliders are at their proper values. The Launcher menu will be updated with these new settings.	Settings 'Apps Ranking' tab	Button tooltip	Click this button once the sliders are at their proper values. The Launcher menu will be updated with these new settings.
 Increase Rank	Settings 'Apps Ranking' tab	Slider high text	Increase Rank
-Higher runtime total will 	Settings 'Apps Ranking' tab	Slider label part 1	Higher runtime total will 
-More launches will 	Settings 'Apps Ranking' tab	Slider label part 1	More launches will 
-More recent dates will 	Settings 'Apps Ranking' tab	Slider label part 1	More recent dates will 
-Shorter interval will 	Settings 'Apps Ranking' tab	Slider label part 1	Shorter interval will 
+Higher runtime total will	Settings 'Apps Ranking' tab	Slider label part 1	Higher runtime total will
+More launches will	Settings 'Apps Ranking' tab	Slider label part 1	More launches will
+More recent dates will	Settings 'Apps Ranking' tab	Slider label part 1	More recent dates will
+Shorter interval will	Settings 'Apps Ranking' tab	Slider label part 1	Shorter interval will
 have no effect	Settings 'Apps Ranking' tab	Slider label part 2	have no effect
 heavily decrease the rank	Settings 'Apps Ranking' tab	Slider label part 2	heavily decrease the rank
 heavily increase the rank	Settings 'Apps Ranking' tab	Slider label part 2	heavily increase the rank
@@ -59,12 +63,13 @@ slightly increase the rank	Settings 'Apps Ranking' tab	Slider label part 2	sligh
 very heavily decrease the rank	Settings 'Apps Ranking' tab	Slider label part 2	very heavily decrease the rank
 very heavily increase the rank	Settings 'Apps Ranking' tab	Slider label part 2	very heavily increase the rank
 Decrease Rank	Settings 'Apps Ranking' tab	Slider low text	Decrease Rank
-This slider will set how much the application's final rank is determined by\n	Settings 'Apps Ranking' tab	Slider tooltip part 1	This slider will set how much the application's final rank is determined by\n
+This slider will set how much the application's final rank is determined by	Settings 'Apps Ranking' tab	Slider tooltip part 1	This slider will set how much the application's final rank is determined by
 the length of time between the application's two most recent launches.	Settings 'Apps Ranking' tab	Slider tooltip part 2	the length of time between the application's two most recent launches.
 the most recent date and time the application was launched.	Settings 'Apps Ranking' tab	Slider tooltip part 2	the most recent date and time the application was launched.
 the total cumulative running time of the application since its first launch.	Settings 'Apps Ranking' tab	Slider tooltip part 2	the total cumulative running time of the application since its first launch.
 the total number of times the application has been launched.	Settings 'Apps Ranking' tab	Slider tooltip part 2	the total number of times the application has been launched.
 the very first date and time the application was launched.	Settings 'Apps Ranking' tab	Slider tooltip part 2	the very first date and time the application was launched.
+Apps Ranking	Settings 'Apps Ranking' tab	Tab label	Apps Ranking
 Apps	Settings 'Layout' tab	Box label	Apps
 Files, Folders and Queries	Settings 'Layout' tab	Box label	Files, Folders and Queries
 Show Deskbar App List	Settings 'Layout' tab	Checkbox label	Show Deskbar App List
@@ -78,7 +83,9 @@ Window look:	Settings 'Layout' tab	Menu label	Window look:
 Highest rank icon size:	Settings 'Layout' tab	Slider label	Highest rank icon size:
 Lowest rank icon size:	Settings 'Layout' tab	Slider label	Lowest rank icon size:
 Recent files icon size:	Settings 'Layout' tab	Slider label	Recent files icon size:
+Layout	Settings 'Layout' tab	Tab label	Layout
 No Border	Settings 'Layout' tab	Window look menu item	No Border
 No Title Bar	Settings 'Layout' tab	Window look menu item	No Title Bar
 Normal Title Bar	Settings 'Layout' tab	Window look menu item	Normal Title Bar
 Small Title Bar	Settings 'Layout' tab	Window look menu item	Small Title Bar
+Einsteinium Launcher Settings	Settings window	Settings window title	Einsteinium Launcher Settings

@@ -11,7 +11,7 @@ AppListItem::AppListItem(BEntry entry, const char * sig, int iconSize)
 	:
 	BListItem(),
 //	fDrawTwoLines(false),
-	fRemoveName(B_TRANSLATE_COMMENT("Exclude ", "Include one space at the end of text")),
+	fRemoveName(B_TRANSLATE_COMMENT("Exclude", "Added to application label when modifier key pressed")),
 	fInitStatus(B_ERROR)
 {
 	// Draw Settings
@@ -26,6 +26,7 @@ AppListItem::AppListItem(BEntry entry, const char * sig, int iconSize)
 	BPath path;
 	entry.GetPath(&path);
 	fName.SetTo(path.Leaf());
+	fRemoveName.Append(" ");
 	fRemoveName.Append(fName);
 	fSignature.SetTo(sig);
 	entry.GetRef(&fEntryRef);

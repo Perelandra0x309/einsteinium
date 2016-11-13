@@ -9,7 +9,7 @@
 
 SettingsView::SettingsView(BRect size, AppSettings* settings)
 	:
-	BView(size, "Layout", B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
+	BView(size, B_TRANSLATE_COMMENT("Layout", "Tab label"), B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
 {
 /*	fOneLineRB = new BRadioButton("One Line", "Show application name and status on one line",
 		new BMessage(LINES_OPTION_CHANGED));
@@ -56,8 +56,7 @@ SettingsView::SettingsView(BRect size, AppSettings* settings)
 	textView->SetMaxBytes(3);
 //	textView->SetExplicitMaxSize(BSize(be_plain_font->StringWidth("0000"), B_SIZE_UNSET));
 
-	fMaxIconsizeS = new BSlider("Max Icon Size", B_TRANSLATE_COMMENT("Highest rank icon size:", "Slider label"),
-						NULL, 1, 8, B_HORIZONTAL, B_TRIANGLE_THUMB);
+	fMaxIconsizeS = new BSlider("Max Icon Size", "", NULL, 1, 8, B_HORIZONTAL, B_TRIANGLE_THUMB);
 	fMaxIconsizeS->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fMaxIconsizeS->SetHashMarkCount(8);
 	BString minLabel, maxLabel;
@@ -66,15 +65,13 @@ SettingsView::SettingsView(BRect size, AppSettings* settings)
 	fMaxIconsizeS->SetLimitLabels(minLabel.String(),maxLabel.String());
 	fMaxIconsizeS->SetModificationMessage(new BMessage(EL_APP_ICON_OPTION_DRAG));
 
-	fMinIconsizeS = new BSlider("Min Icon Size", B_TRANSLATE_COMMENT("Lowest rank icon size:", "Slider label"),
-						NULL, 1, 8, B_HORIZONTAL, B_TRIANGLE_THUMB);
+	fMinIconsizeS = new BSlider("Min Icon Size", "", NULL, 1, 8, B_HORIZONTAL, B_TRIANGLE_THUMB);
 	fMinIconsizeS->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fMinIconsizeS->SetHashMarkCount(8);
 	fMinIconsizeS->SetLimitLabels(minLabel.String(),maxLabel.String());
 	fMinIconsizeS->SetModificationMessage(new BMessage(EL_APP_ICON_OPTION_DRAG));
 
-	fDocIconsizeS = new BSlider("Doc Icon Size", B_TRANSLATE_COMMENT("Recent files icon size:", "Slider label"),
-						NULL, 1, 8, B_HORIZONTAL, B_TRIANGLE_THUMB);
+	fDocIconsizeS = new BSlider("Doc Icon Size", "", NULL, 1, 8, B_HORIZONTAL, B_TRIANGLE_THUMB);
 	fDocIconsizeS->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fDocIconsizeS->SetHashMarkCount(8);
 	fDocIconsizeS->SetLimitLabels(minLabel.String(),maxLabel.String());
@@ -628,7 +625,8 @@ SettingsView::_SliderValueForIconSize(int value)
 void
 SettingsView::_SetMaxIconLabel(int value)
 {
-	BString label("Highest rank icon size: ");
+	BString label(B_TRANSLATE_COMMENT("Highest rank icon size:", "Slider label"));
+	label.Append(" ");
 	label << value;
 	fMaxIconsizeS->SetLabel(label.String());
 }
@@ -637,7 +635,8 @@ SettingsView::_SetMaxIconLabel(int value)
 void
 SettingsView::_SetMinIconLabel(int value)
 {
-	BString label("Lowest rank icon size: ");
+	BString label(B_TRANSLATE_COMMENT("Lowest rank icon size:", "Slider label"));
+	label.Append(" ");
 	label << value;
 	fMinIconsizeS->SetLabel(label.String());
 }
@@ -646,7 +645,8 @@ SettingsView::_SetMinIconLabel(int value)
 void
 SettingsView::_SetDocIconLabel(int value)
 {
-	BString label("Icon size: ");
+	BString label(B_TRANSLATE_COMMENT("Recent files icon size:", "Slider label"));
+	label.Append(" ");
 	label << value;
 	fDocIconsizeS->SetLabel(label.String());
 }

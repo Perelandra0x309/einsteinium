@@ -4,6 +4,9 @@
  */
 #include "MainView.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Launcher tabs"
+
 MainView::MainView(BRect size)
 	:
 	BTabView("MainView", B_WIDTH_FROM_LABEL),
@@ -17,15 +20,18 @@ MainView::MainView(BRect size)
 //	viewRect.bottom-=(TabHeight()+6);
 	fAppsListView = new AppsListView(viewRect);
 	fAppsListView->SetFontSizeForValue(settings->fontSize);
-	fAppsScrollView = new BScrollView("Apps", fAppsListView, /*B_FOLLOW_ALL_SIDES, */0, false, true, B_NO_BORDER);
+	fAppsScrollView = new BScrollView(B_TRANSLATE_COMMENT("Apps", "Tab label"),
+					fAppsListView, /*B_FOLLOW_ALL_SIDES, */0, false, true, B_NO_BORDER);
 
 	fDocsListView = new RecentDocsBListView(viewRect);
 	fDocsListView->SetFontSizeForValue(settings->fontSize);
-	fDocsScrollView = new BScrollView("Files", fDocsListView, /*B_FOLLOW_ALL_SIDES, */0, false, true, B_NO_BORDER);
+	fDocsScrollView = new BScrollView(B_TRANSLATE_COMMENT("Files", "Tab label"),
+					fDocsListView, /*B_FOLLOW_ALL_SIDES, */0, false, true, B_NO_BORDER);
 
 	fFoldersListView = new RecentFoldersBListView(viewRect);
 	fFoldersListView->SetFontSizeForValue(settings->fontSize);
-	fFoldersScrollView = new BScrollView("Folders & Queries", fFoldersListView, /*B_FOLLOW_ALL_SIDES, */0, false, true, B_NO_BORDER);
+	fFoldersScrollView = new BScrollView(B_TRANSLATE_COMMENT("Folders & Queries", "Tab label"),
+					fFoldersListView, /*B_FOLLOW_ALL_SIDES, */0, false, true, B_NO_BORDER);
 
 	fAppsTab = new BTab();
 	AddTab(fAppsScrollView, fAppsTab);

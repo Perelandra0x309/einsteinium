@@ -4,11 +4,14 @@
  */
 #include "SettingsWindow.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Settings window"
+
 SettingsWindow::SettingsWindow(AppSettings* settings, ScaleSettings* scales,
 								BMessage *appExclusions)
 	:
-	BWindow(BRect(), "Einsteinium Launcher Settings", B_FLOATING_WINDOW_LOOK,
-	B_MODAL_ALL_WINDOW_FEEL, B_NOT_ZOOMABLE | /*B_NOT_RESIZABLE | */B_ASYNCHRONOUS_CONTROLS)
+	BWindow(BRect(), B_TRANSLATE_COMMENT("Einsteinium Launcher Settings", "Settings window title"),
+		B_FLOATING_WINDOW_LOOK, B_MODAL_ALL_WINDOW_FEEL, B_NOT_ZOOMABLE | /*B_NOT_RESIZABLE | */B_ASYNCHRONOUS_CONTROLS)
 {
 	Lock();
 	BRect bounds = Bounds();

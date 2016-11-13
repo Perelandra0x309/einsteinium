@@ -1,4 +1,4 @@
-1	English	application/x-vnd.Einsteinium_Preferences	548383269
+1	English	application/x-vnd.Einsteinium_Preferences	3299147149
 <Name not found>	AppRelaunchSettings.cpp	Keep first and last < >	<Name not found>
 Executable does not have an application signature	Daemon relaunch view	Alert message	Executable does not have an application signature
 Application Relaunch Settings	Daemon relaunch view	Box label	Application Relaunch Settings
@@ -28,6 +28,12 @@ The Launcher settings are set within the Launcher application.  Click the button
 Einsteinium provides smarter monitoring of applications and system services for Haiku.  Currently the two major functions implimented are automatically restarting applications and system services that quit or crash, and gathering statistics on application usage to provide customizable ranked lists of applications.\n\nThis preferences application is used to set options for the Einsteinium Daemon and Engine.  See each application's main section to get more details.	Main Window	About text	Einsteinium provides smarter monitoring of applications and system services for Haiku.  Currently the two major functions implimented are automatically restarting applications and system services that quit or crash, and gathering statistics on application usage to provide customizable ranked lists of applications.\n\nThis preferences application is used to set options for the Einsteinium Daemon and Engine.  See each application's main section to get more details.
 About Einsteinium Preferences	Main Window	Box label	About Einsteinium Preferences
 Einsteinium Copyright 2013 by Brian Hill	Main Window	Copyright text	Einsteinium Copyright 2013 by Brian Hill
+App Relaunch	Main Window	List label	App Relaunch
+Daemon	Main Window	List label	Daemon
+Engine	Main Window	List label	Engine
+Launcher	Main Window	List label	Launcher
+Maintenance	Main Window	List label	Maintenance
+Einsteinium Preferences	Main Window	Window title	Einsteinium Preferences
 Error: Could not create messenger for service 	Status box	Alert message	Error: Could not create messenger for service 
 Restart	Status box	Button label	Restart
 Start	Status box	Button label	Start

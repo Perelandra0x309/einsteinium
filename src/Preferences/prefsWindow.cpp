@@ -9,7 +9,7 @@
 
 prefsWindow::prefsWindow(BRect size)
 	:
-	BWindow(size, "Einsteinium Preferences", B_TITLED_WINDOW, B_NOT_ZOOMABLE)
+	BWindow(size, B_TRANSLATE_COMMENT("Einsteinium Preferences", "Window title"), B_TITLED_WINDOW, B_NOT_ZOOMABLE)
 {
 	Lock();
 	BRect viewRect(Bounds());
@@ -23,13 +23,17 @@ prefsWindow::prefsWindow(BRect size)
 	fPrefsListView = new BListView(viewRect, "Preferences", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
 	fPrefsListView->SetSelectionMessage(new BMessage(PREFS_ITEM_CHANGED));
 	//Daemon settings
-	fDaemonBLI = new BitmapListItem(e_daemon_sig, "Daemon");
-	fDAppLaunchSI = new BStringItem("    App Relaunch");
+	fDaemonBLI = new BitmapListItem(e_daemon_sig, B_TRANSLATE_COMMENT("Daemon", "List label"));
+	BString appRelaunchLabel("    ");
+	appRelaunchLabel.Append(B_TRANSLATE_COMMENT("App Relaunch", "List label"));
+	fDAppLaunchSI = new BStringItem(appRelaunchLabel);
 	//Engine settings
-	fEngineBLI = new BitmapListItem(e_engine_sig, "Engine");
-	fEMaintSI = new BStringItem("    Maintenance");
+	fEngineBLI = new BitmapListItem(e_engine_sig, B_TRANSLATE_COMMENT("Engine", "List label"));
+	BString maintenanceLabel("    ");
+	maintenanceLabel.Append(B_TRANSLATE_COMMENT("Maintenance", "List label"));
+	fEMaintSI = new BStringItem(maintenanceLabel);
 	//Launcher settings
-	fLauncherBLI = new BitmapListItem(e_launcher_sig, "Launcher");
+	fLauncherBLI = new BitmapListItem(e_launcher_sig, B_TRANSLATE_COMMENT("Launcher", "List label"));
 
 	//Resize the list view
 	BFont font;

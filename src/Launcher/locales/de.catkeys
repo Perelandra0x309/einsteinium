@@ -1,18 +1,18 @@
-1	German	application/x-vnd.Einsteinium_Engine	888062527
+1	English	application/x-vnd.Einsteinium_Engine	419800861
+Exclude	'Apps' list	Added to application label when modifier key pressed	Ausschließen
+Exclude from Apps list	'Apps' list	Application pop-up menu	Von Anwendungsliste ausschließen
+Launch	'Apps' list	Application pop-up menu	Starten
 Quit	'Apps' list	Application pop-up menu	Beenden
 Settings…	'Apps' list	Application pop-up menu	Einstellungen…
 Show in Tracker	'Apps' list	Application pop-up menu	Im Tracker zeigen
-Launch	'Apps' list	Application pop-up menu	Starten
-Exclude from Apps list	'Apps' list	Application pop-up menu	Von Anwendungsliste ausschließen
-Exclude 	'Apps' list	Include one space at the end of text	Ausschließen 
 Unknown type	'Files' tab	Label for unknown document type	Unbekannter Typ
 Settings…	'Files' tab	Popup menu option	Einstellungen…
 Show in Tracker	'Files' tab	Popup menu option	Im Tracker zeigen
 Folders	'Folders & Queries' tab	Folders top parent item	Ordner
 Queries	'Folders & Queries' tab	Queries top parent item	Queries
-Yes	Deskbar Menu		Ja
 No	Deskbar Menu		Nein
 OK	Deskbar Menu		OK
+Yes	Deskbar Menu		Ja
 The Einsteinium Launcher has detected that the Engine is not running.  Would you like to start the Engine?	Deskbar Menu	Alert window asking to start the Engine	Der Einsteinium Launcher hat festgestellt, dass die Engine nicht läuft. Soll die Engine gestartet werden?
 Close Deskbar Menu	Deskbar Menu	Deskbar menu option	Deskbar Menü schließen
 Settings…	Deskbar Menu	Deskbar menu option to open Launcher settings	Einstellungen…
@@ -23,62 +23,69 @@ Warning:	Deskbar Menu	Message (line 1) when Engine is not running	Warnung:
 Einsteinium Engine is not running.	Deskbar Menu	Message (line 2) when Engine is not running	Die Einsteinium Engine wurde nicht gestartet.
 Please start the Engine to populate	Deskbar Menu	Message (line 3) when Engine is not running	Bitte Engine starten, um dieses Menü
 this menu.	Deskbar Menu	Message (line 4) when Engine is not running	zu füllen.
-Yes	Launcher application	Alert button label	Ja
 No	Launcher application	Alert button label	Nein
+Yes	Launcher application	Alert button label	Ja
 OK	Launcher application	Button label	OK
 The Einsteinium Launcher sent an invalid subscription to the Engine.  Please check your Launcher settings.	Launcher application	Failed subscription warning message	Der Einsteinium Launcher hat eine ungültige Indizierung zur Engine gesandt. Bitte die Launcher Einstellungen überprüfen.
 The Einsteinium Engine is not running.  Without the Engine the Launcher's Apps list will be populated from Haiku's recent applications list.  Do you wish to start the Engine now?	Launcher application	Warning message when Engine is not running	Die Einsteinium Engine wurde nicht gestartet. Ohne die Engine wird die Anwendungsliste des Launchers mit Haikus Liste der letzten Anwendungen befüllt. Soll die Engine jetzt gestartet werden?
- does not have an application signature	Settings 'App Exclusions' tab	Alert message.  Note space needed as first character	 hat keine Anwendungs-Signatur
+Apps	Launcher tabs	Tab label	Anwendungen
+Files	Launcher tabs	Tab label	Files
+Folders & Queries	Launcher tabs	Tab label	Ordner & Queries
+does not have an application signature	Settings 'App Exclusions' tab	Alert message	hat keine Anwendungs-Signatur
 Exclude These Apps From The Launcher	Settings 'App Exclusions' tab	Box label	Diese Anwendungen vom Launcher ausschließen.
-Remove	Settings 'App Exclusions' tab	Button label	Entfernen
 Add…	Settings 'App Exclusions' tab	Button label	Hinzu…
 OK	Settings 'App Exclusions' tab	Button label	OK
-Applications in this list will be completely excluded from\nthe Launcher deskbar menu.  Adding or removing applications\nfrom this list will instantly update the Launcher.	Settings 'App Exclusions' tab	List tooltip	Anwendungen in dieser Liste tauchen im Launcher\nin der Deskbar nicht auf. Aus dieser Liste entfernte oder hinzugefügte Anwendungen werden sofort im Launcher aktualisiert.
-Date of very first launch:	Settings 'Apps Ranking' tab	Box label	Datum des ersten Starts:
+Remove	Settings 'App Exclusions' tab	Button label	Entfernen
+Applications in this list will be excluded from the Launcher.	Settings 'App Exclusions' tab	List tooltip	Anwendungen in dieser Liste tauchen im Launcher nicht auf.
+Apps Exclusions	Settings 'App Exclusions' tab	Tab label	Apps Exclusions
+Application Ranking Weights	Settings 'Apps Ranking' tab	Box label	Gewichtung der Anwendungs-Ränge
 Date of most recent launch:	Settings 'Apps Ranking' tab	Box label	Datum des letzten Starts:
+Date of very first launch:	Settings 'Apps Ranking' tab	Box label	Datum des ersten Starts:
+Time lapsed between the last two launches:	Settings 'Apps Ranking' tab	Box label	Vergangene Zeit zwischen den letzten beiden Starts:
 Total lifetime running time:	Settings 'Apps Ranking' tab	Box label	Gesamte Laufzeit:
 Total number of launches:	Settings 'Apps Ranking' tab	Box label	Gesamtzahl der Starts:
-Application Ranking Weights	Settings 'Apps Ranking' tab	Box label	Gewichtung der Anwendungs-Ränge
-Time lapsed between the last two launches:	Settings 'Apps Ranking' tab	Box label	Vergangene Zeit zwischen den letzten beiden Starts:
 Save and Recalculate Ranks	Settings 'Apps Ranking' tab	Button label	Speichern und Ränge neu berechnen
-Click this button once the sliders are at their proper values.\nThe Launcher menu will be updated with these new settings.	Settings 'Apps Ranking' tab	Button tooltip	Diesen Button klicken wenn die Regler die gewünschten Werte zeigen.\nDas Launcher Menü wird dann mit diesen neuen Einstellungen aktualisiert.
+Click this button once the sliders are at their proper values. The Launcher menu will be updated with these new settings.	Settings 'Apps Ranking' tab	Button tooltip	Diesen Button klicken wenn die Regler die gewünschten Werte zeigen. Das Launcher Menü wird dann mit diesen neuen Einstellungen aktualisiert.
 Increase Rank	Settings 'Apps Ranking' tab	Slider high text	Rang erhöhen
-More recent dates will 	Settings 'Apps Ranking' tab	Slider label part 1	Jüngere Daten werden 
-Shorter interval will 	Settings 'Apps Ranking' tab	Slider label part 1	Kürzere Intervalle werden
-Higher runtime total will 	Settings 'Apps Ranking' tab	Slider label part 1	Längere Laufzeiten werden
-More launches will 	Settings 'Apps Ranking' tab	Slider label part 1	Weitere Starts werden 
+Higher runtime total will	Settings 'Apps Ranking' tab	Slider label part 1	Längere Laufzeiten werden
+More launches will	Settings 'Apps Ranking' tab	Slider label part 1	Weitere Starts werden
+More recent dates will	Settings 'Apps Ranking' tab	Slider label part 1	Jüngere Daten werden
+Shorter interval will	Settings 'Apps Ranking' tab	Slider label part 1	Kürzere Intervalle werden
+have no effect	Settings 'Apps Ranking' tab	Slider label part 2	keine Auswirkung haben.
+heavily decrease the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang stark verringern
+heavily increase the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang stark erhöhen
+minimally decrease the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang minimal verringern
+minimally increase the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang minimal erhöhen
+moderately decrease the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang moderat verringern
+moderately increase the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang moderat erhöhen
 slightly decrease the rank	Settings 'Apps Ranking' tab	Slider label part 2	den nur Rang leicht verringern
 slightly increase the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang leicht erhöhen
-minimally increase the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang minimal erhöhen
-minimally decrease the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang minimal verringern
-moderately increase the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang moderat erhöhen
-moderately decrease the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang moderat verringern
-very heavily increase the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang sehr stark erhöhen
 very heavily decrease the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang sehr stark verringern
-heavily increase the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang stark erhöhen
-heavily decrease the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang stark verringern
-have no effect	Settings 'Apps Ranking' tab	Slider label part 2	keine Auswirkung haben.
+very heavily increase the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang sehr stark erhöhen
 Decrease Rank	Settings 'Apps Ranking' tab	Slider low text	Rang verringern
-This slider will set how much the application's final rank is determined by\n	Settings 'Apps Ranking' tab	Slider tooltip part 1	Dieser Regler bestimmt wie sehr der endgültige Rang der Anwendung abhängt von\n
-the very first date and time the application was launched.	Settings 'Apps Ranking' tab	Slider tooltip part 2	Datum und Zeit des ersten Starts der Anwendung.
+This slider will set how much the application's final rank is determined by	Settings 'Apps Ranking' tab	Slider tooltip part 1	Dieser Regler bestimmt wie sehr der endgültige Rang der Anwendung abhängt von
+the length of time between the application's two most recent launches.	Settings 'Apps Ranking' tab	Slider tooltip part 2	dem Zeitraum zwischen den letzten beiden Starts der Anwendung.
 the most recent date and time the application was launched.	Settings 'Apps Ranking' tab	Slider tooltip part 2	Datum und Zeit des letzten Starts der Anwendung.
-the total number of times the application has been launched.	Settings 'Apps Ranking' tab	Slider tooltip part 2	der Anzahl der bisherigen Anwendungssstarts.
 the total cumulative running time of the application since its first launch.	Settings 'Apps Ranking' tab	Slider tooltip part 2	die sich ansammelnde Laufzeit der Anwendung seit ihrem ersten Start.
-the length of time between the application's two most recent launches.	Settings 'Apps Ranking' tab	Slider tooltip part 2	the length of time between the application's two most recent launches.
+the total number of times the application has been launched.	Settings 'Apps Ranking' tab	Slider tooltip part 2	der Anzahl der bisherigen Anwendungssstarts.
+the very first date and time the application was launched.	Settings 'Apps Ranking' tab	Slider tooltip part 2	Datum und Zeit des ersten Starts der Anwendung.
+Apps Ranking	Settings 'Apps Ranking' tab	Tab label	Apps Ranking
 Apps	Settings 'Layout' tab	Box label	Anwendungen
 Files, Folders and Queries	Settings 'Layout' tab	Box label	Dateien, Ordner und Queries
 Show Deskbar App List	Settings 'Layout' tab	Checkbox label	Deskbar Anwendungsliste zeigen
 System size	Settings 'Layout' tab	First font menu item	Systemgröße
 Show this many apps:	Settings 'Layout' tab	Input box label	Anzahl anzuzeigender Anwendungen:
 Show this many recent files:	Settings 'Layout' tab	Input box label	Anzahl der zuletzt benutzen Dateien:
-Show this many recent queries:	Settings 'Layout' tab	Input box label	Anzahl der zuletzt benutzen Queries:
 Show this many recent folders:	Settings 'Layout' tab	Input box label	Anzahl der zuletzt benutzten Ordner:
-Window look:	Settings 'Layout' tab	Menu label	Fensterstil:
+Show this many recent queries:	Settings 'Layout' tab	Input box label	Anzahl der zuletzt benutzen Queries:
 Font size:	Settings 'Layout' tab	Menu label	Schriftgröße:
-Recent files icon size:	Settings 'Layout' tab	Slider label	Icongröße der zuletzt benutzen Dateien:
+Window look:	Settings 'Layout' tab	Menu label	Fensterstil:
 Highest rank icon size:	Settings 'Layout' tab	Slider label	Icongröße des höchsten Rangs:
 Lowest rank icon size:	Settings 'Layout' tab	Slider label	Icongröße des niedrigsten Rangs:
-Small Title Bar	Settings 'Layout' tab	Window look menu item	Kleine Fensterreiter
-Normal Title Bar	Settings 'Layout' tab	Window look menu item	Normale Fensterreiter
-No Title Bar	Settings 'Layout' tab	Window look menu item	Ohne Fensterreiter
+Recent files icon size:	Settings 'Layout' tab	Slider label	Icongröße der zuletzt benutzen Dateien:
+Layout	Settings 'Layout' tab	Tab label	Layout
 No Border	Settings 'Layout' tab	Window look menu item	Ohne Rahmen
+No Title Bar	Settings 'Layout' tab	Window look menu item	Ohne Fensterreiter
+Normal Title Bar	Settings 'Layout' tab	Window look menu item	Normale Fensterreiter
+Small Title Bar	Settings 'Layout' tab	Window look menu item	Kleine Fensterreiter
+Einsteinium Launcher Settings	Settings window	Settings window title	Einsteinium Launcher Settings

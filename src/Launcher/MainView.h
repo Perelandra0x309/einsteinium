@@ -12,6 +12,7 @@
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <StringList.h>
+#include <Catalog.h>
 #include "launcher_constants.h"
 #include "AppsListView.h"
 #include "RecentDocsBListView.h"

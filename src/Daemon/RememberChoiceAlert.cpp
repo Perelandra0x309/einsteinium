@@ -17,7 +17,7 @@ RememberChoiceAlert::RememberChoiceAlert(const char* title, const char* text,
 {
 	fInvoker = NULL;
 	// Use the text view to add a check box to the alert
-	fRememberCB = new BCheckBox("Save Settings", B_TRANSLATE("Always use the following choice:"), NULL);
+	fRememberCB = new BCheckBox("Save Settings", B_TRANSLATE_COMMENT("Always use the following choice:", "Alert window checkbox label"), NULL);
 	BTextView *textView = TextView();
 	BLayoutBuilder::Group<>(textView, B_VERTICAL, 0)
 		.AddGlue()

@@ -16,7 +16,7 @@ rgb_color kBarColor = {205,205,255,0};
 
 LauncherRankingsView::LauncherRankingsView(BRect size, ScaleSettings* scales)
 	:
-	BView(size, "Apps Ranking", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS)
+	BView(size, B_TRANSLATE_COMMENT("Apps Ranking", "Tab label"), B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS)
 {
 //	SetViewColor(bg_color);
 
@@ -56,7 +56,7 @@ LauncherRankingsView::LauncherRankingsView(BRect size, ScaleSettings* scales)
 	runtimeBox->SetLabel(B_TRANSLATE_COMMENT("Total lifetime running time:", "Box label"));
 	runtimeBox->AddChild(fRuntimeSl);
 	fSetB = new BButton("Set Button", B_TRANSLATE_COMMENT("Save and Recalculate Ranks", "Button label"), new BMessage(EL_SAVE_RANKING));
-	fSetB->SetToolTip(B_TRANSLATE_COMMENT("Click this button once the sliders are at their proper values.\n"
+	fSetB->SetToolTip(B_TRANSLATE_COMMENT("Click this button once the sliders are at their proper values. "
 							"The Launcher menu will be updated with these new settings.", "Button tooltip"));
 	fSlidersBox = new BBox("Rank Sliders");
 	fSlidersBox->SetLabel(B_TRANSLATE_COMMENT("Application Ranking Weights", "Box label"));
@@ -178,34 +178,36 @@ LauncherRankingsView::_InitSlider(BSlider *slider, uint32 message)
 void
 LauncherRankingsView::_SetSliderScaleLabel(BSlider* sldr, int n)
 {
-	BString label, tooltip(B_TRANSLATE_COMMENT("This slider will set how much the application's final rank is determined by\n", "Slider tooltip part 1"));
+	BString label, tooltip(B_TRANSLATE_COMMENT("This slider will set how much the application's final rank is determined by", "Slider tooltip part 1"));
+	tooltip.Append("\n");
 	if(sldr==fLaunchesSl)
 	{
-		label.SetTo(B_TRANSLATE_COMMENT("More launches will ", "Slider label part 1"));
+		label.SetTo(B_TRANSLATE_COMMENT("More launches will", "Slider label part 1"));
 		tooltip.Append(B_TRANSLATE_COMMENT("the total number of times the application has been launched.", "Slider tooltip part 2"));
 	}
 	else if(sldr==fFirstSl)
 	{
-		label.SetTo(B_TRANSLATE_COMMENT("More recent dates will ", "Slider label part 1"));
+		label.SetTo(B_TRANSLATE_COMMENT("More recent dates will", "Slider label part 1"));
 		tooltip.Append(B_TRANSLATE_COMMENT("the very first date and time the application was launched.", "Slider tooltip part 2"));
 	}
 	else if(sldr==fLastSl)
 	{
-		label.SetTo(B_TRANSLATE_COMMENT("More recent dates will ", "Slider label part 1"));
+		label.SetTo(B_TRANSLATE_COMMENT("More recent dates will", "Slider label part 1"));
 		tooltip.Append(B_TRANSLATE_COMMENT("the most recent date and time the application was launched.", "Slider tooltip part 2"));
 	}
 	else if(sldr==fIntervalSl)
 	{
-		label.SetTo(B_TRANSLATE_COMMENT("Shorter interval will ", "Slider label part 1"));
+		label.SetTo(B_TRANSLATE_COMMENT("Shorter interval will", "Slider label part 1"));
 		tooltip.Append(B_TRANSLATE_COMMENT("the length of time between the application's two most recent launches.", "Slider tooltip part 2"));
 	}
 	else if(sldr==fRuntimeSl)
 	{
-		label.SetTo(B_TRANSLATE_COMMENT("Higher runtime total will ", "Slider label part 1"));
+		label.SetTo(B_TRANSLATE_COMMENT("Higher runtime total will", "Slider label part 1"));
 		tooltip.Append(B_TRANSLATE_COMMENT("the total cumulative running time of the application since its first launch.", "Slider tooltip part 2"));
 	}
 	else
 		return;
+	label.Append(" ");
 	switch(n)
 	{
 		case -5:
