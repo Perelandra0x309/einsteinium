@@ -1,4 +1,4 @@
-1	English	application/x-vnd.Einsteinium_Engine	419800861
+1	German	application/x-vnd.Einsteinium_Engine	419800861
 Exclude	'Apps' list	Added to application label when modifier key pressed	Ausschließen
 Exclude from Apps list	'Apps' list	Application pop-up menu	Von Anwendungsliste ausschließen
 Launch	'Apps' list	Application pop-up menu	Starten
@@ -29,7 +29,7 @@ OK	Launcher application	Button label	OK
 The Einsteinium Launcher sent an invalid subscription to the Engine.  Please check your Launcher settings.	Launcher application	Failed subscription warning message	Der Einsteinium Launcher hat eine ungültige Indizierung zur Engine gesandt. Bitte die Launcher Einstellungen überprüfen.
 The Einsteinium Engine is not running.  Without the Engine the Launcher's Apps list will be populated from Haiku's recent applications list.  Do you wish to start the Engine now?	Launcher application	Warning message when Engine is not running	Die Einsteinium Engine wurde nicht gestartet. Ohne die Engine wird die Anwendungsliste des Launchers mit Haikus Liste der letzten Anwendungen befüllt. Soll die Engine jetzt gestartet werden?
 Apps	Launcher tabs	Tab label	Anwendungen
-Files	Launcher tabs	Tab label	Files
+Files	Launcher tabs	Tab label	Dateien
 Folders & Queries	Launcher tabs	Tab label	Ordner & Queries
 does not have an application signature	Settings 'App Exclusions' tab	Alert message	hat keine Anwendungs-Signatur
 Exclude These Apps From The Launcher	Settings 'App Exclusions' tab	Box label	Diese Anwendungen vom Launcher ausschließen.
@@ -37,7 +37,7 @@ Add…	Settings 'App Exclusions' tab	Button label	Hinzu…
 OK	Settings 'App Exclusions' tab	Button label	OK
 Remove	Settings 'App Exclusions' tab	Button label	Entfernen
 Applications in this list will be excluded from the Launcher.	Settings 'App Exclusions' tab	List tooltip	Anwendungen in dieser Liste tauchen im Launcher nicht auf.
-Apps Exclusions	Settings 'App Exclusions' tab	Tab label	Apps Exclusions
+Apps Exclusions	Settings 'App Exclusions' tab	Tab label	Ausnahmen
 Application Ranking Weights	Settings 'Apps Ranking' tab	Box label	Gewichtung der Anwendungs-Ränge
 Date of most recent launch:	Settings 'Apps Ranking' tab	Box label	Datum des letzten Starts:
 Date of very first launch:	Settings 'Apps Ranking' tab	Box label	Datum des ersten Starts:
@@ -58,7 +58,7 @@ minimally decrease the rank	Settings 'Apps Ranking' tab	Slider label part 2	den 
 minimally increase the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang minimal erhöhen
 moderately decrease the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang moderat verringern
 moderately increase the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang moderat erhöhen
-slightly decrease the rank	Settings 'Apps Ranking' tab	Slider label part 2	den nur Rang leicht verringern
+slightly decrease the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang nur leicht verringern
 slightly increase the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang leicht erhöhen
 very heavily decrease the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang sehr stark verringern
 very heavily increase the rank	Settings 'Apps Ranking' tab	Slider label part 2	den Rang sehr stark erhöhen
@@ -69,7 +69,7 @@ the most recent date and time the application was launched.	Settings 'Apps Ranki
 the total cumulative running time of the application since its first launch.	Settings 'Apps Ranking' tab	Slider tooltip part 2	die sich ansammelnde Laufzeit der Anwendung seit ihrem ersten Start.
 the total number of times the application has been launched.	Settings 'Apps Ranking' tab	Slider tooltip part 2	der Anzahl der bisherigen Anwendungssstarts.
 the very first date and time the application was launched.	Settings 'Apps Ranking' tab	Slider tooltip part 2	Datum und Zeit des ersten Starts der Anwendung.
-Apps Ranking	Settings 'Apps Ranking' tab	Tab label	Apps Ranking
+Apps Ranking	Settings 'Apps Ranking' tab	Tab label	Rangfolge
 Apps	Settings 'Layout' tab	Box label	Anwendungen
 Files, Folders and Queries	Settings 'Layout' tab	Box label	Dateien, Ordner und Queries
 Show Deskbar App List	Settings 'Layout' tab	Checkbox label	Deskbar Anwendungsliste zeigen
@@ -88,4 +88,4 @@ No Border	Settings 'Layout' tab	Window look menu item	Ohne Rahmen
 No Title Bar	Settings 'Layout' tab	Window look menu item	Ohne Fensterreiter
 Normal Title Bar	Settings 'Layout' tab	Window look menu item	Normale Fensterreiter
 Small Title Bar	Settings 'Layout' tab	Window look menu item	Kleine Fensterreiter
-Einsteinium Launcher Settings	Settings window	Settings window title	Einsteinium Launcher Settings
+Einsteinium Launcher Settings	Settings window	Settings window title	Einsteinium Launcher Einstellungen

@@ -1,4 +1,4 @@
-1	English	application/x-vnd.Einsteinium_Preferences	3299147149
+1	German	application/x-vnd.Einsteinium_Preferences	3299147149
 <Name not found>	AppRelaunchSettings.cpp	Keep first and last < >	<Name nicht gefunden>
 Executable does not have an application signature	Daemon relaunch view	Alert message	Die ausführbare Datei besitzt keine Anwendungs-Signatur
 Application Relaunch Settings	Daemon relaunch view	Box label	Einstellungen für den Neustart von Anwendungen
@@ -28,16 +28,16 @@ The Launcher settings are set within the Launcher application.  Click the button
 Einsteinium provides smarter monitoring of applications and system services for Haiku.  Currently the two major functions implimented are automatically restarting applications and system services that quit or crash, and gathering statistics on application usage to provide customizable ranked lists of applications.\n\nThis preferences application is used to set options for the Einsteinium Daemon and Engine.  See each application's main section to get more details.	Main Window	About text	Einsteinium bietet eine intelligente Überwachung von Anwendungen und Diensten in Haiku. Die beiden Hauptfunktionen sind zur Zeit das automatische Neustarten von Anwendungen und Diensten nach deren Beendigung oder Absturz und das Sammeln von Nutzungsdaten für die Erstellung von benutzerdefinierten Listen benutzter Anwendungen.\n\nDieses Einstellungspanel dient der Konfiguration von Einsteinium Daemon und Engine. Für mehr Details, siehe die entsprechenden Sektionen dieser Module.
 About Einsteinium Preferences	Main Window	Box label	Über Einsteinium Preferences
 Einsteinium Copyright 2013 by Brian Hill	Main Window	Copyright text	Einsteinium Copyright 2013 von Brian Hill
-App Relaunch	Main Window	List label	App Relaunch
+App Relaunch	Main Window	List label	App Neustart
 Daemon	Main Window	List label	Daemon
 Engine	Main Window	List label	Engine
 Launcher	Main Window	List label	Launcher
-Maintenance	Main Window	List label	Maintenance
-Einsteinium Preferences	Main Window	Window title	Einsteinium Preferences
+Maintenance	Main Window	List label	Datenpflege
+Einsteinium Preferences	Main Window	Window title	Einsteinium Einstellungen
 Error: Could not create messenger for service 	Status box	Alert message	Fehler: Der Messenger für den Dienst konnte nicht erstellt werden.
 Restart	Status box	Button label	Neustart
 Start	Status box	Button label	Start
-Stop	Status box	Button label	Stop
+Stop	Status box	Button label	Stopp
 Restarting...	Status box	Status 'Restarting...' text	Neustart...
 Running	Status box	Status 'Running' text	Läuft
 Starting...	Status box	Status 'Starting...' text	Startet...
