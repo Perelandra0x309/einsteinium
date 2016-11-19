@@ -1,10 +1,11 @@
-1	English	application/x-vnd.Einsteinium_Engine	419800861
+1	English	application/x-vnd.Einsteinium_Engine	3687250118
 Exclude	'Apps' list	Added to application label when modifier key pressed	Exclude
 Exclude from Apps list	'Apps' list	Application pop-up menu	Exclude from Apps list
 Launch	'Apps' list	Application pop-up menu	Launch
 Quit	'Apps' list	Application pop-up menu	Quit
 Settings…	'Apps' list	Application pop-up menu	Settings…
 Show in Tracker	'Apps' list	Application pop-up menu	Show in Tracker
+Other	'Files' tab	Folder label	Other
 Unknown type	'Files' tab	Label for unknown document type	Unknown type
 Settings…	'Files' tab	Popup menu option	Settings…
 Show in Tracker	'Files' tab	Popup menu option	Show in Tracker

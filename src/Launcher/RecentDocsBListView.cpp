@@ -419,7 +419,7 @@ RecentDocsBListView::BuildList(bool force)
 							SuperTypeListItem *superItem = _GetSuperItem(superTypeName, settings->docIconSize);
 							// Change application supertype to display "Other" instead
 							if(strcmp(superTypeName, "application")==0)
-								superItem->SetName("Other");
+								superItem->SetName(B_TRANSLATE_COMMENT("Other", "Folder label"));
 							fSuperListPointers.AddPointer(superTypeName, superItem);
 							fSuperListPointers.AddString(EL_SUPERTYPE_NAMES, superTypeName);
 							AddItem(superItem);
