@@ -81,6 +81,107 @@ Launcher.
 <p>When new versions of Einsteinium are released the Haiku package manager will update the Einsteinium package.
 
 <h3>
+<a id="quick-tips" class="anchor" href="#quick-tips" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Einsteinium Quick Start Tips</h3>
+<ul><li>There is a Launcher deskbar icon that shows a menu of the ranked list of applications.  It is the icon with the gold, silver and bronze boxes.  Click this to quickly access the applications list.</P>
+<p><img valign="top" src="images/tip_launcher1.png"><img src="images/tip_launcher2.png">
+<li>Use the Shortcuts preferences application to create a keyboard shortcut that quickly opens Launcher
+<p><img src="images/tip_shortcuts.png">
+<li>The Launcher application can be navigated using the mouse or keyboard keys, such as the TAB, arrows and RETURN keys
+<li>Press a letter key and the next item in the list starting with that letter will be highlighted
+<li>Press RETURN or left click on an item to open it
+<li>Right click on any item to see additional actions to take
+<img src="images/tip_launcher3.png"><img valign="top" src="images/tip_launcher4.png">
+</ul>
+
+<h3>
+<a id="using-einsteinium" class="anchor" href="#using-einsteinium" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How To Use Einsteinium</h3>
+<p><B>Einsteinium Daemon:</B>
+<P>The Daemon runs in the background and keeps track of the currently running applications, making sure that everything you want to stay running does (such as servers, Deskbar, Tracker, mail client, etc).  Using the Einsteinium Preferences app you can specify the list of apps you want the Daemon to keep track of.</P>
+<p><img src="images/preferences_app_relaunch.png">
+<P>Open the Einsteinium Preferences app and select the &#8220;App Relaunch&#8221; option in the left side pane.</P>
+<P>Here you can define how you want the Daemon to behave when specific applications quit.  You also define the default behavior for any applications which are not specified in this list.  The first entry labeled &#8220;Default setting (for all applications not in this list)&#8221; is the default behavior.  Any specific applications you add (with the &#8220;Add...&#8221; button) will override the default behavior for that application.</P>
+<P>You can setup each app's behavior to either automatically relaunch, have the Daemon prompt you whether you wish to relaunch the app, or do nothing.  Each app in the list is color coded to match its setting:</P>
+<p><ul><li>Green: when the app is set to automatically relaunch</li>
+<li>Blue: when the app is set to ask whether you want to relaunch the app</li>
+<li>Red: when the app is set to not relaunch</li>
+</ul>
+<P>In the above screenshot, you can see that the default behavior is to have the Daemon ask if an application should be relaunched.  The input_server is set to automatically relaunch if it quits.  And the other four applications are set to not relaunch when they quit.</P>
+<P>As an example of the default behavior, open the StyledEdit application and then quit it.  The Daemon will determine that StyledEdit is not specified in the Preferences, so it uses the default setting and asks if you wish to restart the application:</P>
+<img src="images/daemon_alert.png">
+<P>Choosing &#8220;Yes&#8221; will restart the app and choosing &#8220;No&#8221; will not restart it.</P>
+<P>If you wish to have the Daemon always use the same choice (always restart this app or never restart this app), then select the &#8220;Always use the following choice:&#8221; checkbox and then click &#8220;Yes&#8221; or &#8220;No&#8221;:</P>
+<img src="images/daemon_alert_remember.png">
+<P>Doing so will add this application to the Preferences with your choice so the Daemon will always behave in the same way with this application.  As you can see below, StyledEdit is now set to not relaunch:</P>
+<img src="images/preferences_app_stylededit.png">
+<P>If you find the Daemon too intrusive by having to tell it which choice you want for each new application it detects, you can change the default setting to &#8220;Do not relaunch this application when it quits&#8221;.  Then the Daemon will do nothing by default, and only ask you or automatically restart apps that you specifically set to do so in the Preferences.  This method would be best if you only have a few applications or servers you wish to restart while ignoring most other applications.</P>
+<P><B>Einsteinium Launcher:</B></P>
+<P>The Launcher is an application and file launcher that displays a list of applications, files, folders and queries.</P>
+<p><img src="images/launcher_apps.png"><img src="images/launcher_files.png"><img src="images/launcher_fq.png">
+<P>The Apps list sorts applications according to the ranking criteria that you specify as being more or less important.  The applications can be sorted by the following values:</P>
+<P><ul><li>Total number of times the application has been launched</li>
+<li>The date and time of the very first launch</li>
+<li>The date and time of the most recent launch</li>
+<li>The time that elapsed between the two most recent launches</li>
+<li>The total running time of the application over its lifetime</li></ul>
+<P>Each of the values above is assigned a &#8220;weight&#8221; to determine how much the value effects the final order of each application listed.  Each weight ranges from having a very positive effect (lists the application higher in the order) down to a very negative effect (lists the application lower in the order).  In between these two extremes are weights which give a more moderate positive or negative effect, or no weight at all (in which the value has no effect on the final order).</P>
+<P>To change the weight of each criteria value right click on any application in the list and click &#8220;Settings...&#8221;, then click on the &#8220;Apps Ranking&#8221; tab.</P>
+<p><img src="images/launcher_app_rannkings.png">
+<P>Here you can move each slider to increase or decrease the effect each criteria has on the final order of the application list.  The weight options you have for each criteria are (from increasing to decreasing weights):</P>
+<P><ul><li>Very heavily increase the rank</li>
+<li>Heavily increase the rank</li>
+<li>Moderately increase the rank</li>
+<li>Slightly increase the rank</li>
+<li>Minimally increase the rank</li>
+<li>No effect</li>
+<li>Minimally decrease the rank</li>
+<li>Slightly decrease the rank</li>
+<li>Moderately decrease the rank</li>
+<li>Heavily decrease the rank</li>
+<li>Very heavily decrease the rank</li></ul>
+<P>After changing any of the ranking weights click the &#8220;Save and Recalculate Ranks&#8221; button and the Launcher will be updated with a new list of applications based on these new weights.</P>
+<P>You can also change the layout of the Launcher by clicking on the &#8220;Layout&#8221; tab.</P>
+<p><img src="images/launcher_layout.png">
+<P>Here for the Apps list you specify how many apps you want in the list.  Also, the icons for each app will vary in size, from the highest ranking app to the lowest ranking app.  Set how large you want the highest app and the lowest app to be, and all the apps between them will be proportionally scaled to transition in size from the highest to lowest sizes.  If you want all the icons to be the same size, just set the highest and lowest sizes to be equal.</P>
+<P>For files, folders and queries you can specify how many of each you would like to see and what the icon size is.  These lists are ranked using the standard Haiku most recent list.  However one feature of the files list is that the files are grouped by their type.</P>
+<P>The overall font size and look of the Launcher window can also be changed on this tab.</P>
+<P>In the &#8220;App Exclusions&#8221; tab you can specify applications that you do not want to appear in the Apps list at all.  For example you can exclude the Deskbar and Tracker since you really will never manually launch these applications.  All system servers and any applications located in /bin directories are automatically excluded and do not need to be specifically excluded.</P>
+<p><img src="images/launcher_app_exclusions.png">
+<P>An even easier way to exclude applications from the Launcher is by right clicking the application in the list and selecting &#8220;Exclude from Apps list&#8221;.</P>
+<p><img src="images/launcher_exclude.png">
+<P>Also from the right click menu on an app you can quit the application (if it is open already) or open the folder where the app is located with the &#8220;Show in Tracker&#8221; menu option.</P>
+
+<h3>
+<a id="launcher-quick-tips" class="anchor" href="#launcher-quick-tips" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Einsteinium Launcher Quick Tips</h3>
+<P><ul><li>When you first run the Launcher, set the window size and position where you like it.  Launcher will remember these settings.</P>
+<li>Hit the &#8220;TAB&#8221; key to switch between the tabs.</li>
+<li>The folder location of the highlighted item is shown at the bottom of the Launcher window.</li>
+<li>Use the mouse wheel to select next/previous item, click the wheel button to launch selected item.</li>
+<li>Use the up and down keys to select the next/previous item.</li>
+<li>Using the up/down keys and wheel mouse you can wrap around between the first and last items.</li>
+<li>Hit a letter on the keyboard repeatedly to cycle through items that start with that letter.</li>
+<li>Hold down the &#8220;ALT&#8221; or &#8220;SHIFT&#8221; keys while selecting an item and Launcher will remain open.</li>
+<li>Setup a quick key combo to run Launcher using the Shortcuts preferences, for example to run Launcher with ALT-E:</li>
+<p><img src="images/tip_shortcuts.png">
+<li>Files are grouped together by their file type.  These groups can be collapsed and expanded by clicking on the group or pressing the left/right key when the group item is selected.</li>
+<li>Press the &#8220;ESC&#8221; key to hide the Launcher without launching anything. (Note: When you click an item to launch it the Launcher hides but remains running.  This is to ensure a quick response when you run the Launcher again.  Press ALT-Q to fully quit the Launcher.)</li>
+<li>Right click on an item to get other options, including settings.<B></B></li>
+</ul>
+
+<h3>
+<a id="einsteinium-preferences" class="anchor" href="#einsteinium-preferences" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Einsteinium Preferences</h3>
+<P>The Einsteinium Preferences app allows you to change settings which effect the way the Daemon, Engine and Launcher behave.  The Preferences application can be launched from the Haiku menu under the &#8220;Preferences&#8221; folder, or from the Launcher menu in the Deskbar.</P>
+<p><img src="images/preferences_daemon.png">
+<P>The Daemon and Engine can be started and stopped easily from within the Preferences application under the &#8220;Daemon&#8221; and &#8220;Engine&#8221; sections.  These sections also display the current running status.</P>
+
+<h3>
+<a id="einsteinium-engine" class="anchor" href="#einsteinium-engine" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Einsteinium Engine</h3>
+<P>The Engine is a background application that monitors all applications for when they launch and quit, and records these times into a database.  The Engine is primarily called upon by other third party applications to provide a ranked list of applications given certain parameters.  For developer information on using the Engine please see the Engine Subscriber's Development Guide.</P>
+<p><img src="images/preferences_maintenance.png">
+<P>If there are ever any problems with the Launcher menu list or any other application that uses the Engine, these may be resolved by running maintenance on the Engine database.  This can be done by opening the Einsteinium Preferences, selecting the &#8220;Maintenance&#8221;section, and clicking the &#8220;Rescan Data&#8221; button.</P>
+
+
+
+<h3>
 <a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Authors and Contributors</h3>
 <p>Einsteinium was first envisioned and started development in 1999 for BeOS 4.5 by Kris Finkenbinder,
 Mikeal Eiman and myself (Brian Hill <a href="https://github.com/Perelandra0x309" class="user-mention">@Perelandra0x309</a>).
@@ -91,7 +192,9 @@ Einsteinium stalled as the future of BeOS was uncertain. Then Haiku became the b
 the continuation BeOS unrestrained by commercial interests. Development of Einsteinium was
 resumed by myself and has progressed as time and life allowed. Now I am happy to release a full
 working version of Einsteinium that fulfills our vision from so many years ago.
-
+<p>Thank you for translations by:
+<ul><li><a href="https://github.com/humdingerb" class="user-mention">@humdingerb</a> (German)</li>
+</ul>
 
 <h3>
 <a id="support-or-contact" class="anchor" href="#support-or-contact" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Support or Contact</h3>
