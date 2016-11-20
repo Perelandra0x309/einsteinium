@@ -129,10 +129,10 @@ SuperTypeListItem::DrawItem(BView *owner, BRect item_rect, bool complete)
 
 	//background
 	if(IsSelected()) {
-		backgroundColor = ui_color(B_MENU_SELECTED_BACKGROUND_COLOR);
+		backgroundColor = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
 	}
 	else {
-		backgroundColor = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
+		backgroundColor = ui_color(B_LIST_BACKGROUND_COLOR);
 	}
 	owner->SetHighColor(backgroundColor);
 	owner->SetLowColor(backgroundColor);
@@ -183,7 +183,10 @@ SuperTypeListItem::DrawItem(BView *owner, BRect item_rect, bool complete)
 		offset_height += floor( (listItemHeight - fTextOnlyHeight)/2 );
 			// center the text vertically
 	BPoint cursor(item_rect.left + offset_width, item_rect.top + offset_height + kTextMargin);
-	owner->SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
+	if(IsSelected())
+		owner->SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
+	else
+		owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
 	owner->MovePenTo(cursor.x, cursor.y);
 	owner->DrawString(fName);
 }
