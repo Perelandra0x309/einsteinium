@@ -11,7 +11,7 @@ SettingsWindow::SettingsWindow(AppSettings* settings, ScaleSettings* scales,
 								BMessage *appExclusions)
 	:
 	BWindow(BRect(), B_TRANSLATE_COMMENT("Einsteinium Launcher Settings", "Settings window title"),
-		B_FLOATING_WINDOW_LOOK, B_MODAL_ALL_WINDOW_FEEL, B_NOT_ZOOMABLE | /*B_NOT_RESIZABLE | */B_ASYNCHRONOUS_CONTROLS)
+		B_FLOATING_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL, B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 	Lock();
 	BRect bounds = Bounds();
@@ -31,9 +31,9 @@ SettingsWindow::SettingsWindow(AppSettings* settings, ScaleSettings* scales,
 		.Add(fTabView)
 		.SetInsets(2, 2, 2, 2)
 	);
-
+	
 	BSize size = ChildAt(0)->PreferredSize();
-	ResizeTo(size.width, size.height);
+	SetSizeLimits(size.Width(), 9999, size.Height(), 9999);
 
 	PopulateAppSettings(settings);
 	Unlock();
