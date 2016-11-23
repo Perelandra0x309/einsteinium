@@ -13,7 +13,10 @@ DaemonStatusView::DaemonStatusView(BRect size)
 	fWatchingRoster(false),
 	fStatusBox(NULL)
 {
-
+	// Boot settings file
+	find_directory(B_USER_SETTINGS_DIRECTORY, &fBootSettingsPath);
+	fBootSettingsPath.Append("Einsteinium/boot");
+	
 	// About box
 	fAboutBox = new BBox("About");
 	fAboutBox->SetLabel(B_TRANSLATE_COMMENT("About Einsteinum Daemon", "Box label"));
@@ -26,18 +29,34 @@ DaemonStatusView::DaemonStatusView(BRect size)
 	fAboutTextView->MakeSelectable(false);
 	fAboutTextView->MakeEditable(false);
 
-	BGroupLayout *boxLayout = new BGroupLayout(B_VERTICAL);
-	fAboutBox->SetLayout(boxLayout);
-	BLayoutBuilder::Group<>(boxLayout)
+	BLayoutBuilder::Group<>(fAboutBox, B_VERTICAL)
 		.Add(fAboutTextView)
-		.SetInsets(10, 20, 10, 10)
-	;
+		.SetInsets(10, 20, 10, 10);
 
 	// Status Box
 	BEntry serviceEntry = GetEntryFromSig(e_daemon_sig);
 	if(serviceEntry.Exists())
 		fStatusBox = new SystemStatusBox(B_TRANSLATE_COMMENT("Daemon Running Status", "Box label"), serviceEntry, e_daemon_sig);
-
+	
+	// Boot launch setting
+	fLaunchCB = new BCheckBox("launch", B_TRANSLATE_COMMENT("Launch Daemon when Haiku boots", "Checkbox label"),
+								new BMessage(BOOT_SETTINGS_CHANGED));
+	BFile bootSettings(fBootSettingsPath.Path(), B_READ_WRITE | B_CREATE_FILE);
+	if(bootSettings.InitCheck() == B_OK)
+	{
+		BString value;
+		bootSettings.ReadAttrString("launch_daemon", &value);
+		if(value=="True")
+			fLaunchCB->SetValue(1);
+		else if(value=="False")
+			fLaunchCB->SetValue(0);
+		else{
+			fLaunchCB->SetValue(1);
+			value.SetTo("True");
+			bootSettings.WriteAttrString("launch_daemon", &value);
+		}
+	}
+	
 	// Layout
 	BGroupLayout *layout = new BGroupLayout(B_VERTICAL);
 	SetLayout(layout);
@@ -45,7 +64,7 @@ DaemonStatusView::DaemonStatusView(BRect size)
 	builder.Add(fAboutBox, 0);
 	if(fStatusBox != NULL)
 		builder.Add(fStatusBox, 1);
-	builder.AddGlue();
+	builder.Add(fLaunchCB).AddGlue();
 
 	// TODO this isn't quite right, need to calculate based on TextView preferred size?
 	BSize minSize(PreferredSize());
@@ -68,6 +87,7 @@ DaemonStatusView::AttachedToWindow()
 	SetViewColor(Parent()->ViewColor());
 	fAboutTextView->SetViewColor(Parent()->ViewColor());
 	BView::AttachedToWindow();
+	fLaunchCB->SetTarget(this);
 
 	//Start watching the application roster for launches and quits of services
 	status_t result = be_roster->StartWatching(BMessenger(this),
@@ -98,6 +118,15 @@ DaemonStatusView::MessageReceived(BMessage* msg)
 			{
 				BMessenger messenger(fStatusBox);
 				messenger.SendMessage(msg);
+			}
+			break;
+		}
+		case BOOT_SETTINGS_CHANGED: {
+			BFile bootSettings(fBootSettingsPath.Path(), B_READ_WRITE | B_CREATE_FILE);
+			if(bootSettings.InitCheck() == B_OK)
+			{
+				BString value = fLaunchCB->Value() ? "True" : "False";
+				bootSettings.WriteAttrString("launch_daemon", &value);
 			}
 			break;
 		}

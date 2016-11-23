@@ -61,7 +61,7 @@ prefsWindow::prefsWindow(BRect size)
 	fAboutTextView->MakeSelectable(false);
 	fAboutTextView->MakeEditable(false);
 	fAboutTextView->SetViewColor(fMainView->ViewColor());
-	fCopyrightStringView = new BStringView("Copyright", B_TRANSLATE_COMMENT("Einsteinium Copyright 2013 by Brian Hill", "Copyright text"));
+	fCopyrightStringView = new BStringView("Copyright", B_TRANSLATE_COMMENT("Einsteinium Copyright 2016 by Brian Hill", "Copyright text"));
 	BGroupLayout *boxLayout = new BGroupLayout(B_VERTICAL, 5);
 	fAboutBox->SetLayout(boxLayout);
 	BLayoutBuilder::Group<>(boxLayout)
@@ -97,12 +97,12 @@ prefsWindow::prefsWindow(BRect size)
 
 	// resize main window and set min size based on the min sizes of each view
 	float minHeight=0, minWidth=0;
-	BSize minSize = fDRelaunchView->GetMinSize();
+	BSize minSize = fDRelaunchView->PreferredSize();
 	minHeight = minSize.height;
 	minWidth = minSize.width;
 	// Make height minimum of 500
 	minHeight = max_c(minHeight, 500);
-	float finalMinWidth = fPrefsListView->Frame().right + minWidth + 10;
+	float finalMinWidth = fPrefsListView->Frame().right + minWidth + 15;
 	float finalMinHeight = minHeight + 10;
 	SetSizeLimits(finalMinWidth, B_SIZE_UNLIMITED, finalMinHeight, B_SIZE_UNLIMITED);
 	ResizeTo(finalMinWidth, finalMinHeight);

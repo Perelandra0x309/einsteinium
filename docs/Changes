@@ -1,6 +1,7 @@
 Version 1.3.2
 New German translation (thanks Humdinger)
-Builds successfully under x86 GCC4 architechture
+Builds successfully under x86 GCC4 architecture
+Added settings to specify whether the Daemon and Engine should launch when Haiku boots
 New scripts to help build from source
 Fixed some small GUI layout issues
 Bug fixes:

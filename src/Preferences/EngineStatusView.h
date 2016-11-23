@@ -24,8 +24,10 @@ public:
 private:
 	BBox			*fAboutBox;
 	BTextView		*fAboutTextView;
+	BCheckBox		*fLaunchCB;
 	bool			fWatchingRoster;
 	SystemStatusBox *fStatusBox;
+	BPath			fBootSettingsPath;
 };
 
 #endif

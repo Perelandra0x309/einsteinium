@@ -34,7 +34,7 @@ SystemStatusBox::SystemStatusBox(const char *label, BEntry entry, const char * s
 	fRestartB->SetEnabled(false);
 	fStartstopB = new BButton(fStopLabel);
 	fStartstopB->SetEnabled(false);
-
+	
 	BGroupLayout *layout = new BGroupLayout(B_HORIZONTAL, 10);
 	SetLayout(layout);
 	BLayoutBuilder::Group<>(layout)
@@ -42,7 +42,7 @@ SystemStatusBox::SystemStatusBox(const char *label, BEntry entry, const char * s
 		.AddGlue()
 		.Add(fRestartB)
 		.Add(fStartstopB)
-		.SetInsets(5, 15, 5, 5)
+		.SetInsets(10, 20, 10, 10)
 	;
 }
 
