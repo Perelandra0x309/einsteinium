@@ -62,7 +62,7 @@ prefsWindow::prefsWindow(BRect size)
 	fAboutTextView->MakeEditable(false);
 	fAboutTextView->SetViewColor(fMainView->ViewColor());
 	fCopyrightStringView = new BStringView("Copyright", B_TRANSLATE_COMMENT("Einsteinium Copyright 2016 by Brian Hill", "Copyright text"));
-	BGroupLayout *boxLayout = new BGroupLayout(B_VERTICAL, 5);
+	BGroupLayout *boxLayout = new BGroupLayout(B_VERTICAL, 10);
 	fAboutBox->SetLayout(boxLayout);
 	BLayoutBuilder::Group<>(boxLayout)
 		.Add(fAboutTextView, 1)

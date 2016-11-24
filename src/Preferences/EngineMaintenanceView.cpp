@@ -12,43 +12,27 @@ EngineMaintenanceView::EngineMaintenanceView(BRect size)
 	BView(size, "Engine Maintenance", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS),
 	fWatchingRoster(false)
 {
-	BRect viewRect(0,0,size.Width(), size.Height());
-
 	//Engine commands
-//	fMaintBox = new BBox("Maintenance BBox");
-	fMaintBox = new BBox(viewRect, "Maintenance BBox", B_FOLLOW_LEFT_RIGHT);
+	fMaintBox = new BBox("Maintenance BBox");
 	fMaintBox->SetLabel(B_TRANSLATE_COMMENT("Database Maintenance", "Box label"));
 	fDataB = new BButton("data", B_TRANSLATE_COMMENT("Rescan Data", "Button label"), new BMessage(E_RESCAN_DATA));
-	fDataB->ResizeToPreferred();
-//	fDataTV = new BTextView("Rescan Data Description");
-	viewRect.InsetBy(10, 5);
-	viewRect.top += 15;
-	BRect textRect(0,0,viewRect.Width(), viewRect.Height());
-	fDataTV = new BTextView(viewRect, "Rescan Data Description", textRect, B_FOLLOW_ALL);
+	fDataTV = new BTextView("Rescan Data Description");
 	fDataTV->SetText(B_TRANSLATE_COMMENT("If you are having trouble with applications not ranking properly you can"
-		" press the \"Rescan Data\" button below to have the Engine rescan the database and recreate"
-		" application statistics.  The Engine must be running to perform this task.", "Description text"));
+		" press the Rescan Data button below to have the Engine rescan the database and recreate"
+		" application statistics.  The Engine must be running to perform this task.", "Description"));
 	fDataTV->MakeSelectable(false);
 	fDataTV->MakeEditable(false);
-
-/*	fMaintBox->AddChild(BGroupLayoutBuilder(B_VERTICAL, 5)
-		.Add(fDataTV)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 5)
-			.AddGlue()
-			.Add(fDataB)//, 0, 4)
-			.AddGlue()
-		)
-		.SetInsets(5, 5, 5, 5)
-	);
-
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
-		.Add(fMaintBox)
+	
+	BLayoutBuilder::Group<>(fMaintBox, B_VERTICAL, 10)
+		.Add(fDataTV, 1)
+		.Add(fDataB, 1)
+		.SetInsets(10, 20, 10, 10)
+	;
+	
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 10)
+		.Add(fMaintBox, 0)
 		.AddGlue()
-	);*/
-	fMaintBox->AddChild(fDataTV);
-	fMaintBox->AddChild(fDataB);
-	AddChild(fMaintBox);
+	;
 }
 
 

@@ -30,10 +30,8 @@ EngineStatusView::EngineStatusView(BRect size)
 		" the Einsteinium Engine.", "Description text"));
 	fAboutTextView->MakeSelectable(false);
 	fAboutTextView->MakeEditable(false);
-	BGroupLayout *boxLayout = new BGroupLayout(B_VERTICAL);
-	fAboutBox->SetLayout(boxLayout);
-	BLayoutBuilder::Group<>(boxLayout)
-		.Add(fAboutTextView)
+	BLayoutBuilder::Group<>(fAboutBox, B_VERTICAL, 10)
+		.Add(fAboutTextView, 1)
 		.SetInsets(10, 20, 10, 10)
 	;
 
@@ -44,7 +42,7 @@ EngineStatusView::EngineStatusView(BRect size)
 		fStatusBox = new SystemStatusBox(B_TRANSLATE_COMMENT("Engine Running Status", "Box label"), serviceEntry, e_engine_sig);
 	
 	// Boot launch setting
-	fLaunchCB = new BCheckBox("launch", B_TRANSLATE_COMMENT("Launch Engine when Haiku boots", "Checkbox label"),
+	fLaunchCB = new BCheckBox("launch", B_TRANSLATE_COMMENT("Start Engine when Haiku boots", "Checkbox label"),
 								new BMessage(BOOT_SETTINGS_CHANGED));
 	BFile bootSettings(fBootSettingsPath.Path(), B_READ_WRITE | B_CREATE_FILE);
 	if(bootSettings.InitCheck() == B_OK)
@@ -63,18 +61,13 @@ EngineStatusView::EngineStatusView(BRect size)
 	}
 	
 	// Layout
-	BGroupLayout *layout = new BGroupLayout(B_VERTICAL);
+	BGroupLayout *layout = new BGroupLayout(B_VERTICAL, 10);
 	SetLayout(layout);
 	BGroupLayoutBuilder builder(layout);
 	builder.Add(fAboutBox, 0);
 	if(fStatusBox != NULL)
-		builder.Add(fStatusBox, 1);
-	builder.Add(fLaunchCB).AddGlue();
-
-	// TODO this isn't quite right, need to calculate based on TextView preferred size?
-	BSize minSize(PreferredSize());
-	minSize.height += 50;
-	fAboutBox->SetExplicitMinSize(minSize);
+		builder.Add(fStatusBox, 0);
+	builder.Add(fLaunchCB, 0).AddGlue();
 }
 
 

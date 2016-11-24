@@ -40,7 +40,7 @@ DaemonRelaunchView::DaemonRelaunchView(BRect size)
 							"be color coded based on the action specified, so you can quickly view all your\n"
 							"app settings.", "Tootip text"));
 
-	BGroupLayout *boxLayout = BLayoutBuilder::Group<>(B_VERTICAL)
+	BGroupLayout *boxLayout = BLayoutBuilder::Group<>(B_VERTICAL, 10)
 		.Add(fAppsSView)
 		.AddGroup(B_HORIZONTAL)
 			.AddGlue()
@@ -53,7 +53,7 @@ DaemonRelaunchView::DaemonRelaunchView(BRect size)
 		.SetInsets(10, 10, 10, 10);
 	fRelaunchBox->AddChild(boxLayout->View());
 
-	BGroupLayout *layout = new BGroupLayout(B_VERTICAL);
+	BGroupLayout *layout = new BGroupLayout(B_VERTICAL, 10);
 	SetLayout(layout);
 	BLayoutBuilder::Group<>(layout)
 		.Add(fRelaunchBox);

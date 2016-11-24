@@ -29,8 +29,8 @@ DaemonStatusView::DaemonStatusView(BRect size)
 	fAboutTextView->MakeSelectable(false);
 	fAboutTextView->MakeEditable(false);
 
-	BLayoutBuilder::Group<>(fAboutBox, B_VERTICAL)
-		.Add(fAboutTextView)
+	BLayoutBuilder::Group<>(fAboutBox, B_VERTICAL, 10)
+		.Add(fAboutTextView, 1)
 		.SetInsets(10, 20, 10, 10);
 
 	// Status Box
@@ -39,7 +39,7 @@ DaemonStatusView::DaemonStatusView(BRect size)
 		fStatusBox = new SystemStatusBox(B_TRANSLATE_COMMENT("Daemon Running Status", "Box label"), serviceEntry, e_daemon_sig);
 	
 	// Boot launch setting
-	fLaunchCB = new BCheckBox("launch", B_TRANSLATE_COMMENT("Launch Daemon when Haiku boots", "Checkbox label"),
+	fLaunchCB = new BCheckBox("launch", B_TRANSLATE_COMMENT("Start Daemon when Haiku boots", "Checkbox label"),
 								new BMessage(BOOT_SETTINGS_CHANGED));
 	BFile bootSettings(fBootSettingsPath.Path(), B_READ_WRITE | B_CREATE_FILE);
 	if(bootSettings.InitCheck() == B_OK)
@@ -58,18 +58,13 @@ DaemonStatusView::DaemonStatusView(BRect size)
 	}
 	
 	// Layout
-	BGroupLayout *layout = new BGroupLayout(B_VERTICAL);
+	BGroupLayout *layout = new BGroupLayout(B_VERTICAL, 10);
 	SetLayout(layout);
 	BGroupLayoutBuilder builder(layout);
 	builder.Add(fAboutBox, 0);
 	if(fStatusBox != NULL)
-		builder.Add(fStatusBox, 1);
-	builder.Add(fLaunchCB).AddGlue();
-
-	// TODO this isn't quite right, need to calculate based on TextView preferred size?
-	BSize minSize(PreferredSize());
-	minSize.height += 20;
-	fAboutBox->SetExplicitMinSize(minSize);
+		builder.Add(fStatusBox, 0);
+	builder.Add(fLaunchCB, 0).AddGlue();
 }
 
 

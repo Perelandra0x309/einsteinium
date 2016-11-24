@@ -22,7 +22,7 @@ LauncherAboutView::LauncherAboutView(BRect size)
 					" launcher with applications ordered the way you want them.", "About text"));
 	fAboutTextView->MakeSelectable(false);
 	fAboutTextView->MakeEditable(false);
-	BGroupLayout *boxLayout = new BGroupLayout(B_VERTICAL);
+	BGroupLayout *boxLayout = new BGroupLayout(B_VERTICAL, 10);
 	fAboutBox->SetLayout(boxLayout);
 	BLayoutBuilder::Group<>(boxLayout)
 		.Add(fAboutTextView)
@@ -38,7 +38,7 @@ LauncherAboutView::LauncherAboutView(BRect size)
 	fSettingsTV->MakeSelectable(false);
 	fSettingsTV->MakeEditable(false);
 	fSettingsButton = new BButton(B_TRANSLATE_COMMENT("Open Launcher Settings", "Button label"), new BMessage(OPEN_LAUNCHER_SETTINGS));
-	BGroupLayout *settingsBoxLayout = new BGroupLayout(B_VERTICAL);
+	BGroupLayout *settingsBoxLayout = new BGroupLayout(B_VERTICAL, 10);
 	fSettingsBox->SetLayout(settingsBoxLayout);
 	BLayoutBuilder::Group<>(settingsBoxLayout)
 		.Add(fSettingsTV)
@@ -47,7 +47,7 @@ LauncherAboutView::LauncherAboutView(BRect size)
 	;
 
 	// Layout
-	BGroupLayout *layout = new BGroupLayout(B_VERTICAL);
+	BGroupLayout *layout = new BGroupLayout(B_VERTICAL, 10);
 	SetLayout(layout);
 	BLayoutBuilder::Group<>(layout)
 		.Add(fAboutBox, 0)
