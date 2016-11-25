@@ -30,6 +30,7 @@ public:
 			void		SelectDefaultTab();
 			void		SettingsChanged(uint32 what);
 			void		BuildAppsListView(BMessage *message);
+			void		UpdateInfoView();
 private:
 	BTab					*fAppsTab, *fRecentDocsTab, *fRecentFoldersTab;
 	BScrollView				*fAppsScrollView, *fDocsScrollView, *fFoldersScrollView;

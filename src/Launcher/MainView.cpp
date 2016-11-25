@@ -83,6 +83,7 @@ MainView::MessageReceived(BMessage* msg)
 			_BuildAppsListViewFromRecent();
 			_BuildDocsListView();
 			_BuildFoldersListView();
+			UpdateInfoView();
 			break;
 		}
 		case EL_UPDATE_RECENT_LISTS_FORCE:
@@ -90,6 +91,7 @@ MainView::MessageReceived(BMessage* msg)
 			_BuildAppsListViewFromRecent(true);
 			_BuildDocsListView(true);
 			_BuildFoldersListView(true);
+			UpdateInfoView();
 			break;
 		}
 		case EL_EXCLUSIONS_CHANGED:
@@ -206,6 +208,27 @@ MainView::SettingsChanged(uint32 what)
 			fFoldersListView->SettingsChanged(what);
 	}
 
+}
+
+
+void
+MainView::UpdateInfoView()
+{
+	int32 selection = Selection();
+	switch(selection) {
+		case 0: {
+			fAppsListView->SendInfoViewUpdate();
+			break;
+		}
+		case 1: {
+			fDocsListView->SendInfoViewUpdate();
+			break;
+		}
+		case 2: {
+			fFoldersListView->SendInfoViewUpdate();
+			break;
+		}
+	}
 }
 
 
