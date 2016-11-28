@@ -13,13 +13,13 @@ MainWindow::MainWindow(BRect size, window_look look)
 	fView = new MainView(frameRect);
 	fInfoView = new BStringView("InfoView","");
 
-	BLayoutBuilder::Group<>(this, B_VERTICAL)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		// Get rid of pixels at edges of list view
-		.SetInsets(-3, 0, -3, 3)
+		.SetInsets(-3, 0, -3, 0)
 		.Add(fView)
-		.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING)
+		.AddGroup(B_VERTICAL)
 			// align text vertically centered
-			.SetInsets(5, -8, 0, 0)
+			.SetInsets(5, 2, 0, 2)
 			.Add(fInfoView);
 
 	SetSizeLimits(fView->TabFrame(fView->CountTabs()-1).right + 5, 9999, 200, 9999);
@@ -52,7 +52,7 @@ MainWindow::MessageReceived(BMessage* msg)
 		{
 			BString textStr;
 			msg->FindString(EL_INFO_STRING, &textStr);
-			fInfoView->TruncateString(&textStr, B_TRUNCATE_SMART, Bounds().Width());
+			fInfoView->TruncateString(&textStr, B_TRUNCATE_SMART, Bounds().Width()-2);
 			fInfoView->SetText(textStr);
 			fInfoView->Invalidate();
 			break;
