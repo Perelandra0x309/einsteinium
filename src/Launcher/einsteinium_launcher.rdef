@@ -35,4 +35,4 @@ resource vector_icon {
 };
 
 
-resource app_flags B_MULTIPLE_LAUNCH | B_BACKGROUND_APP;
+resource app_flags B_EXCLUSIVE_LAUNCH;

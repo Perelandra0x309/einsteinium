@@ -250,12 +250,13 @@ LauncherApp::MessageReceived(BMessage* msg)
 			fSettingsWindow->Activate();
 			break;
 		}
-		case EL_SHOW_WINDOW:
+		case B_SILENT_RELAUNCH:
+//		case EL_SHOW_WINDOW:
 		{
 			//fWindow->SelectDefaultTab();
-			if(fWindow->IsHidden())
+			if(fWindow->IsMinimized())
 			{
-				fWindow->Show();
+				fWindow->Minimize(false);
 				fWindow->UpdateIfNeeded();
 			}
 			else
@@ -273,7 +274,8 @@ LauncherApp::MessageReceived(BMessage* msg)
 		{
 			if(!fSettingsWindow->IsHidden())
 				fSettingsWindow->Hide();
-			fWindow->Hide();
+//			fWindow->Hide();
+			fWindow->Minimize(true);
 			break;
 		}
 		case EL_UPDATE_RECENT_LISTS:
