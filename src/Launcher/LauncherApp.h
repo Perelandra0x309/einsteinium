@@ -29,7 +29,7 @@ protected:
 	AppSettings				fAppSettings;
 
 private:
-	bool					fQuitRequested, fLastEngineStatusRunning, fWatchingRoster, fEngineAlertIsShowing;
+	bool					fLastEngineStatusRunning, fWatchingRoster, fEngineAlertIsShowing;
 	MainWindow				*fWindow;
 	SettingsWindow			*fSettingsWindow;
 	LauncherSettingsFile	*fSettingsFile;

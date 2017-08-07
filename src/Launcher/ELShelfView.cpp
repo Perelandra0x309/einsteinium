@@ -7,6 +7,26 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Deskbar Menu"
 
+extern "C" _EXPORT BView* instantiate_deskbar_item()
+{
+	return new ELShelfView();
+}
+
+// Compliments of AnEvilYak
+status_t
+our_image(image_info& image)
+{
+	int32 cookie = 0;
+	while (get_next_image_info(B_CURRENT_TEAM, &cookie, &image) == B_OK) {
+		if ((char *)our_image >= (char *)image.text
+			&& (char *)our_image <= (char *)image.text + image.text_size)
+			return B_OK;
+	}
+
+	return B_ERROR;
+}
+
+
 ELShelfView::ELShelfView()
 	:
 	BView(BRect(0, 0, 15, 15), EL_SHELFVIEW_NAME, B_FOLLOW_NONE, B_WILL_DRAW),
@@ -18,24 +38,27 @@ ELShelfView::ELShelfView()
 	fEngineAlertIsShowing(false),
 	fWatchingRoster(false)
 {
-	app_info info;
-	be_app->GetAppInfo(&info);
-	fIcon = new BBitmap(Bounds(), B_RGBA32);
-	if (fIcon->InitCheck() == B_OK)
-	{
-		status_t result = BNodeInfo::GetTrackerIcon(&info.ref, fIcon, B_MINI_ICON);
-		if(result != B_OK)
+	image_info info;
+	entry_ref ref;
+	if (our_image(info) == B_OK
+			&& get_ref_for_path(info.name, &ref) == B_OK) {
+		fIcon = new BBitmap(Bounds(), B_RGBA32);
+		if (fIcon->InitCheck() == B_OK)
 		{
-			printf("Error getting tracker icon\n");
+			status_t result = BNodeInfo::GetTrackerIcon(&ref, fIcon, B_MINI_ICON);
+			if(result != B_OK)
+			{
+				printf("Error getting tracker icon\n");
+				delete fIcon;
+				fIcon = NULL;
+			}
+		}
+		else
+		{
+			printf("Error creating bitmap\n");
 			delete fIcon;
 			fIcon = NULL;
 		}
-	}
-	else
-	{
-		printf("Error creating bitmap\n");
-		delete fIcon;
-		fIcon = NULL;
 	}
 
 	SetToolTip(EL_TOOLTIP_TEXT);
@@ -58,7 +81,7 @@ ELShelfView::ELShelfView(BMessage *message)
 	status_t result = message->FindMessage("fIconArchive", &iconArchive);
 	if(result == B_OK)
 		fIcon = new BBitmap(&iconArchive);
-	// Apparently Haiku does not yet archive tool tips (Release 1 Alpha 3)
+	// Apparently Haiku does not yet archive tool tips (Release 1 pre beta)
 	SetToolTip(EL_TOOLTIP_TEXT);
 }
 
@@ -155,7 +178,6 @@ ELShelfView::Archive(BMessage *data, bool deep) const
 {
 	BView::Archive(data, deep);
 	data->AddString("add_on", e_launcher_sig);
-//	data->AddString("class", "ELShelfView");
 	if(fIcon != NULL)
 	{
 		BMessage archive;

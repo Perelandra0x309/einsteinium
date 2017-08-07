@@ -21,7 +21,6 @@ LauncherApp::LauncherApp()
 	BApplication(e_launcher_sig),
 	EngineSubscriber(),
 	fSettingsFile(NULL),
-	fQuitRequested(false),
 	fLastEngineStatusRunning(false),
 	fEngineAlert(NULL),
 	fEngineAlertIsShowing(false),
@@ -89,19 +88,13 @@ LauncherApp::QuitRequested()
 	delete fSettingsFile;
 	fSettingsFile = NULL;
 
+	BApplication::QuitRequested();
 	return true;
 }
 
 void
 LauncherApp::ReadyToRun()
 {
-	//Were we sent a quit arguement?
-	if(fQuitRequested)
-	{
-		be_app->PostMessage(B_QUIT_REQUESTED);
-		return;
-	}
-
 	if(_IsEngineRunning())
 		_Subscribe();
 	//Deskbar menu automatically starts the engine, so don't need this if we are showing the deskbar menu
@@ -143,15 +136,7 @@ LauncherApp::ArgvReceived(int32 argc, char** argv)
 	{
 		//option to quit
 		if(strcmp(argv[1],"-q")==0 || strcmp(argv[1],"--quit")==0)
-		{	fQuitRequested=true;
-		//	be_app->PostMessage(B_QUIT_REQUESTED);
-		}
-		//only create the deskbar shelfview according to settings, then quit
-		else if(strcmp(argv[1],"--prepdeskbar")==0)
-		{
-			_ShowShelfView(fAppSettings.showDeskbarMenu);
-			fQuitRequested=true;
-		}
+			be_app->PostMessage(B_QUIT_REQUESTED);
 		//option is not recognized
 		else
 		{	printf("Unknown option.\n"); }
@@ -425,7 +410,6 @@ LauncherApp::_CreateExclusionsSignatureList(BMessage *exclusions)
 }
 
 
-
 void
 LauncherApp::_ShowShelfView(bool showShelfView)
 {
@@ -433,15 +417,14 @@ LauncherApp::_ShowShelfView(bool showShelfView)
 	// Don't add another ELShelfView to the Deskbar if one is already attached
 	if(showShelfView && !deskbar.HasItem(EL_SHELFVIEW_NAME))
 	{
-		BView *shelfView = new ELShelfView();
-		deskbar.AddItem(shelfView);
-		delete shelfView;
+		app_info info;
+		status_t result = be_app->GetAppInfo(&info);
+		if (result == B_OK)
+			deskbar.AddItem(&info.ref);
 	}
 	// Remove ELShelfView if there is one in the deskbar
 	else if(!showShelfView && deskbar.HasItem(EL_SHELFVIEW_NAME))
-	{
 		deskbar.RemoveItem(EL_SHELFVIEW_NAME);
-	}
 }
 
 

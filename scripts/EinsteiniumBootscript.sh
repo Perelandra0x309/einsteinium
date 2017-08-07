@@ -50,13 +50,4 @@ then
 	open $userBinDir/einsteinium_engine
 fi
 
-#create Launcher Deskbar menu
-if [ -d $sysAppsDir/Einsteinium ]
-then
-	$sysAppsDir/Einsteinium/Einsteinium\ Launcher --prepdeskbar
-elif [ -d $userAppsDir/Einsteinium ]
-then
-	$userAppsDir/Einsteinium/Einsteinium\ Launcher --prepdeskbar
-fi
-
 exit 0

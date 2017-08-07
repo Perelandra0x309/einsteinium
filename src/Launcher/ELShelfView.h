@@ -29,6 +29,8 @@
 
 int	MenuItemSortLabel(const void* item1, const void* item2);
 
+extern "C" _EXPORT BView* instantiate_deskbar_item();
+
 class _EXPORT ELShelfView : public BView, public EngineSubscriber {
 public:
 							ELShelfView();
