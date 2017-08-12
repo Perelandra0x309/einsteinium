@@ -9,7 +9,7 @@
 
 AppsListView::AppsListView(BRect size)
 	:
-	BListView(size, "Apps List", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES),
+	BListView("Apps List"),
 	fMenu(NULL),
 	fLastRecentAppRef(),
 	isShowing(false),
@@ -160,6 +160,39 @@ AppsListView::KeyDown(const char* bytes, int32 numbytes)
 		BListView::KeyDown(bytes, numbytes);
 }
 
+
+void
+AppsListView::Draw(BRect rect)
+{
+	if(IsEmpty()) {
+		float width, height;
+		BFont font;
+		BString message(B_TRANSLATE("No applications in recent list"));
+		SetHighColor(ui_color(B_CONTROL_BACKGROUND_COLOR));
+		FillRect(rect);
+		GetPreferredSize(&width, &height);
+		GetFont(&font);
+		float messageWidth = font.StringWidth(message.String());
+		MovePenTo((width - messageWidth) / 2, (height + font.Size()) / 2);
+		SetHighColor(ui_color(B_MENU_SELECTED_BACKGROUND_COLOR));
+		DrawString(message.String());
+	} else {
+		BRect bounds(Bounds());
+		bounds.top = ItemFrame(CountItems() - 1).bottom;
+		SetHighColor(ui_color(B_CONTROL_BACKGROUND_COLOR));
+		FillRect(bounds);
+		BListView::Draw(rect);
+	}
+	Invalidate();
+}
+
+
+void
+AppsListView::FrameResized(float w, float h)
+{
+	BListView::FrameResized(w, h);
+	Invalidate();
+}
 
 
 void

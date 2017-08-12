@@ -1,6 +1,6 @@
-NAME = Einsteinium_Launcher
+NAME = Einsteinium
 TYPE = APP
-APP_MIME_SIG = application/x-vnd.Einsteinium_Engine
+APP_MIME_SIG = application/x-vnd.Einsteinium_Launcher
 SRCS = ../Engine/EngineSubscriber.cpp \
 	main.cpp \
 	LauncherApp.cpp \
