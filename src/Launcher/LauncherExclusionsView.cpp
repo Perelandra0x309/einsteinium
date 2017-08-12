@@ -9,7 +9,7 @@
 
 LauncherExclusionsView::LauncherExclusionsView(BRect size, BMessage *appExclusions)
 	:
-	BView(size, B_TRANSLATE_COMMENT("Apps Exclusions", "Tab label"), B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS)
+	BView(size, B_TRANSLATE_COMMENT("App Exclusions", "Tab label"), B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS)
 {
 //	SetViewColor(bg_color);
 	BRect viewRect;

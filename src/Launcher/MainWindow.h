@@ -5,6 +5,9 @@
 #ifndef EINSTEINIUM_LAUNCHER_WINDOW_H
 #define EINSTEINIUM_LAUNCHER_WINDOW_H
 
+
+#include <Catalog.h>
+
 #include <InterfaceKit.h>
 #include "launcher_constants.h"
 #include "MainView.h"
@@ -20,8 +23,11 @@ public:
 			void			SelectDefaultTab();
 			void			BuildAppsListView(BMessage *msg);
 private:
-	MainView				*fView;
-	BStringView				*fInfoView;
+	MainView*				fView;
+	BStringView*			fInfoView;
+	BMenuBar*				fMenuBar;
+	BMenu*					fFileMenu;
+	BMenu*					fSettingsMenu;
 };
 
 #endif

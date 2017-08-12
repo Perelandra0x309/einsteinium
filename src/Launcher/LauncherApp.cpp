@@ -144,16 +144,6 @@ LauncherApp::ArgvReceived(int32 argc, char** argv)
 }
 
 
-/*void
-LauncherApp::AppActivated(bool active)
-{
-	if(active)
-	{
-		be_app->PostMessage(EL_SHOW_WINDOW);
-	}
-}*/
-
-
 void
 LauncherApp::MessageReceived(BMessage* msg)
 {
@@ -228,6 +218,13 @@ LauncherApp::MessageReceived(BMessage* msg)
 			_Subscribe();
 			break;
 		}
+		case EL_SHOW_SETTINGS_LAYOUT:
+		case EL_SHOW_SETTINGS_RANKINGS:
+		case EL_SHOW_SETTINGS_EXCLUSIONS:
+		{
+			fSettingsWindow->SelectTab(msg->what);
+			// Fall through
+		}
 		case EL_SHOW_SETTINGS:
 		{
 			if(fSettingsWindow->IsHidden())
@@ -236,7 +233,6 @@ LauncherApp::MessageReceived(BMessage* msg)
 			break;
 		}
 		case B_SILENT_RELAUNCH:
-//		case EL_SHOW_WINDOW:
 		{
 			//fWindow->SelectDefaultTab();
 			if(fWindow->IsMinimized())
@@ -259,7 +255,6 @@ LauncherApp::MessageReceived(BMessage* msg)
 		{
 			if(!fSettingsWindow->IsHidden())
 				fSettingsWindow->Hide();
-//			fWindow->Hide();
 			fWindow->Minimize(true);
 			break;
 		}

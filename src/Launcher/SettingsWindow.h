@@ -24,6 +24,7 @@ public:
 	virtual	bool			QuitRequested();
 	virtual void			MessageReceived(BMessage*);
 			void			Show(BRect);
+			void			SelectTab(uint32 which);
 //			AppSettings		GetAppSettings();
 			void			PopulateAppSettings(AppSettings *settings);
 			ScaleSettings	GetScaleSettings();

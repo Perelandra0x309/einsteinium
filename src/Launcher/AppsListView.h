@@ -41,7 +41,8 @@ private:
 	LPopUpMenu			*fMenu;
 	bool				isShowing;
 	entry_ref			fLastRecentAppRef;
-	BMenuItem			*fStartStopMI, *fTrackerMI, *fRemoveMI, *fSettingsMI;
+//	BMenuItem			*fStartStopMI, *fSettingsMI;
+	BMenuItem			*fTrackerMI, *fRemoveMI;
 	status_t			_AddAppListItem(BEntry appEntry, int totalCount, int index, AppSettings *settings);
 	virtual status_t	_InvokeSelectedItem();
 	virtual void		_InitPopUpMenu(int32 selectedIndex);

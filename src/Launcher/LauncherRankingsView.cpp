@@ -16,7 +16,7 @@ rgb_color kBarColor = {205,205,255,0};
 
 LauncherRankingsView::LauncherRankingsView(BRect size, ScaleSettings* scales)
 	:
-	BView(size, B_TRANSLATE_COMMENT("Apps Ranking", "Tab label"), B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS)
+	BView(size, B_TRANSLATE_COMMENT("App Ranking", "Tab label"), B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS)
 {
 //	SetViewColor(bg_color);
 

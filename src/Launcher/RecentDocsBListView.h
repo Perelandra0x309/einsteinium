@@ -34,7 +34,7 @@ protected:
 
 private:
 	LPopUpMenu			*fMenu;
-	BMenuItem			*fSettingsMI, *fTrackerMI;
+	BMenuItem			*fTrackerMI;
 	bool				isShowing;
 	entry_ref			fLastRecentDocRef;
 	BMessage			fSuperListPointers;

@@ -4,6 +4,9 @@
  */
 #include "MainWindow.h"
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Main Window"
+
 MainWindow::MainWindow(BRect size, window_look look)
 	:
 	BWindow(size, "Einsteinium Launcher", look, B_NORMAL_WINDOW_FEEL, B_NOT_ZOOMABLE, B_ALL_WORKSPACES)
@@ -12,10 +15,32 @@ MainWindow::MainWindow(BRect size, window_look look)
 	BRect frameRect(Bounds());
 	fView = new MainView(frameRect);
 	fInfoView = new BStringView("InfoView","");
+	fMenuBar = new BMenuBar("MenuBar");
+	fFileMenu = new BMenu("File");
+	BMenuItem *menuItem1 = new BMenuItem(B_TRANSLATE_COMMENT("Hide window", ""),
+		new BMessage(EL_HIDE_APP), 'W');
+	BMenuItem *menuItem2 = new BMenuItem(B_TRANSLATE_COMMENT("Quit", ""),
+		new BMessage(EL_QUIT_FROM_MENUBAR), 'Q');
+	fFileMenu->AddItem(menuItem1);
+	fFileMenu->AddItem(menuItem2);
+	fSettingsMenu = new BMenu("Settings");
+	BMenuItem *menuItem3 = new BMenuItem(B_TRANSLATE_COMMENT("Layout"B_UTF8_ELLIPSIS, ""),
+		new BMessage(EL_SHOW_SETTINGS_LAYOUT));
+	BMenuItem *menuItem4 = new BMenuItem(B_TRANSLATE_COMMENT("App Ranking"B_UTF8_ELLIPSIS, ""),
+		new BMessage(EL_SHOW_SETTINGS_RANKINGS));
+	BMenuItem *menuItem5 = new BMenuItem(B_TRANSLATE_COMMENT("App Exclusions"B_UTF8_ELLIPSIS, ""),
+		new BMessage(EL_SHOW_SETTINGS_EXCLUSIONS));
+	fSettingsMenu->AddItem(menuItem3);
+	fSettingsMenu->AddItem(menuItem4);
+	fSettingsMenu->AddItem(menuItem5);
+	
+	fMenuBar->AddItem(fFileMenu);
+	fMenuBar->AddItem(fSettingsMenu);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		// Get rid of pixels at edges of list view
 		.SetInsets(-3, 0, -3, 0)
+		.Add(fMenuBar)
 		.Add(fView)
 		.AddGroup(B_VERTICAL)
 			// align text vertically centered
@@ -57,6 +82,17 @@ MainWindow::MessageReceived(BMessage* msg)
 			fInfoView->Invalidate();
 			break;
 		}
+		case EL_HIDE_APP:
+			be_app->PostMessage(EL_HIDE_APP);
+			break;
+		case EL_QUIT_FROM_MENUBAR:
+			be_app->PostMessage(B_QUIT_REQUESTED);
+			break;
+		case EL_SHOW_SETTINGS_LAYOUT:
+		case EL_SHOW_SETTINGS_RANKINGS:
+		case EL_SHOW_SETTINGS_EXCLUSIONS:
+			be_app->PostMessage(msg);
+			break;
 		default:
 			BWindow::MessageReceived(msg);
 	}

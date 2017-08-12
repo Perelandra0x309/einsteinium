@@ -89,6 +89,30 @@ SettingsWindow::Show(BRect mainWindowFrame)
 	BWindow::Show();
 }
 
+
+void
+SettingsWindow::SelectTab(uint32 which)
+{
+	switch(which) {
+		case EL_SHOW_SETTINGS_LAYOUT:
+			Lock();
+			fTabView->Select(0);
+			Unlock();
+			break;
+		case EL_SHOW_SETTINGS_RANKINGS:
+			Lock();
+			fTabView->Select(1);
+			Unlock();
+			break;
+		case EL_SHOW_SETTINGS_EXCLUSIONS:
+			Lock();
+			fTabView->Select(2);
+			Unlock();
+			break;
+	}
+}
+
+
 /*
 AppSettings
 SettingsWindow::GetAppSettings()

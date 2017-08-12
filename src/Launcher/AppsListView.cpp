@@ -537,25 +537,29 @@ AppsListView::_InitPopUpMenu(int32 selectedIndex)
 	if(fMenu==NULL)
 	{
 		fMenu = new LPopUpMenu(B_EMPTY_STRING);
-		fStartStopMI = new BMenuItem("Start", new BMessage());
-		fMenu->AddItem(fStartStopMI);
-		fTrackerMI = new BMenuItem(B_TRANSLATE_COMMENT("Show in Tracker", "Application pop-up menu"), new BMessage(EL_SHOW_IN_TRACKER));
+//		fStartStopMI = new BMenuItem("Start", new BMessage());
+//		fMenu->AddItem(fStartStopMI);
+		fTrackerMI = new BMenuItem(B_TRANSLATE_COMMENT("Show in Tracker", "Application pop-up menu"),
+			new BMessage(EL_SHOW_IN_TRACKER));
 		fMenu->AddItem(fTrackerMI);
-		fRemoveMI = new BMenuItem(B_TRANSLATE_COMMENT("Exclude from Apps list", "Application pop-up menu"), new BMessage(EL_ADD_APP_EXCLUSION));
+		// TODO Add 'E' shortcut?
+		fRemoveMI = new BMenuItem(B_TRANSLATE_COMMENT("Exclude from Apps list", "Application pop-up menu"),
+			new BMessage(EL_ADD_APP_EXCLUSION));
 		fMenu->AddItem(fRemoveMI);
-		fMenu->AddSeparatorItem();
-		fSettingsMI = new BMenuItem(B_TRANSLATE_COMMENT("Settings" B_UTF8_ELLIPSIS, "Application pop-up menu"), new BMessage(EL_SHOW_SETTINGS));
-		fMenu->AddItem(fSettingsMI);
+//		fMenu->AddSeparatorItem();
+//		fSettingsMI = new BMenuItem(B_TRANSLATE_COMMENT("Settings" B_UTF8_ELLIPSIS, "Application pop-up menu"),
+//			new BMessage(EL_SHOW_SETTINGS));
+//		fMenu->AddItem(fSettingsMI);
 	//	fMenu->SetTargetForItems(this);
-		fStartStopMI->SetTarget(this);
+//		fStartStopMI->SetTarget(this);
 		fTrackerMI->SetTarget(this);
 		fRemoveMI->SetTarget(be_app);
-		fSettingsMI->SetTarget(be_app);
+//		fSettingsMI->SetTarget(be_app);
 	}
 	if(selectedIndex>=0)
 	{
 		AppListItem *selectedItem = (AppListItem*)ItemAt(selectedIndex);
-		bool isRunning = selectedItem->IsRunning();
+/*		bool isRunning = selectedItem->IsRunning();
 		if(isRunning)
 		{
 			fStartStopMI->SetLabel(B_TRANSLATE_COMMENT("Quit", "Application pop-up menu"));
@@ -565,7 +569,7 @@ AppsListView::_InitPopUpMenu(int32 selectedIndex)
 		{
 			fStartStopMI->SetLabel(B_TRANSLATE_COMMENT("Launch", "Application pop-up menu"));
 			fStartStopMI->Message()->what = EL_START_SERVICE;
-		}
+		}*/
 		BMessage *message = fRemoveMI->Message();
 		message->MakeEmpty();
 		message->AddString(EL_EXCLUDE_SIGNATURE, selectedItem->GetSignature());

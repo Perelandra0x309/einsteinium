@@ -568,12 +568,12 @@ RecentDocsBListView::_InitPopUpMenu(int32 selectedIndex)
 	{
 		fMenu = new LPopUpMenu(B_EMPTY_STRING);
 		fTrackerMI = new BMenuItem(B_TRANSLATE_COMMENT("Show in Tracker", "Popup menu option"), new BMessage(EL_SHOW_IN_TRACKER));
-		fSettingsMI = new BMenuItem(B_TRANSLATE_COMMENT("Settings" B_UTF8_ELLIPSIS, "Popup menu option"), new BMessage(EL_SHOW_SETTINGS));
+//		fSettingsMI = new BMenuItem(B_TRANSLATE_COMMENT("Settings" B_UTF8_ELLIPSIS, "Popup menu option"), new BMessage(EL_SHOW_SETTINGS));
 		fMenu->AddItem(fTrackerMI);
-		fMenu->AddSeparatorItem();
-		fMenu->AddItem(fSettingsMI);
-		fMenu->SetTargetForItems(this);
-		fSettingsMI->SetTarget(be_app);
+//		fMenu->AddSeparatorItem();
+//		fMenu->AddItem(fSettingsMI);
+//		fMenu->SetTargetForItems(this);
+//		fSettingsMI->SetTarget(be_app);
 	}
 }
 
