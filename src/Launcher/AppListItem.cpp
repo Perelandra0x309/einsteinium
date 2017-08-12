@@ -301,7 +301,10 @@ AppListItem::DrawItem(BView *owner, BRect item_rect, bool complete)
 
 	//background
 	if(IsSelected()) {
-		backgroundColor = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
+		if(owner->IsFocus())
+			backgroundColor = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
+		else
+			backgroundColor = ui_color(B_LIST_BACKGROUND_COLOR);
 	}
 	else {
 		backgroundColor = ui_color(B_LIST_BACKGROUND_COLOR);
@@ -310,6 +313,13 @@ AppListItem::DrawItem(BView *owner, BRect item_rect, bool complete)
 	owner->SetLowColor(backgroundColor);
 	owner->FillRect(item_rect);
 
+	// Non-focused selected item- draw border around item
+	if(IsSelected() && !owner->IsFocus()) {
+		owner->SetHighColor(ui_color(B_LIST_SELECTED_BACKGROUND_COLOR));
+		owner->StrokeRect(item_rect);
+		owner->SetHighColor(backgroundColor);
+	}
+	
 	//icon
 /*	if (IsSelected() && fShadowIcon) {
 		float offsetMarginHeight = floor( (listItemHeight - fShadowIcon->Bounds().Height())/2);

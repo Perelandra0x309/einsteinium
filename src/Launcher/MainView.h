@@ -19,26 +19,27 @@
 #include "RecentFoldersBListView.h"
 
 
-class MainView : public BTabView {
+class MainView : public BView {
 public:
 						MainView(BRect size);
 //	virtual void		AllAttached();
 //	virtual void		AttachedToWindow();
 	virtual void		MessageReceived(BMessage*);
-	virtual void		KeyDown(const char* bytes, int32 numbytes);
-	virtual void		Select(int32 tab);
-			void		SelectDefaultTab();
+//	virtual void		KeyDown(const char* bytes, int32 numbytes);
+	virtual void		Select(int32 which);
+			void		SelectDefaultView();
 			void		SettingsChanged(uint32 what);
 			void		BuildAppsListView(BMessage *message);
 			void		UpdateInfoView();
+			void		InvalidateFocusView();
 private:
-	BTab					*fAppsTab, *fRecentDocsTab, *fRecentFoldersTab;
+//	BTab					*fAppsTab, *fRecentDocsTab, *fRecentFoldersTab;
 	BScrollView				*fAppsScrollView, *fDocsScrollView, *fFoldersScrollView;
 	AppsListView			*fAppsListView;
 	RecentDocsBListView		*fDocsListView;
 	RecentFoldersBListView	*fFoldersListView;
 	int32					fTabCount;
-	BListView				*fSelectedListView;
+//	BListView				*fSelectedListView;
 	entry_ref				fLastRecentDocRef;
 	void					_UpdateSelectedListView();
 	void					_BuildAppsListViewFromRecent(bool force=false);

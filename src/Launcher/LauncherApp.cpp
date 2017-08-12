@@ -98,10 +98,10 @@ LauncherApp::ReadyToRun()
 	if(_IsEngineRunning())
 		_Subscribe();
 	//Deskbar menu automatically starts the engine, so don't need this if we are showing the deskbar menu
-	else if(!fAppSettings.showDeskbarMenu)
-	{
+///	else if(!fAppSettings.showDeskbarMenu)
+///	{
 		// Force an update to the Apps list
-		fWindow->SelectDefaultTab();
+///		fWindow->SelectDefaultView();
 
 /*		BNotification notify(B_INFORMATION_NOTIFICATION);
 		notify.SetGroup("Einsteinium Launcher");
@@ -114,10 +114,11 @@ LauncherApp::ReadyToRun()
 		engineAlert->SetFeel(B_FLOATING_APP_WINDOW_FEEL);
 		BMessage *runMessage = new BMessage(EL_START_ENGINE_ALERT);
 		engineAlert->Go(new BInvoker(runMessage, this));*/
-		_CheckEngineStatus(true);
-	}
-	else
-		PostMessage(EL_UPDATE_RECENT_LISTS_FORCE);
+///		_CheckEngineStatus(true);
+///	}
+///	else
+///		PostMessage(EL_UPDATE_RECENT_LISTS_FORCE);
+	PostMessage(EL_UPDATE_RECENT_LISTS);
 	fWindow->Show();
 
 	_WatchForEngineChanges(true);

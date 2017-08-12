@@ -43,7 +43,7 @@ AppsListView::MessageReceived(BMessage* msg)
 			_HideApp(modifier);
 			break;
 		}
-		case B_MOUSE_WHEEL_CHANGED:
+/*		case B_MOUSE_WHEEL_CHANGED:
 		{
 		//	printf("Mouse wheel\n");
 			// Prevent scrolling while the menu is showing
@@ -59,7 +59,7 @@ AppsListView::MessageReceived(BMessage* msg)
 			}
 			HandleMouseWheelChanged(msg);
 			break;
-		}
+		}*/
 		case EL_SHOW_IN_TRACKER:
 		{
 			int32 selectedIndex = CurrentSelection();
@@ -152,8 +152,21 @@ AppsListView::KeyDown(const char* bytes, int32 numbytes)
 					BListView::KeyDown(bytes, numbytes);
 				break;
 			}
+			case B_ESCAPE:
+			{
+				be_app->PostMessage(EL_HIDE_APP);
+				break;
+			}
 			default:
-				BListView::KeyDown(bytes, numbytes);
+			{
+				if( bytes[0] >= 'A' && bytes[0] <= 'z')
+					ScrollToNextAppBeginningWith(bytes[0]);
+				else
+					BListView::KeyDown(bytes, numbytes);
+				
+				if (bytes[0] == B_TAB)
+					Window()->PostMessage(EL_INITIATE_INFO_VIEW_UPDATE);
+			}
 		}
 	}
 	else
@@ -179,7 +192,7 @@ AppsListView::Draw(BRect rect)
 	} else {
 		BRect bounds(Bounds());
 		bounds.top = ItemFrame(CountItems() - 1).bottom;
-		SetHighColor(ui_color(B_CONTROL_BACKGROUND_COLOR));
+		SetHighColor(ui_color(B_LIST_BACKGROUND_COLOR));
 		FillRect(bounds);
 		BListView::Draw(rect);
 	}
@@ -194,7 +207,7 @@ AppsListView::FrameResized(float w, float h)
 	Invalidate();
 }
 
-
+/*
 void
 AppsListView::HandleMouseWheelChanged(BMessage *msg)
 {
@@ -226,7 +239,7 @@ AppsListView::HandleMouseWheelChanged(BMessage *msg)
 		ScrollToSelection();
 	}
 }
-
+*/
 
 
 void

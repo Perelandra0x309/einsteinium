@@ -25,7 +25,7 @@ public:
 	virtual void		KeyDown(const char* bytes, int32 numbytes);
 	void				Draw(BRect rect);
 	void				FrameResized(float w, float h);
-			void		HandleMouseWheelChanged(BMessage *msg);
+//			void		HandleMouseWheelChanged(BMessage *msg);
 			void		SettingsChanged(uint32 what);
 	virtual void		SelectionChanged();
 			void		SendInfoViewUpdate();

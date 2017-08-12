@@ -20,14 +20,17 @@ public:
 //	virtual void			FrameMoved(BPoint new_position);
 	virtual void			FrameResized(float new_width, float new_height);
 			void			SettingsChanged(uint32 what);
-			void			SelectDefaultTab();
+			void			SelectDefaultView();
 			void			BuildAppsListView(BMessage *msg);
 private:
+	void					_RedrawInfoText();
+	
 	MainView*				fView;
 	BStringView*			fInfoView;
 	BMenuBar*				fMenuBar;
 	BMenu*					fFileMenu;
 	BMenu*					fSettingsMenu;
+	BString					fInfoString;
 };
 
 #endif

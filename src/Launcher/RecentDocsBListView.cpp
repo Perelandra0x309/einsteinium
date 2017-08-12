@@ -32,7 +32,7 @@ RecentDocsBListView::MessageReceived(BMessage* msg)
 {
 	switch(msg->what)
 	{
-		case B_MOUSE_WHEEL_CHANGED:
+/*		case B_MOUSE_WHEEL_CHANGED:
 		{
 
 		//	printf("Mouse wheel\n");
@@ -49,7 +49,7 @@ RecentDocsBListView::MessageReceived(BMessage* msg)
 			}
 			HandleMouseWheelChanged(msg);
 			break;
-		}
+		}*/
 		case EL_SHOW_IN_TRACKER:
 		{
 			int32 selectedIndex = CurrentSelection();
@@ -151,7 +151,7 @@ RecentDocsBListView::KeyDown(const char* bytes, int32 numbytes)
 					BOutlineListView::KeyDown(bytes, numbytes);
 				break;
 			}
-			case B_RIGHT_ARROW:
+	/*		case B_RIGHT_ARROW:
 			{
 				// Fix a bug in R1A4 where the 0 level list items do not
 				// always expand when the right arrow is pressed
@@ -164,9 +164,25 @@ RecentDocsBListView::KeyDown(const char* bytes, int32 numbytes)
 				}
 				BOutlineListView::KeyDown(bytes, numbytes);
 				break;
+			}*/
+			case B_ESCAPE:
+			{
+				be_app->PostMessage(EL_HIDE_APP);
+				break;
 			}
 			default:
-				BOutlineListView::KeyDown(bytes, numbytes);
+			{
+				if( bytes[0] >= 'A' && bytes[0] <= 'z')
+					ScrollToNextDocBeginningWith(bytes[0]);
+				else
+					BOutlineListView::KeyDown(bytes, numbytes);
+				
+				if (bytes[0] == B_TAB) {
+					Window()->PostMessage(EL_INITIATE_INFO_VIEW_UPDATE);
+					Invalidate();
+						// Redraw the selected list item
+				}
+			}
 		}
 	}
 	else
@@ -200,7 +216,7 @@ RecentDocsBListView::SendInfoViewUpdate()
 	be_app->PostMessage(&infoMsg);
 }
 
-
+/*
 void
 RecentDocsBListView::HandleMouseWheelChanged(BMessage *msg)
 {
@@ -232,7 +248,7 @@ RecentDocsBListView::HandleMouseWheelChanged(BMessage *msg)
 		ScrollToSelection();
 	}
 }
-
+*/
 
 void
 RecentDocsBListView::SettingsChanged(uint32 what)

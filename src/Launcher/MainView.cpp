@@ -9,38 +9,42 @@
 
 MainView::MainView(BRect size)
 	:
-	BTabView("MainView", B_WIDTH_FROM_LABEL),
-	fSelectedListView(NULL),
+	BView("MainView", B_WILL_DRAW),
+//	fSelectedListView(NULL),
 	fLastRecentDocRef()
 {
 	AppSettings *settings = GetAppSettings();
 	BRect viewRect(Bounds());
-//	viewRect.InsetBy(-2,-2);
-//	viewRect.right-=(B_V_SCROLL_BAR_WIDTH+6);
-//	viewRect.bottom-=(TabHeight()+6);
 	fAppsListView = new AppsListView(viewRect);
 	fAppsListView->SetFontSizeForValue(settings->fontSize);
 	fAppsScrollView = new BScrollView(B_TRANSLATE_COMMENT("Apps", "Tab label"),
-					fAppsListView, /*B_FOLLOW_ALL_SIDES, */0, false, true, B_NO_BORDER);
+					fAppsListView, /*B_FOLLOW_ALL_SIDES, */0, false, true);
 
 	fDocsListView = new RecentDocsBListView(viewRect);
 	fDocsListView->SetFontSizeForValue(settings->fontSize);
 	fDocsScrollView = new BScrollView(B_TRANSLATE_COMMENT("Files", "Tab label"),
-					fDocsListView, /*B_FOLLOW_ALL_SIDES, */0, false, true, B_NO_BORDER);
+					fDocsListView, /*B_FOLLOW_ALL_SIDES, */0, false, true);
 
 	fFoldersListView = new RecentFoldersBListView(viewRect);
 	fFoldersListView->SetFontSizeForValue(settings->fontSize);
 	fFoldersScrollView = new BScrollView(B_TRANSLATE_COMMENT("Folders & Queries", "Tab label"),
-					fFoldersListView, /*B_FOLLOW_ALL_SIDES, */0, false, true, B_NO_BORDER);
+					fFoldersListView, /*B_FOLLOW_ALL_SIDES, */0, false, true);
 
-	fAppsTab = new BTab();
+	BLayoutBuilder::Group<>(this, B_HORIZONTAL, 0)
+//		.SetInsets(-3, 0, -3, 0)
+		.Add(fAppsScrollView)
+		.Add(fDocsScrollView)
+		.Add(fFoldersScrollView)
+	.End();
+/*	fAppsTab = new BTab();
 	AddTab(fAppsScrollView, fAppsTab);
 	fRecentDocsTab = new BTab();
 	AddTab(fDocsScrollView, fRecentDocsTab);
 	fRecentFoldersTab = new BTab();
 	AddTab(fFoldersScrollView, fRecentFoldersTab);
 
-	fTabCount = CountTabs();
+	fTabCount = CountTabs();*/
+	
 }
 
 /*
@@ -66,7 +70,7 @@ MainView::MessageReceived(BMessage* msg)
 	{
 		// Catch mouse wheel events that are redirected from a listview that
 		// is not showing and send it to the correct list view
-		case EL_REDIRECTED_MOUSE_WHEEL_CHANGED:
+/*		case EL_REDIRECTED_MOUSE_WHEEL_CHANGED:
 		case B_MOUSE_WHEEL_CHANGED:
 		{
 		//	printf("Redirected mouse wheel changed message\n");
@@ -77,7 +81,7 @@ MainView::MessageReceived(BMessage* msg)
 			else if(fSelectedListView==fFoldersListView)
 				fFoldersListView->HandleMouseWheelChanged(msg);
 			break;
-		}
+		}*/
 		case EL_UPDATE_RECENT_LISTS:
 		{
 			_BuildAppsListViewFromRecent();
@@ -103,28 +107,43 @@ MainView::MessageReceived(BMessage* msg)
 		{
 			// Invalidate the layout to force all ListItem objects to update
 			// when a modifier key is pressed or released
-			if(fSelectedListView==fAppsListView)
-			{
+//			if(fAppsListView->IsFocus())
+//			{
 				fAppsListView->Invalidate();
 				Window()->UpdateIfNeeded();
-			}
+//			}
 			break;
 		}
+		case EL_INITIATE_INFO_VIEW_UPDATE:
+			UpdateInfoView();
+			InvalidateFocusView();
+			break;
 		default:
-			BTabView::MessageReceived(msg);
+			BView::MessageReceived(msg);
 	}
 }
 
-
+/*
 void
 MainView::KeyDown(const char* bytes, int32 numbytes)
 {
+	BView::KeyDown(bytes, numbytes);
+	if (bytes[0] == B_TAB)
+		UpdateInfoView();
 	if(numbytes == 1) {
 		switch(bytes[0]) {
 			case B_TAB:
 			{
-				int32 selection = Selection();
-				Select((selection+1) % fTabCount);
+			//	int32 selection = Selection();
+			//	Select((selection+1) % fTabCount);
+				if(fAppsListView->IsFocus())
+					Select(1);
+				else if(fDocsListView->IsFocus())
+					Select(2);
+				else if(fFoldersListView->IsFocus())
+					Select(0);
+				BView::KeyDown(bytes, numbytes);
+				_UpdateSelectedListView();
 				break;
 			}
 			case B_ESCAPE:
@@ -139,7 +158,13 @@ MainView::KeyDown(const char* bytes, int32 numbytes)
 			case B_LEFT_ARROW:
 			case B_RIGHT_ARROW:
 			{
-				fSelectedListView->KeyDown(bytes, numbytes);
+				//fSelectedListView->KeyDown(bytes, numbytes);
+				if(fAppsListView->IsFocus())
+					fAppsListView->KeyDown(bytes, numbytes);
+				else if(fDocsListView->IsFocus())
+					fDocsListView->KeyDown(bytes, numbytes);
+				else if(fFoldersListView->IsFocus())
+					fFoldersListView->KeyDown(bytes, numbytes);
 				break;
 			}
 			default:
@@ -147,35 +172,47 @@ MainView::KeyDown(const char* bytes, int32 numbytes)
 				if( bytes[0] >= 'A' && bytes[0] <= 'z')
 				{
 				//	printf("Key: %c\n", bytes[0]);
-					if(fSelectedListView==fAppsListView)
+					if(fAppsListView->IsFocus())
 						fAppsListView->ScrollToNextAppBeginningWith(bytes[0]);
-					else if(fSelectedListView==fDocsListView)
+					else if(fDocsListView->IsFocus())
 						fDocsListView->ScrollToNextDocBeginningWith(bytes[0]);
-					else if(fSelectedListView==fFoldersListView)
+					else if(fFoldersListView->IsFocus())
 						fFoldersListView->ScrollToNextDocBeginningWith(bytes[0]);
 				}
 				else
-					BTabView::KeyDown(bytes, numbytes);
+					BView::KeyDown(bytes, numbytes);
 			}
 		}
 	}
 	else
 	{
-		BTabView::KeyDown(bytes, numbytes);
+		BView::KeyDown(bytes, numbytes);
 	}
-}
+}*/
 
 
 void
-MainView::Select(int32 tab)
+MainView::Select(int32 which)
 {
-	BTabView::Select(tab);
+//	BTabView::Select(tab);
+	switch (which)
+	{
+		case 0:
+			fAppsListView->MakeFocus();
+			break;
+		case 1:
+			fDocsListView->MakeFocus();
+			break;
+		case 2:
+			fFoldersListView->MakeFocus();
+			break;
+	}
 	_UpdateSelectedListView();
 }
 
 
 void
-MainView::SelectDefaultTab()
+MainView::SelectDefaultView()
 {
 	Select(0);
 }
@@ -214,7 +251,7 @@ MainView::SettingsChanged(uint32 what)
 void
 MainView::UpdateInfoView()
 {
-	int32 selection = Selection();
+/*	int32 selection = Selection();
 	switch(selection) {
 		case 0: {
 			fAppsListView->SendInfoViewUpdate();
@@ -228,38 +265,65 @@ MainView::UpdateInfoView()
 			fFoldersListView->SendInfoViewUpdate();
 			break;
 		}
-	}
+	}*/
+	if(fAppsListView->IsFocus())
+		fAppsListView->SendInfoViewUpdate();
+	else if(fDocsListView->IsFocus())
+		fDocsListView->SendInfoViewUpdate();
+	else if(fFoldersListView->IsFocus())
+		fFoldersListView->SendInfoViewUpdate();
+}
+
+
+void
+MainView::InvalidateFocusView()
+{
+	if(fAppsListView->IsFocus())
+		fAppsListView->Invalidate();
+	else if(fDocsListView->IsFocus())
+		fDocsListView->Invalidate();
+	else if(fFoldersListView->IsFocus())
+		fFoldersListView->Invalidate();
 }
 
 
 void
 MainView::_UpdateSelectedListView()
 {
-	int32 selection = Selection();
+	fAppsListView->SetShowing(false);
+	fDocsListView->SetShowing(false);
+	fFoldersListView->SetShowing(false);
+/*	int32 selection = Selection();
 	switch(selection) {
-		case 0: {
+		case 0: {*/
+	if(fAppsListView->IsFocus()) {
+		fAppsListView->SetShowing(true);
 			Window()->UpdateIfNeeded();
-			fSelectedListView = fAppsListView;
+//			fSelectedListView = fAppsListView;
 			_BuildAppsListViewFromRecent();
 			fAppsListView->SendInfoViewUpdate();
-			break;
+//			break;
 		}
-		case 1: {
-			fSelectedListView = fDocsListView;
+//		case 1: {
+	else if(fDocsListView->IsFocus()) {
+		fDocsListView->SetShowing(true);
+//			fSelectedListView = fDocsListView;
 			_BuildDocsListView();
 			fDocsListView->SendInfoViewUpdate();
-			break;
+//			break;
 		}
-		case 2: {
-			fSelectedListView = fFoldersListView;
+//		case 2: {
+	else if(fFoldersListView->IsFocus()) {
+		fFoldersListView->SetShowing(true);
+//			fSelectedListView = fFoldersListView;
 			_BuildFoldersListView();
 			fFoldersListView->SendInfoViewUpdate();
-			break;
+//			break;
 		}
-	}
-	fAppsListView->SetShowing(fSelectedListView==fAppsListView);
-	fDocsListView->SetShowing(fSelectedListView==fDocsListView);
-	fFoldersListView->SetShowing(fSelectedListView==fFoldersListView);
+//	}
+//	fAppsListView->SetShowing(fSelectedListView==fAppsListView);
+//	fDocsListView->SetShowing(fSelectedListView==fDocsListView);
+//	fFoldersListView->SetShowing(fSelectedListView==fFoldersListView);*/
 }
 
 
@@ -267,7 +331,9 @@ void
 MainView::BuildAppsListView(BMessage *message)
 {
 	fAppsListView->BuildAppsListView(message);
-	MakeFocus();
+//	Window()->Lock();
+//	MakeFocus();
+//	Window()->Unlock();
 }
 
 
@@ -275,7 +341,9 @@ void
 MainView::_BuildAppsListViewFromRecent(bool force)
 {
 	fAppsListView->BuildAppsListFromRecent(force);
-	MakeFocus();
+//	Window()->Lock();
+//	MakeFocus();
+//	Window()->Unlock();
 }
 
 
@@ -283,13 +351,17 @@ void
 MainView::_BuildDocsListView(bool force)
 {
 	fDocsListView->BuildList(force);
-	MakeFocus();
+//	Window()->Lock();
+//	MakeFocus();
+//	Window()->Unlock();
 }
 
 void
 MainView::_BuildFoldersListView(bool force)
 {
 	fFoldersListView->BuildList(force);
-	MakeFocus();
+//	Window()->Lock();
+//	MakeFocus();
+//	Window()->Unlock();
 }
 
