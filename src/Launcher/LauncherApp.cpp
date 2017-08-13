@@ -393,15 +393,19 @@ LauncherApp::_CreateExclusionsSignatureList(BMessage *exclusions)
 {
 	fAppSettings.exclusionsSignatureList.MakeEmpty();
 	type_code typeFound;
-	int32 signatureCount = 0;
-	status_t result = exclusions->GetInfo(EL_EXCLUDE_SIGNATURE, &typeFound, &signatureCount);
+	int32 appCount = 0;
+	status_t result = exclusions->GetInfo(EL_EXCLUDE_APP, &typeFound, &appCount);
 	BString sig;
-	for(int i=0; i<signatureCount; i++)
+	for(int i=0; i<appCount; i++)
 	{
 		sig.SetTo("");
-		exclusions->FindString(EL_EXCLUDE_SIGNATURE, i, &sig);
-		if(sig.Length()>0)
-			fAppSettings.exclusionsSignatureList.Add(sig);
+		BMessage appSettings;
+		status_t result2 = exclusions->FindMessage(EL_EXCLUDE_APP, i, &appSettings);
+		if (result2 == B_OK) {
+			appSettings.FindString(EL_EXCLUDE_SIGNATURE, &sig);
+			if(sig.Length()>0)
+				fAppSettings.exclusionsSignatureList.Add(sig);
+		}
 	}
 }
 
@@ -497,7 +501,13 @@ LauncherApp::_Subscribe()
 	// TODO change to get from settings window
 	int itemCount = fSettingsFile->GetDeskbarCount();
 	const int *scales = fSettingsFile->GetScales();
-	BMessage exclusionsList = fSettingsFile->GetExclusionsList();
+	BMessage signatures;
+	BStringList& sigList = fAppSettings.exclusionsSignatureList;
+	int32 count = sigList.CountStrings();
+	for (int32 i = 0; i < count; i++) {
+		signatures.AddString(EL_EXCLUDE_SIGNATURE, sigList.StringAt(i).String());
+	}
+	
 
 	// Subscribe to the Einsteinium Engine.  If already subscribed, this will update
 	// the values used for subscription messages
@@ -508,7 +518,7 @@ LauncherApp::_Subscribe()
 	_SetLastLaunchScale(scales[LAST_INDEX]);
 	_SetLastIntervalScale(scales[INTERVAL_INDEX]);
 	_SetTotalRuntimeScale(scales[RUNTIME_INDEX]);
-	_SetExcludeList(&exclusionsList);
+	_SetExcludeList(&signatures);
 	_SubscribeToEngine();
 }
 

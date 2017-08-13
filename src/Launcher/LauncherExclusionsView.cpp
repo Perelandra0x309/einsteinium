@@ -237,8 +237,10 @@ LauncherExclusionsView::GetExclusionsList(BMessage &list)
 	for(int i=0; i<count; i++)
 	{
 		item = (ExcludeItem*)fExclusionLView->ItemAt(i);
-		list.AddString(EL_EXCLUDE_SIGNATURE, item->fAppSig.String());
-		list.AddRef(EL_EXCLUDE_REF, &(item->fAppRef));
+		BMessage excludeSetting;
+		excludeSetting.AddString(EL_EXCLUDE_SIGNATURE, item->fAppSig.String());
+		excludeSetting.AddRef(EL_EXCLUDE_REF, &(item->fAppRef));
+		list.AddMessage(EL_EXCLUDE_APP, &excludeSetting);
 	}
 }
 
@@ -258,27 +260,23 @@ LauncherExclusionsView::GetMinSize()
 void
 LauncherExclusionsView::_RebuildExclusionsList(BMessage &exclusionsList)
 {
-	type_code typeFound;
-	int32 signatureCount, refCount;
-	status_t result1 = exclusionsList.GetInfo(EL_EXCLUDE_SIGNATURE, &typeFound, &signatureCount);
-	status_t result2 = exclusionsList.GetInfo(EL_EXCLUDE_REF, &typeFound, &refCount);
-	if(signatureCount != refCount)
-	{
-		printf("Error building exclusions list: signature and name counts are not the same");
-		return;
-	}
-
+	BMessage excludeSetting;
 	BString sig;
 	entry_ref ref;
 	_EmptyExclusionsList();
-	for(int i=0; i<signatureCount; i++)
-	{
-		exclusionsList.FindString(EL_EXCLUDE_SIGNATURE, i, &sig);
-		exclusionsList.FindRef(EL_EXCLUDE_REF, i, &ref);
-		ExcludeItem *item = new ExcludeItem(ref, sig.String());
-		fExclusionLView->AddItem(item);
+	type_code typeFound;
+	int32 appCount = 0;
+	exclusionsList.GetInfo(EL_EXCLUDE_APP, &typeFound, &appCount);
+	for(int i=0; i<appCount; i++) {
+		excludeSetting.MakeEmpty();
+		status_t result = exclusionsList.FindMessage(EL_EXCLUDE_APP, i, &excludeSetting);
+		if (result == B_OK) {
+			excludeSetting.FindString(EL_EXCLUDE_SIGNATURE, &sig);
+			excludeSetting.FindRef(EL_EXCLUDE_REF, &ref);
+			ExcludeItem *item = new ExcludeItem(ref, sig.String());
+			fExclusionLView->AddItem(item);
+		}
 	}
-
 	// list items alphabetically ignoring case
 	fExclusionLView->SortItems(SortExcludeItems);
 }
@@ -289,8 +287,8 @@ LauncherExclusionsView::_EmptyExclusionsList()
 {
 	//Remove List Items
 	ExcludeItem *Item;
-	do
-	{	Item = (ExcludeItem*)fExclusionLView->RemoveItem(int32(0));
+	do {
+		Item = (ExcludeItem*)fExclusionLView->RemoveItem(int32(0));
 		if(Item)
 			delete Item;
 	}while(Item);
