@@ -49,10 +49,14 @@ private:
 
 class ExcludeItem : public BListItem {
 public:
-					ExcludeItem(const char *sig, const char *name);
+					ExcludeItem(entry_ref srcRef, const char* sig);
+					~ExcludeItem();
 	int				ICompare(ExcludeItem*);
 private:
 	BString			fAppSig, fAppName;
+	entry_ref		fAppRef;
+	int32			fIconSize;
+	BBitmap*		fIcon;
 	void			DrawItem(BView*, BRect, bool);
 	friend class LauncherExclusionsView;
 };

@@ -530,7 +530,7 @@ AppsListView::_InvokeSelectedItem()
 			AppListItem *selectedItem = (AppListItem*)ItemAt(selectedIndex);
 			BMessage message(EL_ADD_APP_EXCLUSION);
 			message.AddString(EL_EXCLUDE_SIGNATURE, selectedItem->GetSignature());
-			message.AddString(EL_EXCLUDE_NAME, selectedItem->GetName());
+			message.AddRef(EL_EXCLUDE_REF, selectedItem->GetEntryRef());
 			be_app->PostMessage(&message);
 		}
 		else
@@ -586,7 +586,7 @@ AppsListView::_InitPopUpMenu(int32 selectedIndex)
 		BMessage *message = fRemoveMI->Message();
 		message->MakeEmpty();
 		message->AddString(EL_EXCLUDE_SIGNATURE, selectedItem->GetSignature());
-		message->AddString(EL_EXCLUDE_NAME, selectedItem->GetName());
+		message->AddRef(EL_EXCLUDE_REF, selectedItem->GetEntryRef());
 	}
 }
 

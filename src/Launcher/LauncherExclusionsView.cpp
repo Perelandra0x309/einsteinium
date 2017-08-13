@@ -150,12 +150,9 @@ LauncherExclusionsView::AddExclusion(BMessage* refMsg)
 	BNode node(&srcEntry);
 	char *buf = new char[B_ATTR_NAME_LENGTH];
 	ssize_t size = node.ReadAttr("BEOS:APP_SIG",0,0,buf,B_ATTR_NAME_LENGTH);
-//	BPath path;
-//	BEntry entry(&srcRef);
-//	entry.GetPath(&path);
 	if( size > 0 )
 	{
-		ExcludeItem *item = new ExcludeItem(buf, srcRef.name);
+		ExcludeItem *item = new ExcludeItem(srcRef, buf);
 		fExclusionLView->AddItem(item);
 		fExclusionLView->SortItems(SortExcludeItems);
 		fExclusionLView->Select(fExclusionLView->IndexOf(item));
@@ -241,7 +238,7 @@ LauncherExclusionsView::GetExclusionsList(BMessage &list)
 	{
 		item = (ExcludeItem*)fExclusionLView->ItemAt(i);
 		list.AddString(EL_EXCLUDE_SIGNATURE, item->fAppSig.String());
-		list.AddString(EL_EXCLUDE_NAME, item->fAppName.String());
+		list.AddRef(EL_EXCLUDE_REF, &(item->fAppRef));
 	}
 }
 
@@ -262,22 +259,23 @@ void
 LauncherExclusionsView::_RebuildExclusionsList(BMessage &exclusionsList)
 {
 	type_code typeFound;
-	int32 signatureCount, nameCount;
+	int32 signatureCount, refCount;
 	status_t result1 = exclusionsList.GetInfo(EL_EXCLUDE_SIGNATURE, &typeFound, &signatureCount);
-	status_t result2 = exclusionsList.GetInfo(EL_EXCLUDE_NAME, &typeFound, &nameCount);
-	if(signatureCount != nameCount)
+	status_t result2 = exclusionsList.GetInfo(EL_EXCLUDE_REF, &typeFound, &refCount);
+	if(signatureCount != refCount)
 	{
 		printf("Error building exclusions list: signature and name counts are not the same");
 		return;
 	}
 
-	BString sig, name;
+	BString sig;
+	entry_ref ref;
 	_EmptyExclusionsList();
 	for(int i=0; i<signatureCount; i++)
 	{
 		exclusionsList.FindString(EL_EXCLUDE_SIGNATURE, i, &sig);
-		exclusionsList.FindString(EL_EXCLUDE_NAME, i, &name);
-		ExcludeItem *item = new ExcludeItem(sig.String(), name.String());
+		exclusionsList.FindRef(EL_EXCLUDE_REF, i, &ref);
+		ExcludeItem *item = new ExcludeItem(ref, sig.String());
 		fExclusionLView->AddItem(item);
 	}
 
@@ -320,13 +318,33 @@ LauncherExclusionsView::UpdateSelectedItem()
 }
 
 
-ExcludeItem::ExcludeItem(const char *sig, const char *name)
+ExcludeItem::ExcludeItem(entry_ref srcRef, const char* sig)
 	:
 	BListItem(),
-	fAppSig(sig),
-	fAppName(name)
-{	}
+	fAppRef(srcRef),
+	fIcon(NULL)
+{
+	// Name and signature
+	fAppSig.SetTo(sig);
+	fAppName.SetTo(srcRef.name);
+	
+	// Icon
+	BNode node;
+	status_t result = B_ERROR;
+	fIconSize = be_plain_font->Size();
+	if (node.SetTo(&fAppRef) == B_OK) {
+		BRect iconRect(0, 0, fIconSize - 1, fIconSize - 1);
+		fIcon = new BBitmap(iconRect, 0, B_RGBA32);
+		BNodeInfo nodeInfo(&node);
+		nodeInfo.GetTrackerIcon(fIcon, icon_size(fIconSize));
+	}
+}
 
+
+ExcludeItem::~ExcludeItem()
+{
+	delete fIcon;
+}
 
 void
 ExcludeItem::DrawItem(BView* owner, BRect item_rect, bool complete)
@@ -343,20 +361,31 @@ ExcludeItem::DrawItem(BView* owner, BRect item_rect, bool complete)
 	{	owner->SetHighColor(color);
 		owner->FillRect(item_rect);
 	}
-	if(IsSelected())
+	
+	if (fIcon->IsValid()) {
+		float offsetMarginHeight = floor( (Height() - fIconSize)/2);
+		owner->SetDrawingMode(B_OP_OVER);
+		owner->DrawBitmap(fIcon, BPoint(item_rect.left + kIconMargin,
+							item_rect.top + offsetMarginHeight));
+		owner->SetDrawingMode(B_OP_COPY);
+	}
+	float offset_width = fIconSize + 2*kIconMargin;
+	
+	if(selected)
 		owner->SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
 	else
 		owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
 	BString text(fAppName);
 	text.Append(" (").Append(fAppSig).Append(")");
-	owner->DrawString(text.String(), BPoint(item_rect.left+5.0,item_rect.bottom - 2.0));
+	owner->DrawString(text.String(), BPoint(item_rect.left + offset_width,
+		item_rect.bottom - 3.0));
 }
 
 
 int
 ExcludeItem::ICompare(ExcludeItem *item)
 {
-	return fAppName.ICompare(item->fAppName);
+	return fAppSig.ICompare(item->fAppSig);
 }
 
 

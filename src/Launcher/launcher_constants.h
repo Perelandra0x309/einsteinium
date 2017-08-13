@@ -92,7 +92,7 @@ static const char* kDirectoryType = "application/x-vnd.Be-directory";
 #define EL_SHELFVIEW_NAME "el_shelfview"
 #define EL_TOOLTIP_TEXT "Einsteinium  \nLauncher"
 #define EL_EXCLUDE_SIGNATURE E_SUBSCRIPTION_EXCLUSIONS
-#define EL_EXCLUDE_NAME "name"
+#define EL_EXCLUDE_REF "ref"
 #define EL_REMOVE_APPLICATION "RemoveApp"
 #define EL_UNKNOWN_SUPERTYPE "Unknown"
 #define EL_SUPERTYPE_NAMES "names"

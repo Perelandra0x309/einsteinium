@@ -24,6 +24,7 @@ public:
 			void			ProcessMessage(BMessage*);
 	const	char*			GetSignature() { return fSignature.String(); }
 	const	char*			GetName() { return fName.String(); }
+			entry_ref*		GetEntryRef() { return &fEntryRef; };
 			bool			IsRunning();
 			status_t		Launch();
 			status_t		ShowInTracker();

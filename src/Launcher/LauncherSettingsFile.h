@@ -39,7 +39,7 @@ public:
 	void					SaveShowDeskbarMenu(bool show);
 	BMessage				GetExclusionsList() { return fExclusionsList; }
 	void					SaveExclusionsList(BMessage &exclusionsList);
-	void					AddToExclusionsList(const char *signature, const char *name);
+//	void					AddToExclusionsList(const char *signature, const char *name);
 	void					AddToExclusionsList(BMessage *msg);
 	bool					GetEngineAutoLaunch() { return fLaunchEngineOnStart; }
 	void					SaveEngineAutoLaunch(bool autoLaunch);
@@ -87,6 +87,7 @@ private:
 	void					_ReadLegacyXMLSettingsFromFile(BPath settingsPath);
 	void					_ParseExclusionSettings(xmlDocPtr doc, xmlNodePtr cur);
 	status_t				_WriteSettingsToFile();
+	status_t				_GetEntryFromSig(const char* sig, entry_ref* ref);
 };
 
 

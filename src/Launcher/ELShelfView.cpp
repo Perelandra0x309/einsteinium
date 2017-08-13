@@ -290,7 +290,7 @@ ELShelfView::MessageReceived(BMessage* msg)
 					{
 						BMessage exclusionsList = fSettingsFile->GetExclusionsList();
 						exclusionsList.AddString(EL_EXCLUDE_SIGNATURE, buf);
-						exclusionsList.AddString(EL_EXCLUDE_NAME, ref.name);
+						exclusionsList.AddRef(EL_EXCLUDE_REF, &ref);
 						fSettingsFile->SaveExclusionsList(exclusionsList);
 						// Subscribe with new parameters
 						_Subscribe();

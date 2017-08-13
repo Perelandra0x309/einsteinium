@@ -71,7 +71,38 @@ LauncherSettingsFile::LauncherSettingsFile(BHandler *messageHandler)
 		//settings files don't exist, create default file
 		else
 		{
-			fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, e_launcher_sig);
+			entry_ref ref;
+			status_t result = _GetEntryFromSig(e_launcher_sig, &ref);
+			if (result == B_OK) {
+				fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, e_launcher_sig);
+				fExclusionsList.AddRef(EL_EXCLUDE_REF, &ref);
+			}
+			result = _GetEntryFromSig(e_daemon_sig, &ref);
+			if (result == B_OK) {
+				fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, e_daemon_sig);
+				fExclusionsList.AddRef(EL_EXCLUDE_REF, &ref);
+			}
+			result = _GetEntryFromSig(e_engine_sig, &ref);
+			if (result == B_OK) {
+				fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, e_engine_sig);
+				fExclusionsList.AddRef(EL_EXCLUDE_REF, &ref);
+			}
+			result = _GetEntryFromSig(e_preferences_sig, &ref);
+			if (result == B_OK) {
+				fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, e_preferences_sig);
+				fExclusionsList.AddRef(EL_EXCLUDE_REF, &ref);
+			}
+			result = _GetEntryFromSig("application/x-vnd.Be-TSKB", &ref);
+			if (result == B_OK) {
+				fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, "application/x-vnd.Be-TSKB");
+				fExclusionsList.AddRef(EL_EXCLUDE_REF, &ref);
+			}
+			result = _GetEntryFromSig("application/x-vnd.Be-TRAK", &ref);
+			if (result == B_OK) {
+				fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, "application/x-vnd.Be-TRAK");
+				fExclusionsList.AddRef(EL_EXCLUDE_REF, &ref);
+			}
+/*			fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, e_launcher_sig);
 			fExclusionsList.AddString(EL_EXCLUDE_NAME, "Einsteinium_Launcher");
 			fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, e_daemon_sig);
 			fExclusionsList.AddString(EL_EXCLUDE_NAME, "einsteinium_daemon");
@@ -82,7 +113,7 @@ LauncherSettingsFile::LauncherSettingsFile(BHandler *messageHandler)
 			fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, "application/x-vnd.Be-TSKB");
 			fExclusionsList.AddString(EL_EXCLUDE_NAME, "Deskbar");
 			fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, "application/x-vnd.Be-TRAK");
-			fExclusionsList.AddString(EL_EXCLUDE_NAME, "Tracker");
+			fExclusionsList.AddString(EL_EXCLUDE_NAME, "Tracker");*/
 
 			_WriteSettingsToFile();
 		}
@@ -341,16 +372,22 @@ void
 LauncherSettingsFile::_ParseExclusionSettings(xmlDocPtr doc, xmlNodePtr cur)
 {
 	xmlChar *sigValue, *nameValue;
-	BString stringValue;
+	BString sigString, nameString;
 	cur = cur->xmlChildrenNode;
 	while (cur != NULL) {
 		if (!xmlStrcmp(cur->name, (const xmlChar *) EL_XMLTEXT_CHILD_NAME_APP)) {
 			sigValue = xmlGetProp(cur, (const xmlChar *) EL_XMLTEXT_PROPERTY_SIGNATURE);
-			stringValue.SetTo((char *)sigValue);
-			fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, stringValue.String());
+			sigString.SetTo((char *)sigValue);
+		//	fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, sigString.String());
 			nameValue = xmlGetProp(cur, (const xmlChar *) EL_XMLTEXT_PROPERTY_NAME);
-			stringValue.SetTo((char *)nameValue);
-			fExclusionsList.AddString(EL_EXCLUDE_NAME, stringValue.String());
+			nameString.SetTo((char *)nameValue);
+		//	fExclusionsList.AddString(EL_EXCLUDE_NAME, stringValue.String());
+			entry_ref ref;
+			status_t result = _GetEntryFromSig(sigString.String(), &ref);
+			if (result == B_OK && nameString.Compare(ref.name) == 0) {
+				fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, sigString.String());
+				fExclusionsList.AddRef(EL_EXCLUDE_REF, &ref);
+			}
 			xmlFree(sigValue);
 		}
 		cur = cur->next;
@@ -441,6 +478,14 @@ LauncherSettingsFile::_WriteSettingsToFile()
 	_StartWatching();
 
 	return B_OK;
+}
+
+
+status_t
+LauncherSettingsFile::_GetEntryFromSig(const char* sig, entry_ref* ref)
+{
+	status_t result = be_roster->FindApp(sig, ref);
+	return result;
 }
 
 
@@ -578,14 +623,14 @@ LauncherSettingsFile::SaveExclusionsList(BMessage &exclusionsList)
 	_WriteSettingsToFile();
 }
 
-
+/*
 void
 LauncherSettingsFile::AddToExclusionsList(const char *signature, const char *name)
 {
 	fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, signature);
 	fExclusionsList.AddString(EL_EXCLUDE_NAME, name);
 	_WriteSettingsToFile();
-}
+}*/
 
 
 void
@@ -594,15 +639,15 @@ LauncherSettingsFile::AddToExclusionsList(BMessage *msg)
 	type_code typeFound;
 	int32 signatureCount = 0;
 	status_t result1 = msg->GetInfo(EL_EXCLUDE_SIGNATURE, &typeFound, &signatureCount);
-	BString sig, name;
+	BString sig;
+	entry_ref ref;
 	for(int i=0; i<signatureCount; i++)
 	{
 		sig.SetTo("");
-		name.SetTo("");
 		msg->FindString(EL_EXCLUDE_SIGNATURE, i, &sig);
-		msg->FindString(EL_EXCLUDE_NAME, i, &name);
+		msg->FindRef(EL_EXCLUDE_REF, i, &ref);
 		fExclusionsList.AddString(EL_EXCLUDE_SIGNATURE, sig);
-		fExclusionsList.AddString(EL_EXCLUDE_NAME, name);
+		fExclusionsList.AddRef(EL_EXCLUDE_REF, &ref);
 	}
 	_WriteSettingsToFile();
 }
