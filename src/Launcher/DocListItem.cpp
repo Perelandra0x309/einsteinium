@@ -133,6 +133,10 @@ DocListItem::ShowInTracker()
 	BMessenger tracker("application/x-vnd.Be-TRAK");
 	BMessage message(B_REFS_RECEIVED);
 	message.AddRef("refs", &folderRef);
+	node_ref nodeRef;
+	fileEntry.GetNodeRef(&nodeRef);
+	message.AddData("nodeRefToSelect", B_RAW_TYPE, (const void*)&nodeRef,
+		sizeof(nodeRef));
 	status_t rc = tracker.SendMessage(&message);
 	return rc;
 }

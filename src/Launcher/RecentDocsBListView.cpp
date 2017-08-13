@@ -588,7 +588,7 @@ RecentDocsBListView::_InitPopUpMenu(int32 selectedIndex)
 		fMenu->AddItem(fTrackerMI);
 //		fMenu->AddSeparatorItem();
 //		fMenu->AddItem(fSettingsMI);
-//		fMenu->SetTargetForItems(this);
+		fMenu->SetTargetForItems(this);
 //		fSettingsMI->SetTarget(be_app);
 	}
 }
