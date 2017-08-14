@@ -92,11 +92,11 @@ AppsListView::MouseDown(BPoint pos)
 			_InvokeSelectedItem();
 		}
 	}
-	else if ( button & B_TERTIARY_MOUSE_BUTTON )
+/*	else if ( button & B_TERTIARY_MOUSE_BUTTON )
 	{
 		// Launch the currently selected item
 		_InvokeSelectedItem();
-	}
+	}*/
 	else if (button & B_SECONDARY_MOUSE_BUTTON)
 	{
 		// Select list item under mouse pointer and show menu

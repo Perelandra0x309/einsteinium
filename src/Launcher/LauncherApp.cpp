@@ -278,12 +278,14 @@ LauncherApp::MessageReceived(BMessage* msg)
 		case EL_ADD_APP_EXCLUSION:
 		{
 			// Add app to exclusion list and resubscribe
-			fSettingsFile->AddToExclusionsList(msg);
-			BMessage exclusionsList = fSettingsFile->GetExclusionsList();
-			fSettingsWindow->SetAppExclusions(&exclusionsList);
-			_CreateExclusionsSignatureList(&exclusionsList);
-			fWindow->PostMessage(EL_EXCLUSIONS_CHANGED);
-			_Subscribe();
+			status_t result = fSettingsFile->AddToExclusionsList(msg);
+			if (result == B_OK) {
+				BMessage exclusionsList = fSettingsFile->GetExclusionsList();
+				fSettingsWindow->SetAppExclusions(&exclusionsList);
+				_CreateExclusionsSignatureList(&exclusionsList);
+				fWindow->PostMessage(EL_EXCLUSIONS_CHANGED);
+				_Subscribe();
+			}
 			break;
 		}
 		case EL_START_ENGINE_ALERT:

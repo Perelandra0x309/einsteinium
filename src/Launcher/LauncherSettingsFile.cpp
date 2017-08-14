@@ -646,25 +646,44 @@ LauncherSettingsFile::SaveExclusionsList(BMessage &exclusionsList)
 }
 
 
-void
+status_t
 LauncherSettingsFile::AddToExclusionsList(BMessage *msg)
 {
+	BString signature;
+	status_t result = msg->FindString(EL_EXCLUDE_SIGNATURE, &signature);
+	if (result != B_OK)
+		return result;
+	// Is this already in the list?
 	type_code typeFound;
-	int32 signatureCount = 0;
-	status_t result1 = msg->GetInfo(EL_EXCLUDE_SIGNATURE, &typeFound, &signatureCount);
-	BString sig;
-	entry_ref ref;
-	for(int i=0; i<signatureCount; i++)
-	{
-		sig.SetTo("");
-		msg->FindString(EL_EXCLUDE_SIGNATURE, i, &sig);
-		msg->FindRef(EL_EXCLUDE_REF, i, &ref);
-		BMessage excludeSetting;
-		excludeSetting.AddString(EL_EXCLUDE_SIGNATURE, sig);
-		excludeSetting.AddRef(EL_EXCLUDE_REF, &ref);
-		fExclusionsList.AddMessage(EL_EXCLUDE_APP, &excludeSetting);
+	int32 count = 0;
+	fExclusionsList.GetInfo(EL_EXCLUDE_APP, &typeFound, &count);
+	BMessage appSettings;
+	bool foundMatch = false;
+	BString appSig;
+	for (int32 i = 0; i < count; i++) {
+		result = fExclusionsList.FindMessage(EL_EXCLUDE_APP, i, &appSettings);
+		if (result == B_OK) {
+			appSig.SetTo("");
+			appSettings.FindString(EL_EXCLUDE_SIGNATURE, &appSig);
+			if(appSig.Length() > 0 && appSig.Compare(signature.String()) == 0) {
+				foundMatch = true;
+				break;
+			}
+		}
 	}
+	if (foundMatch)
+		return B_ERROR;
+	entry_ref ref;
+	result = msg->FindRef(EL_EXCLUDE_REF, &ref);
+	if (result != B_OK)
+		return result;
+	BMessage excludeSetting;
+	excludeSetting.AddString(EL_EXCLUDE_SIGNATURE, signature);
+	excludeSetting.AddRef(EL_EXCLUDE_REF, &ref);
+	fExclusionsList.AddMessage(EL_EXCLUDE_APP, &excludeSetting);
+	
 	_WriteSettingsToFile();
+	return B_OK;
 }
 
 

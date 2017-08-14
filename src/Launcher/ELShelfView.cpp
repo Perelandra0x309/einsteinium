@@ -276,7 +276,7 @@ ELShelfView::MessageReceived(BMessage* msg)
 			status_t result = msg->FindRef("refs", &ref);
 			if( result == B_OK)
 			{
-				// Determine if the user wants to remove the app from the menu
+/*				// Determine if the user wants to remove the app from the menu
 				bool removeApp = true;
 				status_t result = msg->FindBool(EL_REMOVE_APPLICATION, &removeApp);
 				if(result==B_OK && removeApp==true)
@@ -296,7 +296,7 @@ ELShelfView::MessageReceived(BMessage* msg)
 						_Subscribe();
 					}
 				}
-				else
+				else*/
 					be_roster->Launch(&ref);
 			}
 			break;
@@ -454,6 +454,22 @@ ELShelfView::_Subscribe()
 	fItemCount = fSettingsFile->GetDeskbarCount();
 	const int *scales = fSettingsFile->GetScales();
 	BMessage exclusionsList = fSettingsFile->GetExclusionsList();
+	type_code typeFound;
+	int32 count = 0;
+	exclusionsList.GetInfo(EL_EXCLUDE_APP, &typeFound, &count);
+	BMessage appSettings;
+	BString appSig;
+	BMessage signatureList;
+	status_t result;
+	for (int32 i = 0; i < count; i++) {
+		result = exclusionsList.FindMessage(EL_EXCLUDE_APP, i, &appSettings);
+		if (result == B_OK) {
+			appSig.SetTo("");
+			appSettings.FindString(EL_EXCLUDE_SIGNATURE, &appSig);
+			if(appSig.Length() > 0)
+				signatureList.AddString(EL_EXCLUDE_SIGNATURE, appSig.String());
+		}
+	}
 
 	// Subscribe to the Einsteinium Engine.  If already subscribed, this will update
 	// the values used for subscription messages
@@ -464,7 +480,7 @@ ELShelfView::_Subscribe()
 	_SetLastLaunchScale(scales[LAST_INDEX]);
 	_SetLastIntervalScale(scales[INTERVAL_INDEX]);
 	_SetTotalRuntimeScale(scales[RUNTIME_INDEX]);
-	_SetExcludeList(&exclusionsList);
+	_SetExcludeList(&signatureList);
 	_SubscribeToEngine();
 }
 

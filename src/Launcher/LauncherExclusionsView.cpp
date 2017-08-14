@@ -78,7 +78,7 @@ LauncherExclusionsView::LauncherExclusionsView(BRect size, BMessage *appExclusio
 	fAppsPanel = new BFilePanel(B_OPEN_PANEL, NULL, NULL, B_FILE_NODE, false, NULL, fAppFilter);
 	fAppsPanel->Window()->SetFeel(B_MODAL_ALL_WINDOW_FEEL);
 
-	_RebuildExclusionsList(*appExclusions);
+	_RebuildExclusionsListView(*appExclusions);
 }
 
 
@@ -149,15 +149,27 @@ LauncherExclusionsView::AddExclusion(BMessage* refMsg)
 	BEntry srcEntry(&srcRef, true);
 	BNode node(&srcEntry);
 	char *buf = new char[B_ATTR_NAME_LENGTH];
-	ssize_t size = node.ReadAttr("BEOS:APP_SIG",0,0,buf,B_ATTR_NAME_LENGTH);
+	ssize_t size = node.ReadAttr("BEOS:APP_SIG", 0, 0, buf, B_ATTR_NAME_LENGTH);
 	if( size > 0 )
 	{
-		ExcludeItem *item = new ExcludeItem(srcRef, buf);
-		fExclusionLView->AddItem(item);
-		fExclusionLView->SortItems(SortExcludeItems);
-		fExclusionLView->Select(fExclusionLView->IndexOf(item));
-		fExclusionLView->ScrollToSelection();
-		addedApp = true;
+		// Check to make sure it doesn't already exist in list
+		int32 count = fExclusionLView->CountItems();
+		bool notADuplicate = true;
+		for (int32 i = 0; i < count; i++) {
+			ExcludeItem *item = (ExcludeItem*)fExclusionLView->ItemAt(i);
+			if (item->fAppSig.Compare(buf) == 0) {
+				notADuplicate = false;
+				break;
+			}
+		}
+		if (notADuplicate) {
+			ExcludeItem *item = new ExcludeItem(srcRef, buf);
+			fExclusionLView->AddItem(item);
+			fExclusionLView->SortItems(SortExcludeItems);
+			fExclusionLView->Select(fExclusionLView->IndexOf(item));
+			fExclusionLView->ScrollToSelection();
+			addedApp = true;
+		}
 	}
 	else
 	{
@@ -218,10 +230,10 @@ LauncherExclusionsView::GetLinkInclusionDefault(BString &value)
 */
 
 void
-LauncherExclusionsView::PopulateExclusionsList(BMessage &exclusionsList)
+LauncherExclusionsView::PopulateExclusionsListView(BMessage &exclusionsList)
 {
 	Window()->Lock();
-	_RebuildExclusionsList(exclusionsList);
+	_RebuildExclusionsListView(exclusionsList);
 	Window()->Unlock();
 }
 
@@ -258,7 +270,7 @@ LauncherExclusionsView::GetMinSize()
 
 
 void
-LauncherExclusionsView::_RebuildExclusionsList(BMessage &exclusionsList)
+LauncherExclusionsView::_RebuildExclusionsListView(BMessage &exclusionsList)
 {
 	BMessage excludeSetting;
 	BString sig;
@@ -383,7 +395,7 @@ ExcludeItem::DrawItem(BView* owner, BRect item_rect, bool complete)
 int
 ExcludeItem::ICompare(ExcludeItem *item)
 {
-	return fAppSig.ICompare(item->fAppSig);
+	return fAppName.ICompare(item->fAppName);
 }
 
 

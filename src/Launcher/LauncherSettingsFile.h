@@ -40,7 +40,7 @@ public:
 	BMessage				GetExclusionsList() { return fExclusionsList; }
 	void					SaveExclusionsList(BMessage &exclusionsList);
 //	void					AddToExclusionsList(const char *signature, const char *name);
-	void					AddToExclusionsList(BMessage *msg);
+	status_t				AddToExclusionsList(BMessage *msg);
 	bool					GetEngineAutoLaunch() { return fLaunchEngineOnStart; }
 	void					SaveEngineAutoLaunch(bool autoLaunch);
 	int						GetMinAppIconSize() { return fMinAppIconSize; }

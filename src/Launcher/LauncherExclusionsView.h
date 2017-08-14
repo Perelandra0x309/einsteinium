@@ -31,7 +31,7 @@ public:
 	void			UpdateSelectedItem();
 //	void			SetLinkInclusionDefault(const char*);
 //	void			GetLinkInclusionDefault(BString &value);
-	void			PopulateExclusionsList(BMessage &exclusionsList);
+	void			PopulateExclusionsListView(BMessage &exclusionsList);
 	void			GetExclusionsList(BMessage &list);
 //	BSize			GetMinSize();
 private:
@@ -43,7 +43,7 @@ private:
 	ExcludeItem		*fSelectedItem;
 	AppRefFilter	*fAppFilter;
 	BFilePanel		*fAppsPanel;
-	void			_RebuildExclusionsList(BMessage &exclusionsList);
+	void			_RebuildExclusionsListView(BMessage &exclusionsList);
 	void			_EmptyExclusionsList();
 };
 

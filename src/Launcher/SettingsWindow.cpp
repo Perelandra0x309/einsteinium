@@ -147,5 +147,5 @@ SettingsWindow::GetAppExclusions()
 void
 SettingsWindow::SetAppExclusions(BMessage *exclusionsList)
 {
-	fExclusionsView->PopulateExclusionsList(*exclusionsList);
+	fExclusionsView->PopulateExclusionsListView(*exclusionsList);
 }
