@@ -5,7 +5,7 @@
 #include "MainView.h"
 
 #undef B_TRANSLATION_CONTEXT
-#define B_TRANSLATION_CONTEXT "Launcher tabs"
+#define B_TRANSLATION_CONTEXT "Main View"
 
 MainView::MainView(BRect size)
 	:
@@ -17,34 +17,91 @@ MainView::MainView(BRect size)
 	BRect viewRect(Bounds());
 	fAppsListView = new AppsListView(viewRect);
 	fAppsListView->SetFontSizeForValue(settings->fontSize);
-	fAppsScrollView = new BScrollView(B_TRANSLATE_COMMENT("Apps", "Tab label"),
-					fAppsListView, /*B_FOLLOW_ALL_SIDES, */0, false, true);
+	fAppsScrollView = new BScrollView("Apps", fAppsListView, 0, false, true);
 
 	fDocsListView = new RecentDocsBListView(viewRect);
 	fDocsListView->SetFontSizeForValue(settings->fontSize);
-	fDocsScrollView = new BScrollView(B_TRANSLATE_COMMENT("Files", "Tab label"),
-					fDocsListView, /*B_FOLLOW_ALL_SIDES, */0, false, true);
+	fDocsScrollView = new BScrollView("Files", fDocsListView, 0, false, true);
 
 	fFoldersListView = new RecentFoldersBListView(viewRect);
 	fFoldersListView->SetFontSizeForValue(settings->fontSize);
-	fFoldersScrollView = new BScrollView(B_TRANSLATE_COMMENT("Folders & Queries", "Tab label"),
-					fFoldersListView, /*B_FOLLOW_ALL_SIDES, */0, false, true);
-
-	BLayoutBuilder::Group<>(this, B_HORIZONTAL, 0)
-//		.SetInsets(-3, 0, -3, 0)
-		.Add(fAppsScrollView)
-		.Add(fDocsScrollView)
-		.Add(fFoldersScrollView)
-	.End();
-/*	fAppsTab = new BTab();
-	AddTab(fAppsScrollView, fAppsTab);
-	fRecentDocsTab = new BTab();
-	AddTab(fDocsScrollView, fRecentDocsTab);
-	fRecentFoldersTab = new BTab();
-	AddTab(fFoldersScrollView, fRecentFoldersTab);
-
-	fTabCount = CountTabs();*/
+	fFoldersScrollView = new BScrollView("Folders_Queries", fFoldersListView, 0, false, true);
 	
+	
+	BStringView *appSV = new BStringView("Apps",
+		B_TRANSLATE_COMMENT("Applications", "Apps list view header"));
+	appSV->SetAlignment(B_ALIGN_CENTER);
+//	appSV->SetFont(be_bold_font);
+	BStringView *filesSV = new BStringView("Files",
+		B_TRANSLATE_COMMENT("Files", "Files list view header"));
+	filesSV->SetAlignment(B_ALIGN_CENTER);
+//	filesSV->SetFont(be_bold_font);
+	BStringView *foldersSV = new BStringView("F&Q",
+		B_TRANSLATE_COMMENT("Folders & Queries", "Folders & Queries list view header"));
+	foldersSV->SetAlignment(B_ALIGN_CENTER);
+//	foldersSV->SetFont(be_bold_font);
+	float maxWidth = appSV->StringWidth(appSV->Text());
+	maxWidth = std::max(maxWidth, filesSV->StringWidth(filesSV->Text()));
+	maxWidth = std::max(maxWidth, foldersSV->StringWidth(foldersSV->Text()));
+	appSV->SetExplicitMinSize(BSize(maxWidth, B_SIZE_UNSET));
+	filesSV->SetExplicitMinSize(BSize(maxWidth, B_SIZE_UNSET));
+	foldersSV->SetExplicitMinSize(BSize(maxWidth, B_SIZE_UNSET));
+//	BSeparatorView *sep1 = new BSeparatorView(B_VERTICAL);
+//	sep1->SetExplicitMaxSize(BSize(3, B_SIZE_UNSET));
+//	sep1->SetAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_USE_FULL_HEIGHT));
+	
+	BLayoutBuilder::Grid<>(this, 0, 0)
+		.Add(appSV, 0, 0)
+		.Add(fAppsScrollView, 0, 1)
+//		.Add(sep1)
+		.Add(filesSV, 1, 0)
+		.Add(fDocsScrollView, 1, 1)
+		.Add(foldersSV, 2, 0)
+		.Add(fFoldersScrollView, 2, 1)
+	.End();
+/*	BLayoutBuilder::Group<>(this, B_HORIZONTAL, 0)
+//		.SetInsets(-3, 0, -3, 0)
+		.AddGroup(B_VERTICAL, 0, 1.0)
+			.Add(appSV)
+			.Add(fAppsScrollView)
+		.End()
+//		.Add(sep1)
+		.AddGroup(B_VERTICAL, 0, 1.0)
+			.AddGroup(B_HORIZONTAL, 0)
+				.Add(sep1)
+				.Add(filesSV)
+			.End()
+			.Add(fDocsScrollView)
+		.End()
+		.AddGroup(B_VERTICAL, 0, 1.0)
+			.Add(foldersSV)
+			.Add(fFoldersScrollView)
+		.End()
+	.End();*/
+		
+/*	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+//		.SetInsets(-3, 0, -3, 0)
+		.AddGroup(B_HORIZONTAL, 0)
+			.Add(appSV)
+			.Add(new BSeparatorView(B_VERTICAL))
+			.Add(filesSV)
+			.Add(new BSeparatorView(B_VERTICAL))
+			.Add(foldersSV)
+		.End()
+		.AddGroup(B_HORIZONTAL, 0)
+			.Add(fAppsScrollView)
+//			.End()
+//			.Add(sep1)
+//			.AddGroup(B_VERTICAL, 0, 1.0)
+				
+				.Add(fDocsScrollView)
+//			.End()
+//			.AddGroup(B_VERTICAL, 0, 1.0)
+				
+				.Add(fFoldersScrollView)
+			.End()
+//		.End()
+	.End();*/
 }
 
 /*

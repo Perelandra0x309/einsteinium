@@ -9,8 +9,11 @@
 #include <SupportKit.h>
 #include <StorageKit.h>
 #include <fs_attr.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
+#include <GridLayout.h>
+#include <GridLayoutBuilder.h>
+//#include <GroupLayout.h>
+//#include <GroupLayoutBuilder.h>
+//#include <SeparatorView.h>
 #include <StringList.h>
 #include <Catalog.h>
 #include "launcher_constants.h"
@@ -38,7 +41,7 @@ private:
 	AppsListView			*fAppsListView;
 	RecentDocsBListView		*fDocsListView;
 	RecentFoldersBListView	*fFoldersListView;
-	int32					fTabCount;
+//	int32					fTabCount;
 //	BListView				*fSelectedListView;
 	entry_ref				fLastRecentDocRef;
 	void					_UpdateSelectedListView();

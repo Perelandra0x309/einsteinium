@@ -19,20 +19,20 @@ MainWindow::MainWindow(BRect size, window_look look)
 	fMenuBar = new BMenuBar("MenuBar");
 	// File menu
 	fFileMenu = new BMenu("File");
-	BMenuItem *menuItem1 = new BMenuItem(B_TRANSLATE_COMMENT("Hide window", ""),
+	BMenuItem *menuItem1 = new BMenuItem(B_TRANSLATE_COMMENT("Hide window", "File menu"),
 		new BMessage(EL_HIDE_APP), 'W');
-	BMenuItem *menuItem2 = new BMenuItem(B_TRANSLATE_COMMENT("Quit", ""),
+	BMenuItem *menuItem2 = new BMenuItem(B_TRANSLATE_COMMENT("Quit", "File menu"),
 		new BMessage(EL_QUIT_FROM_MENUBAR), 'Q');
 	fFileMenu->AddItem(menuItem1);
 	fFileMenu->AddItem(menuItem2);
 	fMenuBar->AddItem(fFileMenu);
 	// Settings menu
 	fSettingsMenu = new BMenu("Settings");
-	BMenuItem *menuItem3 = new BMenuItem(B_TRANSLATE_COMMENT("Layout"B_UTF8_ELLIPSIS, ""),
+	BMenuItem *menuItem3 = new BMenuItem(B_TRANSLATE_COMMENT("Layout"B_UTF8_ELLIPSIS, "Settings menu"),
 		new BMessage(EL_SHOW_SETTINGS_LAYOUT));
-	BMenuItem *menuItem4 = new BMenuItem(B_TRANSLATE_COMMENT("App Ranking"B_UTF8_ELLIPSIS, ""),
+	BMenuItem *menuItem4 = new BMenuItem(B_TRANSLATE_COMMENT("App Ranking"B_UTF8_ELLIPSIS, "Settings menu"),
 		new BMessage(EL_SHOW_SETTINGS_RANKINGS));
-	BMenuItem *menuItem5 = new BMenuItem(B_TRANSLATE_COMMENT("App Exclusions"B_UTF8_ELLIPSIS, ""),
+	BMenuItem *menuItem5 = new BMenuItem(B_TRANSLATE_COMMENT("App Exclusions"B_UTF8_ELLIPSIS, "Settings menu"),
 		new BMessage(EL_SHOW_SETTINGS_EXCLUSIONS));
 	fSettingsMenu->AddItem(menuItem3);
 	fSettingsMenu->AddItem(menuItem4);
@@ -116,9 +116,8 @@ void
 MainWindow::FrameResized(float new_width, float new_height)
 {
 	BWindow::FrameResized(new_width, new_height);
-//	fView->UpdateInfoView();
-		// Text may need to be retruncated
 	_RedrawInfoText();
+		// Text may need to be retruncated
 }
 
 

@@ -1,13 +1,10 @@
-1	English	application/x-vnd.Einsteinium_Engine	3687250118
+1	English	application/x-vnd.Einsteinium_Launcher	1580833507
+No applications in recent list	'Apps' list		No applications in recent list
 Exclude	'Apps' list	Added to application label when modifier key pressed	Exclude
 Exclude from Apps list	'Apps' list	Application pop-up menu	Exclude from Apps list
-Launch	'Apps' list	Application pop-up menu	Launch
-Quit	'Apps' list	Application pop-up menu	Quit
-Settings…	'Apps' list	Application pop-up menu	Settings…
 Show in Tracker	'Apps' list	Application pop-up menu	Show in Tracker
 Other	'Files' tab	Folder label	Other
 Unknown type	'Files' tab	Label for unknown document type	Unknown type
-Settings…	'Files' tab	Popup menu option	Settings…
 Show in Tracker	'Files' tab	Popup menu option	Show in Tracker
 Folders	'Folders & Queries' tab	Folders top parent item	Folders
 Queries	'Folders & Queries' tab	Queries top parent item	Queries
@@ -29,16 +26,21 @@ Yes	Launcher application	Alert button label	Yes
 OK	Launcher application	Button label	OK
 The Einsteinium Launcher sent an invalid subscription to the Engine.  Please check your Launcher settings.	Launcher application	Failed subscription warning message	The Einsteinium Launcher sent an invalid subscription to the Engine.  Please check your Launcher settings.
 The Einsteinium Engine is not running.  Without the Engine the Launcher's Apps list will be populated from Haiku's recent applications list.  Do you wish to start the Engine now?	Launcher application	Warning message when Engine is not running	The Einsteinium Engine is not running.  Without the Engine the Launcher's Apps list will be populated from Haiku's recent applications list.  Do you wish to start the Engine now?
-Apps	Launcher tabs	Tab label	Apps
-Files	Launcher tabs	Tab label	Files
-Folders & Queries	Launcher tabs	Tab label	Folders & Queries
+Applications	Main View	Apps list view header	Applications
+Files	Main View	Files list view header	Files
+Folders & Queries	Main View	Folders & Queries list view header	Folders & Queries
+App Exclusions…	Main Window		App Exclusions…
+App Ranking…	Main Window		App Ranking…
+Hide window	Main Window		Hide window
+Layout…	Main Window		Layout…
+Quit	Main Window		Quit
 does not have an application signature	Settings 'App Exclusions' tab	Alert message	does not have an application signature
 Exclude These Apps From The Launcher	Settings 'App Exclusions' tab	Box label	Exclude These Apps From The Launcher
 Add…	Settings 'App Exclusions' tab	Button label	Add…
 OK	Settings 'App Exclusions' tab	Button label	OK
 Remove	Settings 'App Exclusions' tab	Button label	Remove
 Applications in this list will be excluded from the Launcher.	Settings 'App Exclusions' tab	List tooltip	Applications in this list will be excluded from the Launcher.
-Apps Exclusions	Settings 'App Exclusions' tab	Tab label	Apps Exclusions
+App Exclusions	Settings 'App Exclusions' tab	Tab label	App Exclusions
 Application Ranking Weights	Settings 'Apps Ranking' tab	Box label	Application Ranking Weights
 Date of most recent launch:	Settings 'Apps Ranking' tab	Box label	Date of most recent launch:
 Date of very first launch:	Settings 'Apps Ranking' tab	Box label	Date of very first launch:
@@ -70,7 +72,7 @@ the most recent date and time the application was launched.	Settings 'Apps Ranki
 the total cumulative running time of the application since its first launch.	Settings 'Apps Ranking' tab	Slider tooltip part 2	the total cumulative running time of the application since its first launch.
 the total number of times the application has been launched.	Settings 'Apps Ranking' tab	Slider tooltip part 2	the total number of times the application has been launched.
 the very first date and time the application was launched.	Settings 'Apps Ranking' tab	Slider tooltip part 2	the very first date and time the application was launched.
-Apps Ranking	Settings 'Apps Ranking' tab	Tab label	Apps Ranking
+App Ranking	Settings 'Apps Ranking' tab	Tab label	App Ranking
 Apps	Settings 'Layout' tab	Box label	Apps
 Files, Folders and Queries	Settings 'Layout' tab	Box label	Files, Folders and Queries
 Show Deskbar App List	Settings 'Layout' tab	Checkbox label	Show Deskbar App List

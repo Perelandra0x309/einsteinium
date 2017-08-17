@@ -164,8 +164,11 @@ AppsListView::KeyDown(const char* bytes, int32 numbytes)
 				else
 					BListView::KeyDown(bytes, numbytes);
 				
-				if (bytes[0] == B_TAB)
+				if (bytes[0] == B_TAB) {
 					Window()->PostMessage(EL_INITIATE_INFO_VIEW_UPDATE);
+					Invalidate();
+						// Redraw the selected list item
+				}
 			}
 		}
 	}
@@ -196,7 +199,6 @@ AppsListView::Draw(BRect rect)
 		FillRect(bounds);
 		BListView::Draw(rect);
 	}
-	Invalidate();
 }
 
 
