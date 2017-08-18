@@ -1,8 +1,8 @@
-1	English	application/x-vnd.Einsteinium_Launcher	1580833507
-No applications in recent list	'Apps' list		No applications in recent list
+1	English	application/x-vnd.Einsteinium_Launcher	604082869
 Exclude	'Apps' list	Added to application label when modifier key pressed	Exclude
 Exclude from Apps list	'Apps' list	Application pop-up menu	Exclude from Apps list
 Show in Tracker	'Apps' list	Application pop-up menu	Show in Tracker
+No applications in recent list	'Apps' list	Message in empty apps list view	No applications in recent list
 Other	'Files' tab	Folder label	Other
 Unknown type	'Files' tab	Label for unknown document type	Unknown type
 Show in Tracker	'Files' tab	Popup menu option	Show in Tracker
@@ -29,11 +29,11 @@ The Einsteinium Engine is not running.  Without the Engine the Launcher's Apps l
 Applications	Main View	Apps list view header	Applications
 Files	Main View	Files list view header	Files
 Folders & Queries	Main View	Folders & Queries list view header	Folders & Queries
-App Exclusions…	Main Window		App Exclusions…
-App Ranking…	Main Window		App Ranking…
-Hide window	Main Window		Hide window
-Layout…	Main Window		Layout…
-Quit	Main Window		Quit
+Hide window	Main Window	File menu	Hide window
+Quit	Main Window	File menu	Quit
+App Exclusions…	Main Window	Settings menu	App Exclusions…
+App Ranking…	Main Window	Settings menu	App Ranking…
+Layout…	Main Window	Settings menu	Layout…
 does not have an application signature	Settings 'App Exclusions' tab	Alert message	does not have an application signature
 Exclude These Apps From The Launcher	Settings 'App Exclusions' tab	Box label	Exclude These Apps From The Launcher
 Add…	Settings 'App Exclusions' tab	Button label	Add…

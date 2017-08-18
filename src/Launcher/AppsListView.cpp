@@ -183,7 +183,8 @@ AppsListView::Draw(BRect rect)
 	if(IsEmpty()) {
 		float width, height;
 		BFont font;
-		BString message(B_TRANSLATE("No applications in recent list"));
+		BString message(B_TRANSLATE_COMMENT("No applications in recent list",
+			"Message in empty apps list view"));
 		SetHighColor(ui_color(B_CONTROL_BACKGROUND_COLOR));
 		FillRect(rect);
 		GetPreferredSize(&width, &height);
