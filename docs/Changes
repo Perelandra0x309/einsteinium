@@ -1,11 +1,12 @@
-Version 1.4.0 (August XX 2017 for Haiku Nightly Image)
+Version 1.4.0 (August 19 2017 for Haiku Nightly Image)
 Builds under x86_64 (dependancies now available)
 Enable the deskbar shelf view instantiation so it will be preserved over a reboot
 Show all 3 lists of Applications, Files and Folders & Queries in a grid instead of tabs
 Show the Launcher in the Deskbar applications list
 App icons added to app exclusions list in Settings, list sorted alphabetically
 Added a menu bar with menu items to access settings, close window or quit application
-When "Show in Tracker" is used have Tracker select the item
+When "Show in Tracker" menu item is selected have Tracker select the item
+Updates to German catkeys by Humdinger
 Bug fix:
 -Prevent duplicate entries in the Settings app exclusions list
 
