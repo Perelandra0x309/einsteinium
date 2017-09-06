@@ -171,10 +171,10 @@ MainView::MessageReceived(BMessage* msg)
 //			}
 			break;
 		}
-		case EL_INITIATE_INFO_VIEW_UPDATE:
+/*		case EL_INITIATE_INFO_VIEW_UPDATE:
 			UpdateInfoView();
 			InvalidateFocusView();
-			break;
+			break;*/
 		default:
 			BView::MessageReceived(msg);
 	}
@@ -276,6 +276,14 @@ MainView::SelectDefaultView()
 
 
 void
+MainView::SelectedListViewChanged()
+{
+	_UpdateSelectedListView();
+	InvalidateFocusView()
+}
+
+
+void
 MainView::SettingsChanged(uint32 what)
 {
 	switch(what)
@@ -347,14 +355,14 @@ MainView::InvalidateFocusView()
 void
 MainView::_UpdateSelectedListView()
 {
-	fAppsListView->SetShowing(false);
-	fDocsListView->SetShowing(false);
-	fFoldersListView->SetShowing(false);
-/*	int32 selection = Selection();
-	switch(selection) {
-		case 0: {*/
+	fAppsListView->SetIsShowing(false);
+	fDocsListView->SetIsShowing(false);
+	fFoldersListView->SetIsShowing(false);
+//	int32 selection = Selection();
+//	switch(selection) {
+//		case 0: {
 	if(fAppsListView->IsFocus()) {
-		fAppsListView->SetShowing(true);
+		fAppsListView->SetIsShowing(true);
 			Window()->UpdateIfNeeded();
 //			fSelectedListView = fAppsListView;
 			_BuildAppsListViewFromRecent();
@@ -363,7 +371,7 @@ MainView::_UpdateSelectedListView()
 		}
 //		case 1: {
 	else if(fDocsListView->IsFocus()) {
-		fDocsListView->SetShowing(true);
+		fDocsListView->SetIsShowing(true);
 //			fSelectedListView = fDocsListView;
 			_BuildDocsListView();
 			fDocsListView->SendInfoViewUpdate();
@@ -371,7 +379,7 @@ MainView::_UpdateSelectedListView()
 		}
 //		case 2: {
 	else if(fFoldersListView->IsFocus()) {
-		fFoldersListView->SetShowing(true);
+		fFoldersListView->SetIsShowing(true);
 //			fSelectedListView = fFoldersListView;
 			_BuildFoldersListView();
 			fFoldersListView->SendInfoViewUpdate();
@@ -380,7 +388,7 @@ MainView::_UpdateSelectedListView()
 //	}
 //	fAppsListView->SetShowing(fSelectedListView==fAppsListView);
 //	fDocsListView->SetShowing(fSelectedListView==fDocsListView);
-//	fFoldersListView->SetShowing(fSelectedListView==fFoldersListView);*/
+//	fFoldersListView->SetShowing(fSelectedListView==fFoldersListView);
 }
 
 

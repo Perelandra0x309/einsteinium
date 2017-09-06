@@ -3,6 +3,7 @@
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "AppListItem.h"
+#include "AppsListView.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "'Apps' list"
@@ -304,28 +305,30 @@ AppListItem::DrawItem(BView *owner, BRect item_rect, bool complete)
 	bool showRemoveLabel = modifier & kExcludeAppModifier;//modifier == B_LEFT_CONTROL_KEY || modifier == B_RIGHT_CONTROL_KEY;
 
 	//background
-	if(IsSelected()) {
-		if(owner->IsFocus())
-			backgroundColor = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
-		else
-			backgroundColor = ui_color(B_LIST_BACKGROUND_COLOR);
-	}
-	else {
+	bool isSelected = IsSelected();
+	bool listIsFocus;
+	AppsListView* listView = dynamic_cast<AppsListView*>(owner);
+	if(listView)
+		listIsFocus = listView->GetIsShowing();
+	else
+		listIsFocus = owner->IsFocus();
+	if(isSelected && listIsFocus)
+		backgroundColor = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
+	else
 		backgroundColor = ui_color(B_LIST_BACKGROUND_COLOR);
-	}
 	owner->SetHighColor(backgroundColor);
 	owner->SetLowColor(backgroundColor);
 	owner->FillRect(item_rect);
 
 	// Non-focused selected item- draw border around item
-	if(IsSelected() && !owner->IsFocus()) {
+	if(isSelected && !listIsFocus) {
 		owner->SetHighColor(ui_color(B_LIST_SELECTED_BACKGROUND_COLOR));
 		owner->StrokeRect(item_rect);
 		owner->SetHighColor(backgroundColor);
 	}
 	
 	//icon
-/*	if (IsSelected() && fShadowIcon) {
+/*	if (isSelected && fShadowIcon) {
 		float offsetMarginHeight = floor( (listItemHeight - fShadowIcon->Bounds().Height())/2);
 		float offsetMarginWidth = floor( (fIconSize - fShadowIcon->Bounds().Width())/2 ) + kIconMargin;
 		owner->SetDrawingMode(B_OP_OVER);
@@ -356,7 +359,7 @@ AppListItem::DrawItem(BView *owner, BRect item_rect, bool complete)
 		offset_height += floor( (listItemHeight - fTextOnlyHeight)/2 );
 			// center the text vertically
 	BPoint cursor(item_rect.left + offset_width, item_rect.top + offset_height + kTextMargin);
-	if(IsSelected())
+	if(isSelected)
 		owner->SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
 	else
 		owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));

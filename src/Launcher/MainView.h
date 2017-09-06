@@ -31,6 +31,7 @@ public:
 //	virtual void		KeyDown(const char* bytes, int32 numbytes);
 	virtual void		Select(int32 which);
 			void		SelectDefaultView();
+			void		SelectedListViewChanged();
 			void		SettingsChanged(uint32 what);
 			void		BuildAppsListView(BMessage *message);
 			void		UpdateInfoView();

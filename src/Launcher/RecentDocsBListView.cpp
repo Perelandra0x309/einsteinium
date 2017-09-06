@@ -178,7 +178,7 @@ RecentDocsBListView::KeyDown(const char* bytes, int32 numbytes)
 					BOutlineListView::KeyDown(bytes, numbytes);
 				
 				if (bytes[0] == B_TAB) {
-					Window()->PostMessage(EL_INITIATE_INFO_VIEW_UPDATE);
+					Window()->PostMessage(EL_LISTVIEW_CHANGED);
 					Invalidate();
 						// Redraw the selected list item
 				}

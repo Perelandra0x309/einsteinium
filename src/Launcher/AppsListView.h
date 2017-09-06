@@ -30,10 +30,12 @@ public:
 	virtual void		SelectionChanged();
 			void		SendInfoViewUpdate();
 			void		SetFontSizeForValue(float fontSize);
-			void		SetShowing(bool showing) { isShowing = showing; };
+			void		SetIsShowing(bool _showing);
+			bool		GetIsShowing() { return isShowing; };
 			void		ScrollToNextAppBeginningWith(char letter);
 			void		BuildAppsListView(BMessage *message);
 			void		BuildAppsListFromRecent(bool force=false);
+
 protected:
 	BWindow				*fWindow;
 

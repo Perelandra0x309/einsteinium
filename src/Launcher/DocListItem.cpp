@@ -255,21 +255,23 @@ DocListItem::DrawItem(BView *owner, BRect item_rect, bool complete)
 	rgb_color backgroundColor;
 
 	//background
-	if(IsSelected()) {
-		if(owner->IsFocus())
-			backgroundColor = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
-		else
-			backgroundColor = ui_color(B_LIST_BACKGROUND_COLOR);
-	}
-	else {
+	bool isSelected = IsSelected();
+	bool listIsFocus;
+	AppsListView* listView = dynamic_cast<AppsListView*>(owner);
+	if(listView)
+		listIsFocus = listView->GetIsShowing();
+	else
+		listIsFocus = owner->IsFocus();
+	if(isSelected && listIsFocus)
+		backgroundColor = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
+	else
 		backgroundColor = ui_color(B_LIST_BACKGROUND_COLOR);
-	}
 	owner->SetHighColor(backgroundColor);
 	owner->SetLowColor(backgroundColor);
 	owner->FillRect(item_rect);
 	
 	// Non-focused selected item- draw border around item
-	if(IsSelected() && !owner->IsFocus()) {
+	if(isSelected && !listIsFocus) {
 		owner->SetHighColor(ui_color(B_LIST_SELECTED_BACKGROUND_COLOR));
 		owner->StrokeRect(item_rect);
 		owner->SetHighColor(backgroundColor);
@@ -320,7 +322,7 @@ DocListItem::DrawItem(BView *owner, BRect item_rect, bool complete)
 		offset_height += floor( (listItemHeight - fTextOnlyHeight)/2 );
 			// center the text vertically
 	BPoint cursor(item_rect.left + offset_width, item_rect.top + offset_height + kTextMargin);
-	if(IsSelected())
+	if(isSelected)
 		owner->SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
 	else
 		owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));

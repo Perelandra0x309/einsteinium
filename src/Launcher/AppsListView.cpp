@@ -165,7 +165,7 @@ AppsListView::KeyDown(const char* bytes, int32 numbytes)
 					BListView::KeyDown(bytes, numbytes);
 				
 				if (bytes[0] == B_TAB) {
-					Window()->PostMessage(EL_INITIATE_INFO_VIEW_UPDATE);
+					Window()->PostMessage(EL_LISTVIEW_CHANGED);
 					Invalidate();
 						// Redraw the selected list item
 				}
@@ -315,6 +315,13 @@ AppsListView::SetFontSizeForValue(float fontSize)
 	if(fontSize==0)
 		fontSize = be_plain_font->Size();
 	BListView::SetFontSize(fontSize);
+}
+
+
+void
+AppsListView::SetIsShowing(bool _showing)
+{
+	isShowing = _showing;
 }
 
 

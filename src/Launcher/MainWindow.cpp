@@ -72,7 +72,7 @@ MainWindow::MessageReceived(BMessage* msg)
 		case EL_UPDATE_RECENT_LISTS:
 		case EL_UPDATE_RECENT_LISTS_FORCE:
 		case EL_EXCLUSIONS_CHANGED:
-		case EL_INITIATE_INFO_VIEW_UPDATE:
+//		case EL_INITIATE_INFO_VIEW_UPDATE:
 		{
 			fView->MessageReceived(msg);
 			break;
@@ -87,6 +87,9 @@ MainWindow::MessageReceived(BMessage* msg)
 			}
 			break;
 		}
+		case EL_LISTVIEW_CHANGED:
+			fView->SelectedListViewChanged();
+			break;
 		case EL_HIDE_APP:
 			be_app->PostMessage(EL_HIDE_APP);
 			break;

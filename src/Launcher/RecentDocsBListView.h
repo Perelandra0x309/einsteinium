@@ -24,7 +24,7 @@ public:
 	virtual void		SelectionChanged();
 			void		SendInfoViewUpdate();
 			void		HandleMouseWheelChanged(BMessage *msg);
-			void		SetShowing(bool showing) { isShowing = showing; };
+			void		SetIsShowing(bool showing) { isShowing = showing; };
 			void		SettingsChanged(uint32 what);
 			void		SetFontSizeForValue(float fontSize);
 			void		ScrollToNextDocBeginningWith(char letter);
