@@ -1,5 +1,5 @@
 /* MainWindow.cpp
- * Copyright 2013 Brian Hill
+ * Copyright 2013-2017 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "MainWindow.h"
@@ -68,11 +68,9 @@ MainWindow::MessageReceived(BMessage* msg)
 {
 	switch(msg->what)
 	{
-//		case B_MOUSE_WHEEL_CHANGED:
 		case EL_UPDATE_RECENT_LISTS:
 		case EL_UPDATE_RECENT_LISTS_FORCE:
 		case EL_EXCLUSIONS_CHANGED:
-//		case EL_INITIATE_INFO_VIEW_UPDATE:
 		{
 			fView->MessageReceived(msg);
 			break;

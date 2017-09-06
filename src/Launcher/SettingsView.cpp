@@ -1,5 +1,5 @@
 /* SettingsView.cpp
- * Copyright 2013 Brian Hill
+ * Copyright 2013-2017 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "SettingsView.h"
@@ -16,36 +16,6 @@ SettingsView::SettingsView(BRect size, AppSettings* settings)
 	fTwoLinesRB = new BRadioButton("Two Lines", "Show application name and status on two lines",
 		new BMessage(LINES_OPTION_CHANGED));*/
 
-/*	fMaxIconSizeMenu = new BPopUpMenu("Max Icon Size Menu");
-//	fMaxIconSizeMenu->AddItem(new BMenuItem("No Icon", new BMessage(APP_ICON_OPTION_CHANGED)));
-	fMaxIconSizeMenu->AddItem(new BMenuItem("8", new BMessage(APP_ICON_OPTION_CHANGED)));
-	fMaxIconSizeMenu->AddItem(new BMenuItem("16", new BMessage(APP_ICON_OPTION_CHANGED)));
-	fMaxIconSizeMenu->AddItem(new BMenuItem("24", new BMessage(APP_ICON_OPTION_CHANGED)));
-	fMaxIconSizeMenu->AddItem(new BMenuItem("32", new BMessage(APP_ICON_OPTION_CHANGED)));
-	fMaxIconSizeMenu->AddItem(new BMenuItem("48", new BMessage(APP_ICON_OPTION_CHANGED)));
-	fMaxIconSizeMenu->AddItem(new BMenuItem("64", new BMessage(APP_ICON_OPTION_CHANGED)));
-	fMaxIconSizeMF = new BMenuField("App Max Icon Size Field", "App highest rank icon size:", fMaxIconSizeMenu);
-
-	fMinIconSizeMenu = new BPopUpMenu("Min Icon Size Menu");
-//	fMinIconSizeMenu->AddItem(new BMenuItem("No Icon", new BMessage(APP_ICON_OPTION_CHANGED)));
-	fMinIconSizeMenu->AddItem(new BMenuItem("8", new BMessage(APP_ICON_OPTION_CHANGED)));
-	fMinIconSizeMenu->AddItem(new BMenuItem("16", new BMessage(APP_ICON_OPTION_CHANGED)));
-	fMinIconSizeMenu->AddItem(new BMenuItem("24", new BMessage(APP_ICON_OPTION_CHANGED)));
-	fMinIconSizeMenu->AddItem(new BMenuItem("32", new BMessage(APP_ICON_OPTION_CHANGED)));
-	fMinIconSizeMenu->AddItem(new BMenuItem("48", new BMessage(APP_ICON_OPTION_CHANGED)));
-	fMinIconSizeMenu->AddItem(new BMenuItem("64", new BMessage(APP_ICON_OPTION_CHANGED)));
-	fMinIconSizeMF = new BMenuField("App Min Icon Size Field", "App lowest rank icon size:", fMinIconSizeMenu);
-
-	fDocIconSizeMenu = new BPopUpMenu("Recent Docs Icon Size Menu");
-//	fDocIconSizeMenu->AddItem(new BMenuItem("No Icon", new BMessage(DOC_ICON_OPTION_CHANGED)));
-	fDocIconSizeMenu->AddItem(new BMenuItem("8", new BMessage(DOC_ICON_OPTION_CHANGED)));
-	fDocIconSizeMenu->AddItem(new BMenuItem("16", new BMessage(DOC_ICON_OPTION_CHANGED)));
-	fDocIconSizeMenu->AddItem(new BMenuItem("24", new BMessage(DOC_ICON_OPTION_CHANGED)));
-	fDocIconSizeMenu->AddItem(new BMenuItem("32", new BMessage(DOC_ICON_OPTION_CHANGED)));
-	fDocIconSizeMenu->AddItem(new BMenuItem("48", new BMessage(DOC_ICON_OPTION_CHANGED)));
-	fDocIconSizeMenu->AddItem(new BMenuItem("64", new BMessage(DOC_ICON_OPTION_CHANGED)));
-	fDocIconSizeMF = new BMenuField("Recent Docs Icon Size Field", "Recent documents icon size:", fDocIconSizeMenu);
-*/
 	fAppsCountTC = new BTextControl(B_TRANSLATE_COMMENT("Show this many apps:", "Input box label"), "",
 							new BMessage(EL_APP_COUNT_OPTION_CHANGED));
 	BTextView *textView = fAppsCountTC->TextView();
@@ -120,10 +90,6 @@ SettingsView::SettingsView(BRect size, AppSettings* settings)
 	fWindowLookMF = new BMenuField("Window Look Field", B_TRANSLATE_COMMENT("Window look:", "Menu label"), fWindowLookMenu);
 
 	fDeskbarShowCB = new BCheckBox(B_TRANSLATE_COMMENT("Show Deskbar App List", "Checkbox label"), new BMessage(EL_DESKBAR_OPTION_CHANGED));
-
-//	fFloatCB = new BCheckBox(B_TRANSLATE_COMMENT("Float above all windows", "Checkbox label"), new BMessage(FLOAT_OPTION_CHANGED));
-
-//	fAboutB = new BButton("About", B_TRANSLATE_COMMENT("About", "Button label") B_UTF8_ELLIPSIS, new BMessage(B_ABOUT_REQUESTED));
 
 	BBox *appsBox = new BBox("Apps");
 	appsBox->SetLabel(B_TRANSLATE_COMMENT("Apps", "Box label"));
@@ -469,9 +435,7 @@ SettingsView::_SetWindowLook(window_look look)
 	BMenuItem* item = fWindowLookMenu->ItemAt(selection);
 	if(item != NULL)
 	{
-	//	Window()->Lock();
 		item->SetMarked(true);
-	//	Window()->Unlock();
 	}
 }
 

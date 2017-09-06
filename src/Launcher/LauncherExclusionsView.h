@@ -1,5 +1,5 @@
 /* LauncherExclusionsView.h
- * Copyright 2013 Brian Hill
+ * Copyright 2013-2017 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #ifndef EP_L_EXCLUSIONS_VIEW
@@ -29,15 +29,12 @@ public:
 	bool			AddExclusion(BMessage* refMsg);
 	bool			RemoveSelectedExclusion();
 	void			UpdateSelectedItem();
-//	void			SetLinkInclusionDefault(const char*);
-//	void			GetLinkInclusionDefault(BString &value);
 	void			PopulateExclusionsListView(BMessage &exclusionsList);
 	void			GetExclusionsList(BMessage &list);
-//	BSize			GetMinSize();
+
 private:
-	BBox			/**fDefaultSettingsBox, */*fSettingsBox;
+	BBox			*fSettingsBox;
 	BButton			*fAddB, *fRemoveB;
-//	BRadioButton	*fPromptRB, *fIncludeRB, *fIgnoreRB;
 	BListView		*fExclusionLView;
 	BScrollView		*fExclusionSView;
 	ExcludeItem		*fSelectedItem;

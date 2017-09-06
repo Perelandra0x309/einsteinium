@@ -1,7 +1,8 @@
 /* DocListItem.cpp
- * Copyright 2013 Brian Hill
+ * Copyright 2013-2017 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
+#include "AppsListView.h"
 #include "DocListItem.h"
 
 
@@ -65,11 +66,6 @@ DocListItem::ProcessMessage(BMessage* msg)
 			status_t rc = _OpenDoc();
 			break;
 		}
-	/*	case EL_STOP_SERVICE:
-		{
-			status_t rc = _StopService();
-			break;
-		}*/
 	}
 }
 
@@ -88,15 +84,6 @@ DocListItem::SetIconSize(int value)
 	fIconSize = value;
 	_GetIcon();
 }
-
-/*
-void
-DocListItem::SetIconSize(int minIconSize, int maxIconSize, int totalCount, int index)
-{
-	int iconSize = int( maxIconSize - (index*(maxIconSize-minIconSize)/(totalCount-1)) );
-	SetIconSize(iconSize);
-}*/
-
 
 
 const char*
@@ -277,17 +264,6 @@ DocListItem::DrawItem(BView *owner, BRect item_rect, bool complete)
 		owner->SetHighColor(backgroundColor);
 	}
 
-	//icon
-/*	if (IsSelected() && fShadowIcon) {
-		float offsetMarginHeight = floor( (listItemHeight - fShadowIcon->Bounds().Height())/2);
-		float offsetMarginWidth = floor( (fIconSize - fShadowIcon->Bounds().Width())/2 ) + kIconMargin;
-		owner->SetDrawingMode(B_OP_OVER);
-		owner->DrawBitmap(fShadowIcon, BPoint(item_rect.left + offsetMarginWidth,
-							item_rect.top + offsetMarginHeight));
-		owner->SetDrawingMode(B_OP_COPY);
-//		offset_width += fIconSize + 2*kIconMargin;
-	}*/
-
 	if (fIcon) {
 		float offsetMarginHeight = floor( (listItemHeight - fIconSize)/2);
 		float offsetMarginWidth = kIconMargin;
@@ -296,7 +272,6 @@ DocListItem::DrawItem(BView *owner, BRect item_rect, bool complete)
 		owner->SetDrawingMode(B_OP_ALPHA);
 		if(fIcon->Bounds().IntegerWidth()+1 != fIconSize)
 		{
-//			printf("Bounds width=%i, iconSize=%i\n", fIcon->Bounds().IntegerWidth()+1,fIconSize);
 			BRect destRect(item_rect.left + offsetMarginWidth,
 							item_rect.top + offsetMarginHeight,
 							item_rect.left + offsetMarginWidth + fIconSize,

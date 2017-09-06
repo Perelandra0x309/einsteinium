@@ -1,5 +1,5 @@
 /* AppListItem.cpp
- * Copyright 2013 Brian Hill
+ * Copyright 2013-2017 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "AppListItem.h"
@@ -33,7 +33,6 @@ AppListItem::AppListItem(BEntry entry, const char * sig, int iconSize)
 	entry.GetRef(&fEntryRef);
 	fNameFirstChar = BString(fName).Truncate(1).ToLower()[0];
 
-//	_GetIcon();
 	fInitStatus = B_OK;
 }
 
@@ -197,52 +196,6 @@ AppListItem::_GetIcon()
 		delete fIcon;
 		fIcon = NULL;
 	}
-/*	delete fIcon;
-	delete fShadowIcon;
-	if(fIconSize == 0)
-	{
-		fIcon = NULL;
-		fShadowIcon = NULL;
-		return;
-	}
-	BNode node;
-	BNodeInfo nodeInfo;
-	if (node.SetTo(&fEntryRef) == B_OK) {
-		BRect iconRect(0, 0, fIconSize - 1, fIconSize - 1);
-		fIcon = new BBitmap(iconRect, 0, B_RGBA32);
-		status_t result = BIconUtils::GetVectorIcon(&node, "BEOS:ICON", fIcon);
-		if(result != B_OK)
-		{
-			// attempt to get mini or large icon
-			delete fIcon;
-			if(nodeInfo.SetTo(&node) == B_OK)
-			{
-				if(fIconSize<32)
-				{
-					iconRect.Set(0, 0, 15, 15);
-					fIcon = new BBitmap(iconRect, 0, B_RGBA32);
-					result = nodeInfo.GetTrackerIcon(fIcon, B_MINI_ICON);
-				}
-				else
-				{
-					iconRect.Set(0, 0, 31, 31);
-					fIcon = new BBitmap(iconRect, 0, B_RGBA32);
-					result = nodeInfo.GetTrackerIcon(fIcon, B_LARGE_ICON);
-				}
-				if(result != B_OK)
-				{
-					delete fIcon;
-					fIcon = NULL;
-				}
-			}
-			else
-				fIcon = NULL;
-		}
-	}
-	else {
-		fIcon = NULL;
-		fShadowIcon = NULL;
-	}*/
 }
 
 /*
@@ -338,8 +291,6 @@ AppListItem::DrawItem(BView *owner, BRect item_rect, bool complete)
 //		offset_width += fIconSize + 2*kIconMargin;
 	}*/
 	if (fIcon) {
-//		float offsetMarginHeight = floor( (listItemHeight - fIcon->Bounds().Height())/2);
-//		float offsetMarginWidth = floor( (fIconSize - fIcon->Bounds().Width())/2 ) + kIconMargin;
 		float offsetMarginHeight = floor( (listItemHeight - fIconSize)/2);
 		float offsetMarginWidth = kIconMargin;
 		owner->SetDrawingMode(B_OP_OVER);

@@ -1,5 +1,5 @@
 /* LauncherExclusionsView.cpp
- * Copyright 2013 Brian Hill
+ * Copyright 2013-2017 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "LauncherExclusionsView.h"
@@ -11,28 +11,8 @@ LauncherExclusionsView::LauncherExclusionsView(BRect size, BMessage *appExclusio
 	:
 	BView(size, B_TRANSLATE_COMMENT("App Exclusions", "Tab label"), B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS)
 {
-//	SetViewColor(bg_color);
 	BRect viewRect;
 
-	// Default Settings
-/*	fDefaultSettingsBox = new BBox("Default Settings BBox");
-	fDefaultSettingsBox->SetLabel("When a new application is detected:");
-	// TODO how to implement this?
-	fPromptRB = new BRadioButton("New App Prompt",
-						"Ask me whether to include the application in rank lists",
-						new BMessage(EL_LIST_INCLUSION_CHANGED));
-	fIncludeRB = new BRadioButton("New App Include",
-						"Automatically include the application in rank lists",
-						new BMessage(EL_LIST_INCLUSION_CHANGED));
-	fIgnoreRB = new BRadioButton("New App Ignore",
-						"Automatically do not include the application in rank lists",
-						new BMessage(EL_LIST_INCLUSION_CHANGED));
-	fDefaultSettingsBox->AddChild(BGroupLayoutBuilder(B_VERTICAL)
-		.Add(fIncludeRB)
-		.Add(fPromptRB)
-		.Add(fIgnoreRB)
-		.SetInsets(5, 5, 5, 5)
-	);*/
 	// TODO Make a double pane view to easily move applications into the excluded list.
 	// Subscribe to the engine to get a current list of applications.
 
@@ -66,9 +46,7 @@ LauncherExclusionsView::LauncherExclusionsView(BRect size, BMessage *appExclusio
 
 	BGroupLayout *layout = new BGroupLayout(B_VERTICAL);
 	SetLayout(layout);
-//	BLayoutBuilder::Group<>(layout)
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 3)
-//		.Add(fDefaultSettingsBox)
 		.Add(fSettingsBox)
 		.SetInsets(4, 4, 4, 4)
 	);
@@ -199,35 +177,6 @@ LauncherExclusionsView::RemoveSelectedExclusion()
 	return true;
 }
 
-/*
-void
-LauncherExclusionsView::SetLinkInclusionDefault(const char* value)
-{
-	if( strcmp(value,EL_XMLTEXT_VALUE_INCLUDE)==0 )
-		fIncludeRB->SetValue(true);
-
-	else if(strcmp(value,EL_XMLTEXT_VALUE_PROMPT)==0 )
-		fPromptRB->SetValue(true);
-
-	else if(strcmp(value,EL_XMLTEXT_VALUE_EXCLUDE)==0 )
-		fIgnoreRB->SetValue(true);
-}
-
-
-void
-LauncherExclusionsView::GetLinkInclusionDefault(BString &value)
-{
-	// Automatically include new applications
-	if(fIncludeRB->Value())
-	value.SetTo(EL_XMLTEXT_VALUE_INCLUDE);
-	// Prompt whether to include in lists
-	else if(fPromptRB->Value())
-	value.SetTo(EL_XMLTEXT_VALUE_PROMPT);
-	// Automatically exclude
-	else if(fIgnoreRB->Value())
-	value.SetTo(EL_XMLTEXT_VALUE_EXCLUDE);
-}
-*/
 
 void
 LauncherExclusionsView::PopulateExclusionsListView(BMessage &exclusionsList)
@@ -255,18 +204,6 @@ LauncherExclusionsView::GetExclusionsList(BMessage &list)
 		list.AddMessage(EL_EXCLUDE_APP, &excludeSetting);
 	}
 }
-
-/*
-BSize
-LauncherExclusionsView::GetMinSize()
-{
-	BSize size(B_SIZE_UNSET, B_SIZE_UNSET);
-	size.width = fIgnoreRB->MinSize().width + 20;
-	size.height = (4 * fIgnoreRB->MinSize().height)
-					+ (2 * fAddB->MinSize().height) + 90;
-
-	return size;
-}*/
 
 
 void

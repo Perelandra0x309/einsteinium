@@ -1,11 +1,12 @@
 /* AppsListView.cpp
- * Copyright 2013 Brian Hill
+ * Copyright 2013-2017 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "AppsListView.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "'Apps' list"
+
 
 AppsListView::AppsListView(BRect size)
 	:
@@ -43,23 +44,6 @@ AppsListView::MessageReceived(BMessage* msg)
 			_HideApp(modifier);
 			break;
 		}
-/*		case B_MOUSE_WHEEL_CHANGED:
-		{
-		//	printf("Mouse wheel\n");
-			// Prevent scrolling while the menu is showing
-			if(fMenu && fMenu->IsShowing())
-				break;
-			// If this list view isn't currently selected redirect message
-			// to the main view to handle (fixes bug in Haiku R1A3)
-			if(!isShowing)
-			{
-				msg->what = EL_REDIRECTED_MOUSE_WHEEL_CHANGED;
-				Parent()->MessageReceived(msg);
-				break;
-			}
-			HandleMouseWheelChanged(msg);
-			break;
-		}*/
 		case EL_SHOW_IN_TRACKER:
 		{
 			int32 selectedIndex = CurrentSelection();
@@ -92,11 +76,6 @@ AppsListView::MouseDown(BPoint pos)
 			_InvokeSelectedItem();
 		}
 	}
-/*	else if ( button & B_TERTIARY_MOUSE_BUTTON )
-	{
-		// Launch the currently selected item
-		_InvokeSelectedItem();
-	}*/
 	else if (button & B_SECONDARY_MOUSE_BUTTON)
 	{
 		// Select list item under mouse pointer and show menu
@@ -110,7 +89,6 @@ AppsListView::MouseDown(BPoint pos)
 
 		_InitPopUpMenu(selectedIndex);
 		ConvertToScreen(&pos);
-		//fMenu->Go(pos, false, false, true);
 		fMenu->Go(pos, true, true, BRect(pos.x - 2, pos.y - 2,
 			pos.x + 2, pos.y + 2), true);
 	}
@@ -209,40 +187,6 @@ AppsListView::FrameResized(float w, float h)
 	BListView::FrameResized(w, h);
 	Invalidate();
 }
-
-/*
-void
-AppsListView::HandleMouseWheelChanged(BMessage *msg)
-{
-	if(msg->what!=B_MOUSE_WHEEL_CHANGED
-		&& msg->what!=EL_REDIRECTED_MOUSE_WHEEL_CHANGED)
-		return;
-
-	float deltaY=0;
-//	printf("Mouse wheel changed\n");
-	status_t result = msg->FindFloat("be:wheel_delta_y", &deltaY);
-	if(result!=B_OK)
-		return;
-	if(deltaY>0)
-	{
-		int32 currentSelection = CurrentSelection();
-		if(currentSelection==(CountItems()-1))
-			Select(0);
-		else
-			Select(currentSelection+1);
-		ScrollToSelection();
-	}
-	else
-	{
-		int32 currentSelection = CurrentSelection();
-		if(currentSelection==0)
-			Select(CountItems()-1);
-		else
-			Select(currentSelection-1);
-		ScrollToSelection();
-	}
-}
-*/
 
 
 void
@@ -427,7 +371,6 @@ AppsListView::BuildAppsListFromRecent(bool force)
 		if(result==B_OK && recentRef==fLastRecentAppRef)
 		{
 			fWindow->UpdateIfNeeded();
-			//printf("List not updated\n");
 			return;
 		}
 		refList.MakeEmpty();
@@ -560,8 +503,6 @@ AppsListView::_InitPopUpMenu(int32 selectedIndex)
 	if(fMenu==NULL)
 	{
 		fMenu = new LPopUpMenu(B_EMPTY_STRING);
-//		fStartStopMI = new BMenuItem("Start", new BMessage());
-//		fMenu->AddItem(fStartStopMI);
 		fTrackerMI = new BMenuItem(B_TRANSLATE_COMMENT("Show in Tracker", "Application pop-up menu"),
 			new BMessage(EL_SHOW_IN_TRACKER));
 		fMenu->AddItem(fTrackerMI);
@@ -569,30 +510,12 @@ AppsListView::_InitPopUpMenu(int32 selectedIndex)
 		fRemoveMI = new BMenuItem(B_TRANSLATE_COMMENT("Exclude from Apps list", "Application pop-up menu"),
 			new BMessage(EL_ADD_APP_EXCLUSION));
 		fMenu->AddItem(fRemoveMI);
-//		fMenu->AddSeparatorItem();
-//		fSettingsMI = new BMenuItem(B_TRANSLATE_COMMENT("Settings" B_UTF8_ELLIPSIS, "Application pop-up menu"),
-//			new BMessage(EL_SHOW_SETTINGS));
-//		fMenu->AddItem(fSettingsMI);
-	//	fMenu->SetTargetForItems(this);
-//		fStartStopMI->SetTarget(this);
 		fTrackerMI->SetTarget(this);
 		fRemoveMI->SetTarget(be_app);
-//		fSettingsMI->SetTarget(be_app);
 	}
 	if(selectedIndex>=0)
 	{
 		AppListItem *selectedItem = (AppListItem*)ItemAt(selectedIndex);
-/*		bool isRunning = selectedItem->IsRunning();
-		if(isRunning)
-		{
-			fStartStopMI->SetLabel(B_TRANSLATE_COMMENT("Quit", "Application pop-up menu"));
-			fStartStopMI->Message()->what = EL_STOP_SERVICE;
-		}
-		else
-		{
-			fStartStopMI->SetLabel(B_TRANSLATE_COMMENT("Launch", "Application pop-up menu"));
-			fStartStopMI->Message()->what = EL_START_SERVICE;
-		}*/
 		BMessage *message = fRemoveMI->Message();
 		message->MakeEmpty();
 		message->AddString(EL_EXCLUDE_SIGNATURE, selectedItem->GetSignature());

@@ -1,5 +1,5 @@
 /* RecentDocsBListView.cpp
- * Copyright 2013 Brian Hill
+ * Copyright 2013-2017 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "RecentDocsBListView.h"
@@ -32,24 +32,6 @@ RecentDocsBListView::MessageReceived(BMessage* msg)
 {
 	switch(msg->what)
 	{
-/*		case B_MOUSE_WHEEL_CHANGED:
-		{
-
-		//	printf("Mouse wheel\n");
-			// Prevent scrolling while the menu is showing
-			if(fMenu && fMenu->IsShowing())
-				break;
-			// If this list view isn't currently selected redirect message
-			// to the main view to handle (fixes bug in Haiku R1A3)
-			if(!isShowing)
-			{
-				msg->what = EL_REDIRECTED_MOUSE_WHEEL_CHANGED;
-				Parent()->MessageReceived(msg);
-				break;
-			}
-			HandleMouseWheelChanged(msg);
-			break;
-		}*/
 		case EL_SHOW_IN_TRACKER:
 		{
 			int32 selectedIndex = CurrentSelection();
@@ -82,11 +64,6 @@ RecentDocsBListView::MouseDown(BPoint pos)
 			_InvokeSelectedItem();
 		}
 	}
-/*	else if ( button & B_TERTIARY_MOUSE_BUTTON )
-	{
-		// Launch the currently selected item
-		_InvokeSelectedItem();
-	}*/
 	else if (button & B_SECONDARY_MOUSE_BUTTON)
 	{
 		// Select list item under mouse pointer and show menu
@@ -105,7 +82,6 @@ RecentDocsBListView::MouseDown(BPoint pos)
 		_InitPopUpMenu(selectedIndex);
 
 		ConvertToScreen(&pos);
-		//fMenu->Go(pos, false, false, true);
 		fMenu->Go(pos, true, true, BRect(pos.x - 2, pos.y - 2,
 			pos.x + 2, pos.y + 2), true);
 	}
@@ -134,8 +110,6 @@ RecentDocsBListView::KeyDown(const char* bytes, int32 numbytes)
 				else
 				{
 					BOutlineListView::KeyDown(bytes, numbytes);
-				//	Select(currentSelection+1);
-				//	ScrollToSelection();
 				}
 				break;
 			}
@@ -216,39 +190,6 @@ RecentDocsBListView::SendInfoViewUpdate()
 	be_app->PostMessage(&infoMsg);
 }
 
-/*
-void
-RecentDocsBListView::HandleMouseWheelChanged(BMessage *msg)
-{
-	if(msg->what!=B_MOUSE_WHEEL_CHANGED
-		&& msg->what!=EL_REDIRECTED_MOUSE_WHEEL_CHANGED)
-		return;
-
-	float deltaY=0;
-//	printf("Mouse wheel changed\n");
-	status_t result = msg->FindFloat("be:wheel_delta_y", &deltaY);
-	if(result!=B_OK)
-		return;
-	if(deltaY>0)
-	{
-		int32 currentSelection = CurrentSelection();
-		if(currentSelection==(CountItems()-1))
-			Select(0);
-		else
-			Select(currentSelection+1);
-		ScrollToSelection();
-	}
-	else
-	{
-		int32 currentSelection = CurrentSelection();
-		if(currentSelection==0)
-			Select(CountItems()-1);
-		else
-			Select(currentSelection-1);
-		ScrollToSelection();
-	}
-}
-*/
 
 void
 RecentDocsBListView::SettingsChanged(uint32 what)
@@ -584,12 +525,8 @@ RecentDocsBListView::_InitPopUpMenu(int32 selectedIndex)
 	{
 		fMenu = new LPopUpMenu(B_EMPTY_STRING);
 		fTrackerMI = new BMenuItem(B_TRANSLATE_COMMENT("Show in Tracker", "Popup menu option"), new BMessage(EL_SHOW_IN_TRACKER));
-//		fSettingsMI = new BMenuItem(B_TRANSLATE_COMMENT("Settings" B_UTF8_ELLIPSIS, "Popup menu option"), new BMessage(EL_SHOW_SETTINGS));
 		fMenu->AddItem(fTrackerMI);
-//		fMenu->AddSeparatorItem();
-//		fMenu->AddItem(fSettingsMI);
 		fMenu->SetTargetForItems(this);
-//		fSettingsMI->SetTarget(be_app);
 	}
 }
 

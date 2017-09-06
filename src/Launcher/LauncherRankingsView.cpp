@@ -1,5 +1,5 @@
 /* LauncherRankingsView.cpp
- * Copyright 2013 Brian Hill
+ * Copyright 2013-2017 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "LauncherRankingsView.h"
@@ -80,13 +80,6 @@ LauncherRankingsView::LauncherRankingsView(BRect size, ScaleSettings* scales)
 	;
 	fSetB->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT, B_ALIGN_VERTICAL_CENTER));
 
-/*	BGroupLayout *layout = new BGroupLayout(B_VERTICAL);
-	SetLayout(layout);
-	BLayoutBuilder::Group<>(layout)
-		.Add(fSlidersBox)
-		.SetInsets(4, 4, 4, 4)
-	;*/
-
 	SetLayout(new BGroupLayout(B_VERTICAL));
 	AddChild(BGroupLayoutBuilder(B_VERTICAL, 3)
 		.Add(fSlidersBox)
@@ -96,9 +89,6 @@ LauncherRankingsView::LauncherRankingsView(BRect size, ScaleSettings* scales)
 	SetSliderValues(*scales);
 }
 
-/*
-LauncherRankingsView::~LauncherRankingsView()
-{	}*/
 
 void
 LauncherRankingsView::AttachedToWindow()
@@ -111,6 +101,7 @@ LauncherRankingsView::AttachedToWindow()
 	fRuntimeSl->SetTarget(this);
 	fSetB->SetTarget(this);
 }
+
 
 void
 LauncherRankingsView::MessageReceived(BMessage* msg)
@@ -315,13 +306,3 @@ LauncherRankingsView::GetSliderValues(ScaleSettings& prefs)
 	prefs.interval_scale = fIntervalSl->Value();
 	prefs.total_run_time_scale = fRuntimeSl->Value();
 }
-
-/*
-BSize
-LauncherRankingsView::GetMinSize()
-{
-	BSize size(B_SIZE_UNSET, B_SIZE_UNSET);
-	size.width = MinSize().width + 10;
-	size.height = MinSize().height;
-	return size;
-}*/

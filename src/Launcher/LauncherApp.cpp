@@ -1,5 +1,5 @@
 /* LauncherApp.cpp
- * Copyright 2013 Brian Hill
+ * Copyright 2013-2017 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "LauncherApp.h"
@@ -7,9 +7,6 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Launcher application"
 
-/*bool IsEngineRunning(){
-	return ((LauncherApp *)be_app)->GetIsEngineRunning();
-};*/
 
 AppSettings* GetAppSettings()
 {
