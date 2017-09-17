@@ -1,5 +1,5 @@
 /* LauncherApp.h
- * Copyright 2013 Brian Hill
+ * Copyright 2013-2017 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #ifndef EINSTEINIUM_LAUNCHER_APP_H
@@ -21,7 +21,6 @@ public:
 	virtual void		ReadyToRun();
 	virtual void		ArgvReceived(int32, char**);
 	virtual void		MessageReceived(BMessage*);
-//	bool				GetIsEngineRunning() { return _IsEngineRunning(); };
 	AppSettings*		GetAppSettings() { return &fAppSettings; };
 
 protected:

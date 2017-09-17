@@ -1,5 +1,5 @@
 /* launcher_constants.h
- * Copyright 2013 Brian Hill
+ * Copyright 2013-2017 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #ifndef EL_CONSTANTS_H
@@ -7,7 +7,6 @@
 
 #include <Window.h>
 
-//bool IsEngineRunning();
 
 //Main directory for all Einsteinium settings
 #define e_settings_dir "Einsteinium"
@@ -157,7 +156,6 @@ enum launcher_messages
 	EL_DOC_ICON_OPTION_DRAG,
 	EL_DOC_COUNT_OPTION_CHANGED,
 	EL_ADD_APP_EXCLUSION,
-//	EL_REDIRECTED_MOUSE_WHEEL_CHANGED,
 	EL_UPDATE_RECENT_LISTS_FORCE,
 	EL_WINDOW_MOVED,
 	EL_APP_COUNT_OPTION_CHANGED,
@@ -184,7 +182,7 @@ enum launcher_messages
 	EL_SHOW_SETTINGS_LAYOUT,
 	EL_SHOW_SETTINGS_RANKINGS,
 	EL_SHOW_SETTINGS_EXCLUSIONS,
-	EL_INITIATE_INFO_VIEW_UPDATE
+	EL_LISTVIEW_CHANGED
 };
 
 #endif

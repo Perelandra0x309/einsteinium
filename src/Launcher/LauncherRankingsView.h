@@ -1,12 +1,11 @@
 /* LauncherRankingsView.h
- * Copyright 2013 Brian Hill
+ * Copyright 2013-2017 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #ifndef EP_L_RANKINGS_VIEW
 #define EP_L_RANKINGS_VIEW
 
 #include <InterfaceKit.h>
-//#include <SupportKit.h>
 #include <Application.h>
 #include <LayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
@@ -17,13 +16,12 @@
 class LauncherRankingsView : public BView {
 public:
 					LauncherRankingsView(BRect, ScaleSettings* scales);
-//					~LauncherRankingsView();
 	virtual void	AttachedToWindow();
 	virtual void	MessageReceived(BMessage*);
 	virtual void	FrameResized(float width, float height);
 	void			SetSliderValues(ScaleSettings& prefs);
 	void			GetSliderValues(ScaleSettings& prefs);
-//	BSize			GetMinSize();
+
 private:
 	BSlider			*fLaunchesSl, *fFirstSl, *fLastSl, *fIntervalSl, *fRuntimeSl;
 	BButton			*fSetB;

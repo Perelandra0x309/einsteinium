@@ -1,5 +1,5 @@
 /* AppsListView.h
- * Copyright 2013 Brian Hill
+ * Copyright 2013-2017 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #ifndef EINSTEINIUM_LAUNCHER_APPLISTVIEW_H
@@ -25,15 +25,16 @@ public:
 	virtual void		KeyDown(const char* bytes, int32 numbytes);
 	void				Draw(BRect rect);
 	void				FrameResized(float w, float h);
-//			void		HandleMouseWheelChanged(BMessage *msg);
 			void		SettingsChanged(uint32 what);
 	virtual void		SelectionChanged();
 			void		SendInfoViewUpdate();
 			void		SetFontSizeForValue(float fontSize);
-			void		SetShowing(bool showing) { isShowing = showing; };
+			void		SetIsShowing(bool _showing);
+			bool		GetIsShowing() { return isShowing; };
 			void		ScrollToNextAppBeginningWith(char letter);
 			void		BuildAppsListView(BMessage *message);
 			void		BuildAppsListFromRecent(bool force=false);
+
 protected:
 	BWindow				*fWindow;
 

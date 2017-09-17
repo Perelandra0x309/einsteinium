@@ -1,5 +1,5 @@
 /* DocListItem.h
- * Copyright 2013 Brian Hill
+ * Copyright 2013-2017 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #ifndef EINSTEINIUM_LAUNCHER_DOCLISTITEM_H
@@ -28,7 +28,6 @@ public:
 			bool			BeginsWith(char letter);
 //			void			SetDrawTwoLines(bool value);
 			void			SetIconSize(int value);
-//			void			SetIconSize(int minIconSize, int maxIconSize, int totalCount, int index);
 			const char*		GetSuperTypeName();
 			const char*		GetTypeName();
 			status_t		InitStatus() { return fInitStatus; }

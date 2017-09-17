@@ -1,5 +1,5 @@
 /* RecentDocsBListView.h
- * Copyright 2013 Brian Hill
+ * Copyright 2013-2017 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #ifndef EINSTEINIUM_LAUNCHER_RECDOCSBLISTVIEW_H
@@ -24,7 +24,7 @@ public:
 	virtual void		SelectionChanged();
 			void		SendInfoViewUpdate();
 			void		HandleMouseWheelChanged(BMessage *msg);
-			void		SetShowing(bool showing) { isShowing = showing; };
+			void		SetIsShowing(bool showing) { isShowing = showing; };
 			void		SettingsChanged(uint32 what);
 			void		SetFontSizeForValue(float fontSize);
 			void		ScrollToNextDocBeginningWith(char letter);

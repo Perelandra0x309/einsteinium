@@ -1,8 +1,9 @@
 /* AppListItem.cpp
- * Copyright 2013 Brian Hill
+ * Copyright 2013-2017 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
 #include "AppListItem.h"
+#include "AppsListView.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "'Apps' list"
@@ -32,7 +33,6 @@ AppListItem::AppListItem(BEntry entry, const char * sig, int iconSize)
 	entry.GetRef(&fEntryRef);
 	fNameFirstChar = BString(fName).Truncate(1).ToLower()[0];
 
-//	_GetIcon();
 	fInitStatus = B_OK;
 }
 
@@ -196,52 +196,6 @@ AppListItem::_GetIcon()
 		delete fIcon;
 		fIcon = NULL;
 	}
-/*	delete fIcon;
-	delete fShadowIcon;
-	if(fIconSize == 0)
-	{
-		fIcon = NULL;
-		fShadowIcon = NULL;
-		return;
-	}
-	BNode node;
-	BNodeInfo nodeInfo;
-	if (node.SetTo(&fEntryRef) == B_OK) {
-		BRect iconRect(0, 0, fIconSize - 1, fIconSize - 1);
-		fIcon = new BBitmap(iconRect, 0, B_RGBA32);
-		status_t result = BIconUtils::GetVectorIcon(&node, "BEOS:ICON", fIcon);
-		if(result != B_OK)
-		{
-			// attempt to get mini or large icon
-			delete fIcon;
-			if(nodeInfo.SetTo(&node) == B_OK)
-			{
-				if(fIconSize<32)
-				{
-					iconRect.Set(0, 0, 15, 15);
-					fIcon = new BBitmap(iconRect, 0, B_RGBA32);
-					result = nodeInfo.GetTrackerIcon(fIcon, B_MINI_ICON);
-				}
-				else
-				{
-					iconRect.Set(0, 0, 31, 31);
-					fIcon = new BBitmap(iconRect, 0, B_RGBA32);
-					result = nodeInfo.GetTrackerIcon(fIcon, B_LARGE_ICON);
-				}
-				if(result != B_OK)
-				{
-					delete fIcon;
-					fIcon = NULL;
-				}
-			}
-			else
-				fIcon = NULL;
-		}
-	}
-	else {
-		fIcon = NULL;
-		fShadowIcon = NULL;
-	}*/
 }
 
 /*
@@ -304,28 +258,30 @@ AppListItem::DrawItem(BView *owner, BRect item_rect, bool complete)
 	bool showRemoveLabel = modifier & kExcludeAppModifier;//modifier == B_LEFT_CONTROL_KEY || modifier == B_RIGHT_CONTROL_KEY;
 
 	//background
-	if(IsSelected()) {
-		if(owner->IsFocus())
-			backgroundColor = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
-		else
-			backgroundColor = ui_color(B_LIST_BACKGROUND_COLOR);
-	}
-	else {
+	bool isSelected = IsSelected();
+	bool listIsFocus;
+	AppsListView* listView = dynamic_cast<AppsListView*>(owner);
+	if(listView)
+		listIsFocus = listView->GetIsShowing();
+	else
+		listIsFocus = owner->IsFocus();
+	if(isSelected && listIsFocus)
+		backgroundColor = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
+	else
 		backgroundColor = ui_color(B_LIST_BACKGROUND_COLOR);
-	}
 	owner->SetHighColor(backgroundColor);
 	owner->SetLowColor(backgroundColor);
 	owner->FillRect(item_rect);
 
 	// Non-focused selected item- draw border around item
-	if(IsSelected() && !owner->IsFocus()) {
+	if(isSelected && !listIsFocus) {
 		owner->SetHighColor(ui_color(B_LIST_SELECTED_BACKGROUND_COLOR));
 		owner->StrokeRect(item_rect);
 		owner->SetHighColor(backgroundColor);
 	}
 	
 	//icon
-/*	if (IsSelected() && fShadowIcon) {
+/*	if (isSelected && fShadowIcon) {
 		float offsetMarginHeight = floor( (listItemHeight - fShadowIcon->Bounds().Height())/2);
 		float offsetMarginWidth = floor( (fIconSize - fShadowIcon->Bounds().Width())/2 ) + kIconMargin;
 		owner->SetDrawingMode(B_OP_OVER);
@@ -335,8 +291,6 @@ AppListItem::DrawItem(BView *owner, BRect item_rect, bool complete)
 //		offset_width += fIconSize + 2*kIconMargin;
 	}*/
 	if (fIcon) {
-//		float offsetMarginHeight = floor( (listItemHeight - fIcon->Bounds().Height())/2);
-//		float offsetMarginWidth = floor( (fIconSize - fIcon->Bounds().Width())/2 ) + kIconMargin;
 		float offsetMarginHeight = floor( (listItemHeight - fIconSize)/2);
 		float offsetMarginWidth = kIconMargin;
 		owner->SetDrawingMode(B_OP_OVER);
@@ -356,7 +310,7 @@ AppListItem::DrawItem(BView *owner, BRect item_rect, bool complete)
 		offset_height += floor( (listItemHeight - fTextOnlyHeight)/2 );
 			// center the text vertically
 	BPoint cursor(item_rect.left + offset_width, item_rect.top + offset_height + kTextMargin);
-	if(IsSelected())
+	if(isSelected)
 		owner->SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
 	else
 		owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));

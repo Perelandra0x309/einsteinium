@@ -1,7 +1,8 @@
 /* DocListItem.cpp
- * Copyright 2013 Brian Hill
+ * Copyright 2013-2017 Brian Hill
  * All rights reserved. Distributed under the terms of the BSD License.
  */
+#include "AppsListView.h"
 #include "DocListItem.h"
 
 
@@ -65,11 +66,6 @@ DocListItem::ProcessMessage(BMessage* msg)
 			status_t rc = _OpenDoc();
 			break;
 		}
-	/*	case EL_STOP_SERVICE:
-		{
-			status_t rc = _StopService();
-			break;
-		}*/
 	}
 }
 
@@ -88,15 +84,6 @@ DocListItem::SetIconSize(int value)
 	fIconSize = value;
 	_GetIcon();
 }
-
-/*
-void
-DocListItem::SetIconSize(int minIconSize, int maxIconSize, int totalCount, int index)
-{
-	int iconSize = int( maxIconSize - (index*(maxIconSize-minIconSize)/(totalCount-1)) );
-	SetIconSize(iconSize);
-}*/
-
 
 
 const char*
@@ -255,36 +242,27 @@ DocListItem::DrawItem(BView *owner, BRect item_rect, bool complete)
 	rgb_color backgroundColor;
 
 	//background
-	if(IsSelected()) {
-		if(owner->IsFocus())
-			backgroundColor = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
-		else
-			backgroundColor = ui_color(B_LIST_BACKGROUND_COLOR);
-	}
-	else {
+	bool isSelected = IsSelected();
+	bool listIsFocus;
+	AppsListView* listView = dynamic_cast<AppsListView*>(owner);
+	if(listView)
+		listIsFocus = listView->GetIsShowing();
+	else
+		listIsFocus = owner->IsFocus();
+	if(isSelected && listIsFocus)
+		backgroundColor = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
+	else
 		backgroundColor = ui_color(B_LIST_BACKGROUND_COLOR);
-	}
 	owner->SetHighColor(backgroundColor);
 	owner->SetLowColor(backgroundColor);
 	owner->FillRect(item_rect);
 	
 	// Non-focused selected item- draw border around item
-	if(IsSelected() && !owner->IsFocus()) {
+	if(isSelected && !listIsFocus) {
 		owner->SetHighColor(ui_color(B_LIST_SELECTED_BACKGROUND_COLOR));
 		owner->StrokeRect(item_rect);
 		owner->SetHighColor(backgroundColor);
 	}
-
-	//icon
-/*	if (IsSelected() && fShadowIcon) {
-		float offsetMarginHeight = floor( (listItemHeight - fShadowIcon->Bounds().Height())/2);
-		float offsetMarginWidth = floor( (fIconSize - fShadowIcon->Bounds().Width())/2 ) + kIconMargin;
-		owner->SetDrawingMode(B_OP_OVER);
-		owner->DrawBitmap(fShadowIcon, BPoint(item_rect.left + offsetMarginWidth,
-							item_rect.top + offsetMarginHeight));
-		owner->SetDrawingMode(B_OP_COPY);
-//		offset_width += fIconSize + 2*kIconMargin;
-	}*/
 
 	if (fIcon) {
 		float offsetMarginHeight = floor( (listItemHeight - fIconSize)/2);
@@ -294,7 +272,6 @@ DocListItem::DrawItem(BView *owner, BRect item_rect, bool complete)
 		owner->SetDrawingMode(B_OP_ALPHA);
 		if(fIcon->Bounds().IntegerWidth()+1 != fIconSize)
 		{
-//			printf("Bounds width=%i, iconSize=%i\n", fIcon->Bounds().IntegerWidth()+1,fIconSize);
 			BRect destRect(item_rect.left + offsetMarginWidth,
 							item_rect.top + offsetMarginHeight,
 							item_rect.left + offsetMarginWidth + fIconSize,
@@ -320,7 +297,7 @@ DocListItem::DrawItem(BView *owner, BRect item_rect, bool complete)
 		offset_height += floor( (listItemHeight - fTextOnlyHeight)/2 );
 			// center the text vertically
 	BPoint cursor(item_rect.left + offset_width, item_rect.top + offset_height + kTextMargin);
-	if(IsSelected())
+	if(isSelected)
 		owner->SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
 	else
 		owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
