@@ -1,3 +1,9 @@
+Version 1.4.1 (September 16 2017 for Haiku Nightly Image)
+Bug fixes:
+-Fix drawing issue in the Launcher when a selected item is under a shown menu
+-Fix issue with icon drawing in Launcher settings
+
+
 Version 1.4.0 (August 19 2017 for Haiku Nightly Image)
 Builds under x86_64 (dependancies now available)
 Enable the deskbar shelf view instantiation so it will be preserved over a reboot
