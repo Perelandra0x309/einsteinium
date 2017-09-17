@@ -372,7 +372,7 @@ ExcludeItem::DrawItem(BView* owner, BRect item_rect, bool complete)
 		owner->FillRect(item_rect);
 	}
 	
-	if (fIcon->IsValid()) {
+	if (fIcon != NULL && fIcon->IsValid()) {
 		float offsetMarginHeight = floor( (Height() - fIconSize)/2);
 		owner->SetDrawingMode(B_OP_OVER);
 		owner->DrawBitmap(fIcon, BPoint(item_rect.left + kIconMargin,
