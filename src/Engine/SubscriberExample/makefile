@@ -2,7 +2,7 @@ NAME := subscriber_example
 TYPE := APP
 SRCS := ../EngineSubscriber.cpp \
 	SubscriberExample.cpp
-LIBS := be tracker stdc++.r4
+LIBS = be tracker $(STDCPPLIBS)
 OPTIMIZE := FULL
 RSRCS := subscriber_example.rsrc
 
