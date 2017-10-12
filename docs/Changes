@@ -1,3 +1,6 @@
+Version 1.4.1a (October 12 2017 for Haiku Nightly Image)
+-Fix make file for Engine Subscriber Example
+
 Version 1.4.1 (September 16 2017 for Haiku Nightly Image)
 Bug fixes:
 -Fix drawing issue in the Launcher when a selected item is under a shown menu
